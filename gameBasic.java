@@ -2,7 +2,7 @@ import java.util.Random;
 
 public class gameBasic {
 
-    public static standardStats spin() {
+    public static spinResult spin() {
 
         Random random = new Random();
 
@@ -29,7 +29,7 @@ public class gameBasic {
             bigWins++;
         }
         
-        return new standardStats(win);
+        return new spinResult(win);
 
         }
 

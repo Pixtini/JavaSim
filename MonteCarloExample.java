@@ -10,7 +10,7 @@ public class MonteCarloExample {
 
         for (long i = 0; i < spins; i++) {
 
-            standardStats result = gameBasic.spin();
+            spinResult result = gameBasic.spin();
 
             totalWinnings += result.win;
         }
