@@ -4,25 +4,32 @@ public class MonteCarloExample {
 
     public static void main(String[] args) {
 
-        long spins = 10_000_000;
-        double stake = 1.0;
-        double totalWinnings = 0.0;
+        long spinCount = 10_000_000;
 
-        for (long i = 0; i < spins; i++) {
+        standardStats stat = new standardStats(spinCount, 1.0, 0.0);
+
+        for (long i = 0; i < spinCount; i++) {
 
             spinResult result = gameBasic.spin();
 
-            totalWinnings += result.win;
+            stat.addWin(result.win);
         }
 
-        double totalStaked = spins * stake;
-        double rtp = totalWinnings / totalStaked;
 
-        System.out.println("Spins: " + spins);
-        System.out.println("Total staked: £" + totalStaked);
-        System.out.println("Total winnings: £" + totalWinnings);
+        stat.calculateStats();
+        stat.printStats();
 
-        System.out.println();
-        System.out.printf("Simulated RTP: %.4f%%%n", rtp * 100);
+
+        ///
+        ///double totalStaked = spins * stake;
+        ///double rtp = totalWinnings / totalStaked;
+
+        ///System.out.println("Spins: " + spins);
+        ///System.out.println("Total staked: £" + totalStaked);
+        ///System.out.println("Total winnings: £" + totalWinnings);
+
+        ///System.out.println();
+        ///System.out.printf("Simulated RTP: %.4f%%%n", rtp * 100);
+        
     }
 }

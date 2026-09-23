@@ -29,7 +29,7 @@ public class gameBasic {
             bigWins++;
         }
         
-        return new spinResult(win);
+        return new spinResult(win, smallWins, mediumWins, bigWins);
 
         }
 
