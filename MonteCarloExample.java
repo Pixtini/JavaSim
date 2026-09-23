@@ -10,9 +10,9 @@ public class MonteCarloExample {
 
         for (long i = 0; i < spins; i++) {
 
-            double win = gameBasic.spin();
+            standardStats result = gameBasic.spin();
 
-            totalWinnings += win;
+            totalWinnings += result.win;
         }
 
         double totalStaked = spins * stake;
