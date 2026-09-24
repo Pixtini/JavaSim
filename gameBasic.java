@@ -16,14 +16,14 @@ public class gameBasic {
         double roll = random.nextDouble();
         double win;
 
-        if (roll < gameConfig.smallWinChance) {
+        if (roll < gameConfig.winChanceThresholds[0]) {
             win = 0.0;
 
-        } else if (roll < gameConfig.mediumWinChance) {
+        } else if (roll < gameConfig.winChanceThresholds[1]) {
             win = gameConfig.smallWin;
             smallWins++;
-
-        } else if (roll < gameConfig.bigWinChance) {
+ 
+        } else if (roll < gameConfig.winChanceThresholds[2]) {
             win = gameConfig.mediumWin;
             mediumWins++;
  
