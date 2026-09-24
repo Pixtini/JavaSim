@@ -16,6 +16,15 @@ public class MonteCarloExample {
 
             stat.addWin(result.win);
             stat.addPaytable(result.winSize);
+
+            if (result.freeSpinFlag){
+                gameBasicFree freeGame = new gameBasicFree();
+
+                spinResult resultFree = freeGame.spin();
+
+                stat.addWin(resultFree.win);
+                stat.addPaytable(resultFree.winSize);
+            }
         }
 
         stat.calculateStats();

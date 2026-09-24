@@ -32,7 +32,7 @@ public class gameBasic {
             winSize  = winSize + 3;
         }
         
-        return new spinResult(win, winSize);
+        return new spinResult(win, winSize, false);
 
         }
 

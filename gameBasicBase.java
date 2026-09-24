@@ -10,6 +10,10 @@ public class gameBasicBase extends gameBasic {
         int firstDigit = (int) (roll * 10);
         boolean isOdd = firstDigit % 2 == 1;
 
+        if (isOdd){
+            result.freeSpinFlag = true;
+        }
+        
         // Use isOdd here
         return result;
     }
