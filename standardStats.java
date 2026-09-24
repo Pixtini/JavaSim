@@ -5,15 +5,21 @@ public class standardStats {
     double totalStaked;
     long spins;
     double stake;
+    int[] paytable;
 
-    public standardStats(long spins, double stake, double totalWinnings ) {
+    public standardStats(long spins, double stake, double totalWinnings, int[] paytable ) {
         this.spins = spins;
         this.stake = stake;
         this.totalWinnings = totalWinnings;
+        this.paytable = paytable;
     }
 
     public void addWin(double win) {
         this.totalWinnings = totalWinnings + win;
+    }
+
+    public void addPaytable(int winSizeCount) {
+        this.paytable[winSizeCount]++; 
     }
 
     public void calculateStats() {
@@ -29,6 +35,11 @@ public class standardStats {
 
         System.out.println();
         System.out.printf("Simulated RTP: %.4f%%%n", rtp * 100);
+
+        System.out.println();
+
+
+        System.out.println("Awards: " + java.util.Arrays.toString(paytable));
     }
         
     }

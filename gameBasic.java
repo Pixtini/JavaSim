@@ -9,9 +9,7 @@ public class gameBasic {
 
         GameConfig gameConfig = new GameConfig();
 
-        int smallWins = 0;
-        int mediumWins = 0;
-        int bigWins = 0;
+        int winSize = 0;
 
         double roll = random.nextDouble();
         double win;
@@ -20,19 +18,19 @@ public class gameBasic {
             win = 0.0;
 
         } else if (roll < gameConfig.winChanceThresholds[1]) {
-            win = gameConfig.smallWin;
-            smallWins++;
+            win = gameConfig.winSize[0];
+            winSize  = winSize + 1;
  
         } else if (roll < gameConfig.winChanceThresholds[2]) {
-            win = gameConfig.mediumWin;
-            mediumWins++;
+            win = gameConfig.winSize[1];
+            winSize  = winSize + 2;
  
         } else {
-            win = gameConfig.bigWin;
-            bigWins++;
+            win = gameConfig.winSize[2];
+            winSize  = winSize + 3;
         }
         
-        return new spinResult(win, smallWins, mediumWins, bigWins);
+        return new spinResult(win, winSize);
 
         }
 
