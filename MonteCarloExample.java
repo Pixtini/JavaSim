@@ -10,7 +10,9 @@ public class MonteCarloExample {
 
         for (long i = 0; i < simConfig.spins; i++) {
 
-            spinResult result = gameBasic.spin();
+            gameBasicBase baseGame = new gameBasicBase();
+
+            spinResult result = baseGame.spin();
 
             stat.addWin(result.win);
             stat.addPaytable(result.winSize);

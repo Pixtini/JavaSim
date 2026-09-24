@@ -3,7 +3,9 @@ import config.GameConfig;
 
 public class gameBasic {
 
-    public static spinResult spin() {
+    protected double roll;
+
+    public spinResult spin() {
 
         Random random = new Random();
 
@@ -11,9 +13,9 @@ public class gameBasic {
 
         int winSize = 0;
 
-        double roll = random.nextDouble();
+        this.roll = random.nextDouble();
         double win;
-
+ 
         if (roll < gameConfig.winChanceThresholds[0]) {
             win = 0.0;
 
