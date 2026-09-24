@@ -6,7 +6,9 @@ public class MonteCarloExample {
 
         SimConfig simConfig = new SimConfig();
 
-        standardStats stat = new standardStats(simConfig.spins, simConfig.stake, 0.0, new int[]{0,0,0,0});
+        standardStats statB = new standardStats(0, simConfig.stake, 0.0, new int[]{0,0,0,0});
+        standardStats statF = new standardStats(0, simConfig.stake, 0.0, new int[]{0,0,0,0});
+
 
         for (long i = 0; i < simConfig.spins; i++) {
 
@@ -14,21 +16,36 @@ public class MonteCarloExample {
 
             spinResult result = baseGame.spin();
 
-            stat.addWin(result.win);
-            stat.addPaytable(result.winSize);
+            statB.addWin(result.win);
+            statB.addPaytable(result.winSize);
 
             if (result.freeSpinFlag){
                 gameBasicFree freeGame = new gameBasicFree();
 
                 spinResult resultFree = freeGame.spin();
 
-                stat.addWin(resultFree.win);
-                stat.addPaytable(resultFree.winSize);
+                statF.addWin(resultFree.win);
+                statF.addPaytable(resultFree.winSize);
             }
         }
 
-        stat.calculateStats();
-        stat.printStats();
+        System.out.println("TotalGame");
+        System.out.println("--------");
+
+        statB.printSimulationStats( statB.totalWinnings, statF.totalWinnings);
+
+        System.out.println("");
+        System.out.println("Basegame");
+        System.out.println("--------");
         
+        statB.calculateStats();
+        statB.printStats();
+        
+        System.out.println("");
+        System.out.println("Freegame");
+        System.out.println("--------");
+        
+        statF.calculateStats();
+        statF.printStats();
     }
 }
