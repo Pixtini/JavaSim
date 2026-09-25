@@ -6,4 +6,6 @@ public class GameConfig {
     // Cumulative roll thresholds: 90% no win, then 5% small, 4% medium, 1% big.
     public double[] winChanceThresholds = {0.90, 0.95, 0.99};
 
+    public int freeSpinAmount = 5;
+
 }

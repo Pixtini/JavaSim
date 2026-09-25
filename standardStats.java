@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class standardStats {
 
     double totalWinnings;
@@ -6,6 +9,8 @@ public class standardStats {
     long spins;
     double stake;
     int[] paytable;
+    Map<Double, Integer> winDist = new HashMap<>();
+    
 
     public standardStats(long spins, double stake, double totalWinnings, int[] paytable ) {
         this.spins = spins;
@@ -28,5 +33,16 @@ public class standardStats {
         this.rtp = totalWinnings / totalStaked;
 
     } 
+
+    public void winDist(double win) {
+        if (winDist.containsKey(win)){
+            winDist.computeIfPresent(win, (key, value) -> value + 1);
+        }
+        else{
+            winDist.put(win, 1);
+        }
+
+    } 
+
 
 }
