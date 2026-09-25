@@ -7,25 +7,35 @@ public class print {
         this.statF = statF;
     }
 
-    public static void printToConsole(standardStats statB, standardStats statF) {
+    public void printSimulationStats(long spins, double stake) {
+        double totalWinnings = statB.totalWinnings + statF.totalWinnings;
 
+        System.out.println("Spins: " + spins);
+        System.out.println("Total staked: £" + (spins * stake));
+        System.out.println("Total winnings: £" + totalWinnings);
+    }
+
+    public void printStats(standardStats stats) {
+        stats.calculateStats();
+
+        System.out.println("Spins: " + stats.spins);
+        System.out.println("Total winnings: £" + stats.totalWinnings);
+        System.out.printf("Simulated RTP: %.4f%%%n", stats.rtp * 100);
+        System.out.println("Awards: "
+                + java.util.Arrays.toString(stats.paytable));
+    }
+
+    public void printToConsole(long spins, double stake) {
         System.out.println("TotalGame");
         System.out.println("--------");
+        printSimulationStats(spins, stake);
 
-        statB.printSimulationStats( statB.totalWinnings, statF.totalWinnings);
+        System.out.println("\nBasegame");
+        System.out.println("--------");
+        printStats(statB);
 
-        System.out.println("");
-        System.out.println("Basegame");
+        System.out.println("\nFreegame");
         System.out.println("--------");
-        
-        statB.calculateStats();
-        statB.printStats();
-        
-        System.out.println("");
-        System.out.println("Freegame");
-        System.out.println("--------");
-        
-        statF.calculateStats();
-        statF.printStats();
+        printStats(statF);
     }
 }

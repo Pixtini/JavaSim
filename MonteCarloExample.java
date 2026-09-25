@@ -30,7 +30,7 @@ public class MonteCarloExample {
         }
         
         print printer = new print(statB, statF);
-        printer.printToConsole(statB, statF);
+        printer.printToConsole(simConfig.spins, simConfig.stake);
 
 
     }
