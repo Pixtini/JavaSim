@@ -28,24 +28,10 @@ public class MonteCarloExample {
                 statF.addPaytable(resultFree.winSize);
             }
         }
-
-        System.out.println("TotalGame");
-        System.out.println("--------");
-
-        statB.printSimulationStats( statB.totalWinnings, statF.totalWinnings);
-
-        System.out.println("");
-        System.out.println("Basegame");
-        System.out.println("--------");
         
-        statB.calculateStats();
-        statB.printStats();
-        
-        System.out.println("");
-        System.out.println("Freegame");
-        System.out.println("--------");
-        
-        statF.calculateStats();
-        statF.printStats();
+        print printer = new print(statB, statF);
+        printer.printToConsole(statB, statF);
+
+
     }
 }

@@ -50,6 +50,7 @@ public class standardStats {
         System.out.println();
         System.out.println("Awards: " + java.util.Arrays.toString(paytable));
     }
+
         
     }
 
