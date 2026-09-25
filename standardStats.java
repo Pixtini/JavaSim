@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import config.SimConfig;
 
 public class standardStats {
 
@@ -8,6 +9,7 @@ public class standardStats {
     double totalStaked;
     long spins;
     double stake;
+    double freespins;
     int[] paytable;
     Map<Double, Integer> winDist = new HashMap<>();
     
@@ -17,6 +19,7 @@ public class standardStats {
         this.stake = stake;
         this.totalWinnings = totalWinnings;
         this.paytable = paytable;
+        this.freespins = 0.0;
     }
 
     public void addWin(double win) {
@@ -28,7 +31,8 @@ public class standardStats {
     }
 
     public void calculateStats() {
-        this.spins = java.util.Arrays.stream(paytable).sum();
+        SimConfig simConfig = new SimConfig();
+        this.spins = simConfig.spins;
         this.totalStaked = spins * stake;
         this.rtp = totalWinnings / totalStaked;
 

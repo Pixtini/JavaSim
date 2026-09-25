@@ -26,6 +26,7 @@ public class MonteCarloExample {
             totalResult.win = result.win;
 
             if (result.freeSpinFlag){
+                statF.freespins = statF.freespins + gameConfig.freeSpinAmount;
                 for (int j = 0; j < gameConfig.freeSpinAmount; j++){
                     gameBasicFree freeGame = new gameBasicFree();
                     spinResult resultFree = freeGame.spin();

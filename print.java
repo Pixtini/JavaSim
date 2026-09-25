@@ -1,5 +1,6 @@
 import java.util.Map;
 import java.util.TreeMap;
+import config.GameConfig;
 
 public class print {
     private final standardStats statB;
@@ -18,12 +19,21 @@ public class print {
         System.out.println("Spins: " + spins);
         System.out.println("Total staked: £" + (spins * stake));
         System.out.println("Total winnings: £" + totalWinnings);
+        System.out.printf("Simulated RTP: %.4f%%%n", (totalWinnings / (spins * stake)) * 100);
     }
 
-    public void printStats(standardStats stats) {
+    public void printStats(standardStats stats, boolean isFreeGame) {
         stats.calculateStats();
+        System.out.println("--------");
 
-        System.out.println("Spins: " + stats.spins);
+        GameConfig gameConfig = new GameConfig();
+        
+        if (isFreeGame) {
+            System.out.println("Spins: " + (stats.freespins));
+
+        } else {
+        System.out.println("Spins: " + stats.spins); 
+        }
         System.out.println("Total winnings: £" + stats.totalWinnings);
         System.out.printf("Simulated RTP: %.4f%%%n", stats.rtp * 100);
         System.out.println("Awards: "
@@ -31,7 +41,8 @@ public class print {
     }
 
     public void printWinDist(Map<Double, Integer> winDist) {
-        System.out.println("Win distribution:");
+        System.out.println("\nWin Dist");
+        System.out.println("--------");
         new TreeMap<>(winDist).forEach((win, count) ->
                 System.out.println(win + " -> " + count));
     }
@@ -42,15 +53,11 @@ public class print {
         printSimulationStats(spins, stake);
 
         System.out.println("\nBasegame");
-        System.out.println("--------");
-        printStats(statB);
+        printStats(statB, false);
 
         System.out.println("\nFreegame");
-        System.out.println("--------");
-        printStats(statF);
+        printStats(statF, true);
 
-        System.out.println("\nWin Dist");
-        System.out.println("--------");
         printWinDist(statT.winDist);
     }
 }
