@@ -25,8 +25,6 @@ public class standardStats {
         this.totalWinnings += result.getWin();
         this.paytable[result.getWinSize()]++;
         this.rounds++;
-        winDist(result.getWin());
-
     }
 
     public void calculateStats() {
@@ -101,9 +99,8 @@ public class standardStats {
         return Math.sqrt(weightedSquaredDifferences / totalCount);
     }
 
-    public void winDist(double win) {
+    public void recordWinInDistribution(double win) {
         winDist.merge(win, 1L, Long::sum);
-
     } 
 
 

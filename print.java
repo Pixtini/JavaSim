@@ -38,8 +38,8 @@ public class print {
         System.out.println("Hits: " + stats.getHits());
     }
 
-    public void printWinDist(Map<Double, Long> winDist) {
-        System.out.println("\nWin Dist");
+    public void printWinDist(String title, Map<Double, Long> winDist) {
+        System.out.println("\n" + title);
         System.out.println("--------");
         new TreeMap<>(winDist).forEach((win, count) ->
                 System.out.println(win + " -> " + count));
@@ -55,6 +55,8 @@ public class print {
         printStats(statB, "Basegame");
         printStats(statF, "Freegame");
 
-        printWinDist(statT.getWinDist());
+        printWinDist("Basegame Win Dist", statB.getWinDist());
+        printWinDist("Freegame Win Dist", statF.getWinDist());
+        printWinDist("Total Game Win Dist", statT.getWinDist());
     }
 }

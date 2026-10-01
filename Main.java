@@ -19,12 +19,14 @@ public class Main {
             spinResult result = baseGame.spin();
 
             statB.addResult(result);
+            statB.recordWinInDistribution(result.getWin());
 
             double totalWin = result.getWin();
 
             if (result.hasFreeSpin()){
                 
                 statF.recordFreegameTrigger();
+                double freeGameWin = 0.0;
 
                 for (int j = 0; j < gameConfig.freeSpinAmount; j++){
                     
@@ -32,11 +34,14 @@ public class Main {
                     spinResult resultFree = freeGame.spin();
                     
                     statF.addResult(resultFree);
+                    freeGameWin += resultFree.getWin();
                     totalWin += resultFree.getWin();
                 }
+
+                statF.recordWinInDistribution(freeGameWin);
             }
             
-            statT.winDist(totalWin);
+            statT.recordWinInDistribution(totalWin);
         }
         
         print printer = new print(statB, statF, statT);
