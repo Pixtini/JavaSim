@@ -1,6 +1,6 @@
 package game;
 
-import model.GameRoundResult;
+import game.model.GameRoundResult;
 
 /** Executes one complete basegame round, including any triggered freegame spins. */
 public interface GameSession {

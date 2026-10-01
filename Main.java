@@ -1,9 +1,9 @@
-import engine.SimulationRunner;
-import config.GameConfig;
-import config.SimConfig;
+import game.config.GameConfig;
 import game.proxy.BasicProxyGame;
-import reporting.Print;
-import result.SimulationResult;
+import simulation.config.SimConfig;
+import simulation.engine.SimulationRunner;
+import simulation.reporting.Print;
+import simulation.result.SimulationResult;
 
 public class Main {
 

@@ -1,12 +1,12 @@
-package engine;
+package simulation.engine;
 
-import config.SimConfig;
+import game.model.GameRoundResult;
+import game.model.SpinResult;
 import game.Game;
 import game.GameSession;
-import model.GameRoundResult;
-import model.SpinResult;
-import result.SimulationResult;
-import stats.StandardStats;
+import simulation.config.SimConfig;
+import simulation.result.SimulationResult;
+import simulation.stats.StandardStats;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

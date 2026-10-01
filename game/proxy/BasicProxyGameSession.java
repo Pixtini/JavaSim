@@ -1,11 +1,11 @@
 package game.proxy;
 
-import config.GameConfig;
+import game.config.GameConfig;
 import game.GameSession;
 import java.util.ArrayList;
 import java.util.Random;
-import model.GameRoundResult;
-import model.SpinResult;
+import game.model.GameRoundResult;
+import game.model.SpinResult;
 
 /** Runs one base spin and, when triggered, the proxy game's free spins. */
 final class BasicProxyGameSession implements GameSession {

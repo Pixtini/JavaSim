@@ -4,23 +4,25 @@
 
 The project is a small Java Monte Carlo game simulation. `Main` wires configuration and a game implementation into `SimulationRunner`, then passes the merged basegame, freegame, and total-game statistics to the reporting class.
 
-The source is grouped by responsibility in Java packages. `Main.java` stays in the default package at the repository root as the launch point; it wires configuration, a game implementation, the simulation engine, and reporting together. The engine depends on a small game contract, so game rules stay outside simulation orchestration.
+The source is grouped into separate game and simulation layers. `Main.java` stays in the default package at the repository root as the launch point; it wires game configuration and an implementation into the simulation layer. The simulation engine depends on the game contract, while game rules stay inside game implementations.
 
 ## Source layout
 
-- `config/`: game and simulation configuration.
-- `engine/`: simulation orchestration, worker threads, seeded partitions, and aggregation.
-- `game/`: game contracts (`Game`, `GameSession`). Implementations live in subpackages.
+- `game/`: game contracts (`Game`, `GameSession`), game-specific configuration and result types, and implementations.
+- `game/config/`: settings used by the current game implementation.
+- `game/model/`: spin and base-round results passed from game sessions to the simulation layer.
 - `game/proxy/`: current probability-based example game. A heavier slot game can implement the same contract in its own package.
-- `model/`: spin and base-round results passed from game sessions to the engine.
-- `result/`: completed simulation output returned by the engine.
-- `stats/`: incremental statistics and win-distribution calculations.
-- `reporting/`: console formatting and report file creation.
+- `simulation/`: generic Monte Carlo execution and output.
+- `simulation/config/`: simulation-wide settings.
+- `simulation/engine/`: orchestration, worker threads, seeded partitions, and aggregation.
+- `simulation/result/`: completed simulation output returned by the engine.
+- `simulation/stats/`: incremental statistics and win-distribution calculations.
+- `simulation/reporting/`: console formatting and report file creation.
 - `Main.java`: root-level application entry point.
 
 ## Configuration
 
-### `config.GameConfig`
+### `game.config.GameConfig`
 
 Holds game-specific values used by the example game:
 
@@ -28,13 +30,13 @@ Holds game-specific values used by the example game:
 - The paytable buckets used by `StandardStats`.
 - The number of free spins awarded by a freegame trigger.
 
-### `config.SimConfig`
+### `simulation.config.SimConfig`
 
 Holds simulation-wide values:
 
 - `rounds`: number of basegame rounds to simulate.
 - `stake`: stake per basegame round.
-- `seed`: stored seed used when `usePreviousSeed` is enabled; `SimulationRunner` replaces it with a randomly generated seed otherwise.
+- `seed`: stored seed used when `usePreviousSeed` is enabled; `simulation.engine.SimulationRunner` replaces it with a randomly generated seed otherwise.
 - `usePreviousSeed`: selects between replaying the configured seed and generating a new seed for this run.
 - `exportReport`: selects console-only detailed output or file-based detailed reporting.
 - `threads`: maximum worker threads used to process partitions.
@@ -42,7 +44,7 @@ Holds simulation-wide values:
 
 ## Simulation flow
 
-`SimulationRunner` resolves the run's effective seed from `SimConfig.usePreviousSeed`. It divides the configured rounds into a fixed number of logical partitions and derives one seed from the run seed and each partition ID. Each task owns its `Random`, `GameSession`, and three statistics collectors. The game implementation creates sessions from the supplied random stream, keeping random sequences deterministic per partition. Tasks do not update shared statistics.
+`simulation.engine.SimulationRunner` resolves the run's effective seed from `SimConfig.usePreviousSeed`. It divides the configured rounds into a fixed number of logical partitions and derives one seed from the run seed and each partition ID. Each task owns its `Random`, `GameSession`, and three statistics collectors. The game implementation creates sessions from the supplied random stream, keeping random sequences deterministic per partition. Tasks do not update shared statistics.
 
 After all tasks finish, the runner merges each partition's statistics in partition-ID order. Fixed partitions and ordered merging keep results reproducible when the same seed, settings, and partition count are used, even if the worker-thread count changes. The effective seed and logical partition count are printed at the end of the console output and `simulation_stats.txt`.
 
@@ -55,7 +57,7 @@ After all tasks finish, the runner merges each partition's statistics in partiti
 
 This means the three win distributions have different observation units: basegame entries are base rounds, freegame entries are triggered freegames, and total-game entries are base rounds. A round without a freegame has no freegame distribution entry.
 
-### `engine.SimulationRunner` and `result.SimulationResult`
+### `simulation.engine.SimulationRunner` and `simulation.result.SimulationResult`
 
 `SimulationRunner` validates the worker settings, resolves the seed, submits fixed partitions to an executor, and merges partition-local statistics in partition order. `SimulationResult` carries the three merged statistics collectors back to `Main` for reporting.
 
@@ -73,13 +75,13 @@ Implements `Game` using the simple probability-based proxy rules. Its session ow
 
 These classes implement the proxy's individual spin logic. They are an example game implementation, not dependencies of the simulation engine.
 
-### `model.SpinResult` and `model.GameRoundResult`
+### `game.model.SpinResult` and `game.model.GameRoundResult`
 
 Immutable results for an individual spin and a complete basegame round. A round result contains one basegame spin and the list of freegame spins it triggered.
 
 ## Statistics
 
-### `stats.StandardStats`
+### `simulation.stats.StandardStats`
 
 Accumulates spin counts, total winnings, paytable awards, freegame trigger counts, and a win distribution. It receives the stake and paytable when constructed rather than creating configuration objects itself.
 
@@ -100,7 +102,7 @@ The percentage of hits and frequency use each distribution's own observation cou
 
 ## Reporting
 
-### `reporting.Print`
+### `simulation.reporting.Print`
 
 Formats the regular summary and detailed distributions. It receives the same `SimConfig` instance used by `Main`, so the report uses the simulation's rounds, stake, output mode, and timing from `SimulationResult`.
 
@@ -130,8 +132,8 @@ javac *.java
 java Main
 ```
 
-`javac *.java` compiles `Main.java` and discovers its package source dependencies. To compile every source explicitly, including tests, use `javac $(find . -name '*.java')`.
+`javac *.java` compiles `Main.java` and discovers the source dependencies in both layers. To compile every source explicitly, including tests, use `javac $(find . -name '*.java')`.
 
 ## Current scope
 
-The code is an example simulation framework rather than a general-purpose engine. `engine.SimulationRunner` handles orchestration and parallel execution through the `game.Game` / `game.GameSession` contract. The current `game.proxy` implementation is a simple probability proxy; a heavier slot engine can implement the contract and own its basegame and randomly triggered freegame rules. See [nextsteps.md](../nextsteps.md) for the proposed order of improvements.
+The code is an example simulation framework rather than a general-purpose engine. `simulation.engine.SimulationRunner` handles orchestration and parallel execution through the `game.Game` / `game.GameSession` contract. The current `game.proxy` implementation is a simple probability proxy; a heavier slot engine can implement the contract and own its basegame and randomly triggered freegame rules. See [nextsteps.md](../nextsteps.md) for the proposed order of improvements.

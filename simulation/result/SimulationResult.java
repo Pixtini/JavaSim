@@ -1,6 +1,6 @@
-package result;
+package simulation.result;
 
-import stats.StandardStats;
+import simulation.stats.StandardStats;
 
 public final class SimulationResult {
 

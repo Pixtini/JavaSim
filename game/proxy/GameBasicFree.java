@@ -1,7 +1,7 @@
 package game.proxy;
 
 import java.util.Random;
-import config.GameConfig;
+import game.config.GameConfig;
 
 public class GameBasicFree extends GameBasic {
 

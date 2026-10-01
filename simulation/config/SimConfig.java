@@ -1,4 +1,4 @@
-package config;
+package simulation.config;
 
 public class SimConfig {
 

@@ -1,4 +1,4 @@
-package reporting;
+package simulation.reporting;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import config.SimConfig;
-import result.SimulationResult;
-import stats.StandardStats;
+import simulation.config.SimConfig;
+import simulation.result.SimulationResult;
+import simulation.stats.StandardStats;
 
 public class Print {
     private static final DateTimeFormatter REPORT_FOLDER_TIME =

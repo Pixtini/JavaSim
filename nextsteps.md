@@ -2,7 +2,7 @@
 
 ## 1. Include complete run configuration in reports
 
-The report records rounds, stake, seed, partitions, and elapsed time, but not all game settings or worker count. Include the selected game's configuration and worker count so a report captures the inputs needed to reproduce and interpret a run. The game contract is now in place; keep game-specific settings with each game's implementation.
+The report records rounds, stake, seed, partitions, and elapsed time, but not all `game.config.GameConfig` values or worker count. Include those settings so a report captures the inputs needed to reproduce and interpret a run. Keep game-specific settings with each game's implementation and simulation-wide settings with the simulation layer.
 
 ## 2. Add a symbol-based game implementation
 

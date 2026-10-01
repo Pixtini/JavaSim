@@ -1,8 +1,8 @@
 package game.proxy;
 
 import java.util.Random;
-import config.GameConfig;
-import model.SpinResult;
+import game.config.GameConfig;
+import game.model.SpinResult;
 
 public class GameBasic {
 
