@@ -3,37 +3,40 @@ import config.GameConfig;
 
 public class gameBasic {
 
-    protected double roll;
+    protected final GameConfig gameConfig;
+    private final Random random;
+
+    public gameBasic(GameConfig gameConfig, Random random) {
+        this.gameConfig = gameConfig;
+        this.random = random;
+    }
 
     public spinResult spin() {
+        return spinForRoll(nextRoll());
+    }
 
-        Random random = new Random();
+    protected final double nextRoll() {
+        return random.nextDouble();
+    }
 
-        GameConfig gameConfig = new GameConfig();
-
-        int winSize = 0;
-
-        this.roll = random.nextDouble();
+    protected final spinResult spinForRoll(double roll) {
+        int winSize;
         double win;
- 
+
         if (roll < gameConfig.winChanceThresholds[0]) {
             win = 0.0;
-
+            winSize = 0;
         } else if (roll < gameConfig.winChanceThresholds[1]) {
             win = gameConfig.winSize[0];
-            winSize  = winSize + 1;
- 
+            winSize = 1;
         } else if (roll < gameConfig.winChanceThresholds[2]) {
             win = gameConfig.winSize[1];
-            winSize  = winSize + 2;
- 
+            winSize = 2;
         } else {
             win = gameConfig.winSize[2];
-            winSize  = winSize + 3;
+            winSize = 3;
         }
-        
+
         return new spinResult(win, winSize, false);
-
-        }
-
     }
+}

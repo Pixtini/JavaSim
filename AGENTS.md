@@ -89,3 +89,9 @@ Do not redesign existing architecture unless the task requires it.
 Do not modify unrelated files.
 
 Before implementing a significant architectural change, explain the proposed approach first.
+
+Any task is not finished until Architecture.md has been updated.
+
+Any task is not finished until nextsteps.md has been updated with a suggestion of the most effective next change within less than 100 words. 
+
+Any change that was previously listed in nextsteps.md must be cleared for clarity and adding another suggestion. 

@@ -38,16 +38,18 @@ public class print {
         output.println("Total winnings: £" + totalWinnings);
         output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", (totalWinnings / (rounds * stake)) * 100);
         output.printf(Locale.ROOT, "Standard Deviation: %.2f%n", statF.getStandardDeviation());
+        output.println();
     }
 
     private void printStats(PrintWriter output, standardStats stats, String type) {
-        output.println("\n" + type);
+        output.println(type);
         output.println("--------");
         output.println("Rounds: " + stats.getRounds());
         output.println("Total winnings: £" + stats.getTotalWinnings());
         output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", stats.getRtp() * 100);
         output.println("Awards: " + java.util.Arrays.toString(stats.getPaytable()));
         output.println("Hits: " + stats.getHits());
+        output.println();
     }
 
     private void printRegularStats(PrintWriter output, SimConfig simConfig) {
@@ -57,23 +59,9 @@ public class print {
         output.flush();
     }
 
-    private void printWinDist(PrintWriter output, String title, Map<Double, Long> winDist) {
-        output.println("\n" + title);
-        output.println("--------");
-        new TreeMap<>(winDist).forEach((win, count) ->
-                output.println(win + " -> " + count));
-    }
-
-    private void printAggregatedWinDist(PrintWriter output, String title,
-            standardStats stats, double totalStaked) {
-        output.println("\n" + title);
-        output.println("Range Min,Range Max,Hits,% Of Winnings,% Of Hits,Frequency,RTP,Total Win");
-
-        List<standardStats.WinBand> bands = stats.getAggregatedWinDistribution(totalStaked);
-        for (int i = 0; i < bands.size(); i++) {
-            standardStats.WinBand band = bands.get(i);
-            writeAggregatedWinBand(output, i, band);
-        }
+    private void printRunSettings(PrintWriter output, SimConfig simConfig) {
+        output.println("Logical partitions: " + simConfig.partitions);
+        output.println("Seed: " + simConfig.seed);
     }
 
     private void writeAggregatedWinBand(PrintWriter output, int index,
@@ -108,8 +96,9 @@ public class print {
         Files.createDirectory(reportFolder);
 
         try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
-                reportFolder.resolve("simulation_stats.txt"), StandardCharsets.UTF_8))) {
+            reportFolder.resolve("simulation_stats.txt"), StandardCharsets.UTF_8))) {
             printRegularStats(output, simConfig);
+            printRunSettings(output, simConfig);
         }
 
         try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
@@ -153,25 +142,17 @@ public class print {
 
     public void printToConsole(SimConfig simConfig) {
         PrintWriter console = new PrintWriter(System.out, true);
+        printRegularStats(console, simConfig);
+
         if (simConfig.exportReport) {
-            printRegularStats(console, simConfig);
             try {
                 Path reportFolder = createReportFiles(simConfig);
-                System.out.println("Detailed report written to: " + reportFolder);
+                console.println("Detailed report written to: " + reportFolder);
             } catch (IOException exception) {
                 throw new RuntimeException("Could not create simulation report files", exception);
             }
-            return;
         }
-
-        printRegularStats(console, simConfig);
-        double totalStaked = simConfig.rounds * simConfig.stake;
-        printWinDist(console, "Basegame Win Dist", statB.getWinDist());
-        printWinDist(console, "Freegame Win Dist", statF.getWinDist());
-        printWinDist(console, "Total Game Win Dist", statT.getWinDist());
-        printAggregatedWinDist(console, "Basegame - Win Distribution Aggregated", statB, totalStaked);
-        printAggregatedWinDist(console, "Freegame - Win Distribution Aggregated", statF, totalStaked);
-        printAggregatedWinDist(console, "Total - Win Distribution Aggregated", statT, totalStaked);
+        printRunSettings(console, simConfig);
         console.flush();
     }
 }

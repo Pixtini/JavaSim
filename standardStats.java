@@ -16,7 +16,7 @@ public class standardStats {
     private double totalStaked;
     private long rounds;
     private long hits;
-    private int freegameTriggers;
+    private long freegameTriggers;
     private int[] paytable;
     private double standardDeviation;
     private final Map<Double, Long> winDist = new HashMap<>();
@@ -49,6 +49,20 @@ public class standardStats {
         return totalWinnings;
     }
 
+    public void mergeFrom(standardStats other) {
+        if (paytable.length != other.paytable.length) {
+            throw new IllegalArgumentException("Cannot merge statistics with different paytable sizes");
+        }
+
+        totalWinnings += other.totalWinnings;
+        rounds += other.rounds;
+        freegameTriggers += other.freegameTriggers;
+        for (int i = 0; i < paytable.length; i++) {
+            paytable[i] += other.paytable[i];
+        }
+        other.winDist.forEach((win, count) -> winDist.merge(win, count, Long::sum));
+    }
+
     public double getRtp() {
         calculateStats();
         return rtp;
@@ -67,7 +81,7 @@ public class standardStats {
         return paytable.clone();
     }
 
-    public int getFreegameTriggers() {
+    public long getFreegameTriggers() {
         return freegameTriggers;
     }
 

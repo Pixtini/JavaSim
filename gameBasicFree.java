@@ -3,9 +3,7 @@ import config.GameConfig;
 
 public class gameBasicFree extends gameBasic {
 
-    @Override
-    public spinResult spin() {
-        spinResult result = super.spin();
-        return result;
+    public gameBasicFree(GameConfig gameConfig, Random random) {
+        super(gameConfig, random);
     }
 }
