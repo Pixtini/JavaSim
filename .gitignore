@@ -1,0 +1,10 @@
+# Java compiler output
+*.class
+
+# Common build output directories
+/build/
+/out/
+/target/
+
+# macOS
+.DS_Store
