@@ -1,6 +1,7 @@
 import java.util.Map;
 import java.util.TreeMap;
 import config.GameConfig;
+import config.SimConfig;
 
 public class print {
     private final standardStats statB;
@@ -13,31 +14,33 @@ public class print {
         this.statT = statT;
     }
 
-    public void printSimulationStats(long spins, double stake) {
+    public void printSimulationStats(long rounds, double stake) {
         double totalWinnings = statB.totalWinnings + statF.totalWinnings;
+        long totalSpins = statB.rounds + statF.rounds;
+        statF.calculateStats();
 
-        System.out.println("Spins: " + spins);
-        System.out.println("Total staked: £" + (spins * stake));
+        System.out.println("Rounds: " + rounds);
+        System.out.println("Spins: " + totalSpins);
+        System.out.println("FG Triggers: " + statF.freegameTriggers);
+        System.out.println("Total staked: £" + (rounds * stake));
         System.out.println("Total winnings: £" + totalWinnings);
-        System.out.printf("Simulated RTP: %.4f%%%n", (totalWinnings / (spins * stake)) * 100);
+        System.out.printf("Simulated RTP: %.4f%%%n", (totalWinnings / (rounds * stake)) * 100);
+        System.out.printf("Standard Deviation: %.2f%n", statF.standardDeviation);
     }
 
-    public void printStats(standardStats stats, boolean isFreeGame) {
+    public void printStats(standardStats stats, String type) {
         stats.calculateStats();
+        System.out.println("\n" + type);
         System.out.println("--------");
 
         GameConfig gameConfig = new GameConfig();
-        
-        if (isFreeGame) {
-            System.out.println("Spins: " + (stats.freespins));
 
-        } else {
-        System.out.println("Spins: " + stats.spins); 
-        }
+        System.out.println("Rounds: " + stats.rounds);
         System.out.println("Total winnings: £" + stats.totalWinnings);
         System.out.printf("Simulated RTP: %.4f%%%n", stats.rtp * 100);
         System.out.println("Awards: "
                 + java.util.Arrays.toString(stats.paytable));
+        System.out.println("Hits: " + stats.hits);
     }
 
     public void printWinDist(Map<Double, Integer> winDist) {
@@ -47,16 +50,15 @@ public class print {
                 System.out.println(win + " -> " + count));
     }
 
-    public void printToConsole(long spins, double stake) {
+    public void printToConsole() {
+        SimConfig simConfig = new SimConfig();
+
         System.out.println("TotalGame");
         System.out.println("--------");
-        printSimulationStats(spins, stake);
+        printSimulationStats(simConfig.rounds, simConfig.stake);
 
-        System.out.println("\nBasegame");
-        printStats(statB, false);
-
-        System.out.println("\nFreegame");
-        printStats(statF, true);
+        printStats(statB, "Basegame");
+        printStats(statF, "Freegame");
 
         printWinDist(statT.winDist);
     }
