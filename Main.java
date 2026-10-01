@@ -45,6 +45,6 @@ public class Main {
         }
         
         print printer = new print(statB, statF, statT);
-        printer.printToConsole();
+        printer.printToConsole(simConfig);
     }
 }

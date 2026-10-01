@@ -5,6 +5,7 @@
 /build/
 /out/
 /target/
+/reports/
 
 # macOS
 .DS_Store

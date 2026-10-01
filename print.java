@@ -1,10 +1,20 @@
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 import config.SimConfig;
 
 public class print {
+    private static final DateTimeFormatter REPORT_FOLDER_TIME =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+
     private final standardStats statB;
     private final standardStats statF;
     private final standardStats statT;
@@ -15,79 +25,153 @@ public class print {
         this.statT = statT;
     }
 
-    public void printSimulationStats(long rounds, double stake) {
+    private void printSimulationStats(PrintWriter output, long rounds, double stake) {
         double totalWinnings = statB.getTotalWinnings() + statF.getTotalWinnings();
         long totalSpins = statB.getRounds() + statF.getRounds();
 
-        System.out.println("Rounds: " + rounds);
-        System.out.println("Spins: " + totalSpins);
-        System.out.println("FG Triggers: " + statF.getFreegameTriggers());
-        System.out.println("Total staked: £" + (rounds * stake));
-        System.out.println("Total winnings: £" + totalWinnings);
-        System.out.printf("Simulated RTP: %.4f%%%n", (totalWinnings / (rounds * stake)) * 100);
-        System.out.printf("Standard Deviation: %.2f%n", statF.getStandardDeviation());
+        output.println("TotalGame");
+        output.println("--------");
+        output.println("Rounds: " + rounds);
+        output.println("Spins: " + totalSpins);
+        output.println("FG Triggers: " + statF.getFreegameTriggers());
+        output.println("Total staked: £" + (rounds * stake));
+        output.println("Total winnings: £" + totalWinnings);
+        output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", (totalWinnings / (rounds * stake)) * 100);
+        output.printf(Locale.ROOT, "Standard Deviation: %.2f%n", statF.getStandardDeviation());
     }
 
-    public void printStats(standardStats stats, String type) {
-        System.out.println("\n" + type);
-        System.out.println("--------");
-
-        System.out.println("Rounds: " + stats.getRounds());
-        System.out.println("Total winnings: £" + stats.getTotalWinnings());
-        System.out.printf("Simulated RTP: %.4f%%%n", stats.getRtp() * 100);
-        System.out.println("Awards: "
-                + java.util.Arrays.toString(stats.getPaytable()));
-        System.out.println("Hits: " + stats.getHits());
+    private void printStats(PrintWriter output, standardStats stats, String type) {
+        output.println("\n" + type);
+        output.println("--------");
+        output.println("Rounds: " + stats.getRounds());
+        output.println("Total winnings: £" + stats.getTotalWinnings());
+        output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", stats.getRtp() * 100);
+        output.println("Awards: " + java.util.Arrays.toString(stats.getPaytable()));
+        output.println("Hits: " + stats.getHits());
     }
 
-    public void printWinDist(String title, Map<Double, Long> winDist) {
-        System.out.println("\n" + title);
-        System.out.println("--------");
+    private void printRegularStats(PrintWriter output, SimConfig simConfig) {
+        printSimulationStats(output, simConfig.rounds, simConfig.stake);
+        printStats(output, statB, "Basegame");
+        printStats(output, statF, "Freegame");
+        output.flush();
+    }
+
+    private void printWinDist(PrintWriter output, String title, Map<Double, Long> winDist) {
+        output.println("\n" + title);
+        output.println("--------");
         new TreeMap<>(winDist).forEach((win, count) ->
-                System.out.println(win + " -> " + count));
+                output.println(win + " -> " + count));
     }
 
-    public void printAggregatedWinDist(String title, standardStats stats, double totalStaked) {
-        System.out.println("\n" + title);
-        System.out.println("Range Min,Range Max,Hits,% Of Winnings,% Of Hits,Frequency,RTP,Total Win");
+    private void printAggregatedWinDist(PrintWriter output, String title,
+            standardStats stats, double totalStaked) {
+        output.println("\n" + title);
+        output.println("Range Min,Range Max,Hits,% Of Winnings,% Of Hits,Frequency,RTP,Total Win");
 
         List<standardStats.WinBand> bands = stats.getAggregatedWinDistribution(totalStaked);
         for (int i = 0; i < bands.size(); i++) {
             standardStats.WinBand band = bands.get(i);
-            String rangeMin = i == 0
-                    ? String.format(Locale.ROOT, "%.2f", band.getLowerBound())
-                    : String.format(Locale.ROOT, "> %.2f", band.getLowerBound());
-
-            System.out.printf(Locale.ROOT,
-                    "%s,%.2f,%d,%.8f%%,%.8f%%,%.2f,%.2f%%,%.2f%n",
-                    rangeMin,
-                    band.getUpperBound(),
-                    band.getHits(),
-                    band.getPercentOfWinnings(),
-                    band.getPercentOfHits(),
-                    band.getFrequency(),
-                    band.getRtp(),
-                    band.getTotalWin());
+            writeAggregatedWinBand(output, i, band);
         }
     }
 
-    public void printToConsole() {
-        SimConfig simConfig = new SimConfig();
+    private void writeAggregatedWinBand(PrintWriter output, int index,
+            standardStats.WinBand band) {
+        String rangeMin = index == 0
+                ? String.format(Locale.ROOT, "%.2f", band.getLowerBound())
+                : String.format(Locale.ROOT, "> %.2f", band.getLowerBound());
 
-        System.out.println("TotalGame");
-        System.out.println("--------");
-        printSimulationStats(simConfig.rounds, simConfig.stake);
+        output.printf(Locale.ROOT,
+                "%s,%.2f,%d,%.8f%%,%.8f%%,%.2f,%.2f%%,%.2f%n",
+                rangeMin,
+                band.getUpperBound(),
+                band.getHits(),
+                band.getPercentOfWinnings(),
+                band.getPercentOfHits(),
+                band.getFrequency(),
+                band.getRtp(),
+                band.getTotalWin());
+    }
 
-        printStats(statB, "Basegame");
-        printStats(statF, "Freegame");
+    private Path createReportFiles(SimConfig simConfig) throws IOException {
+        Path reportsRoot = Path.of("reports");
+        Files.createDirectories(reportsRoot);
+        String timestamp = LocalDateTime.now().format(REPORT_FOLDER_TIME);
+        String folderPrefix = "simulation-" + timestamp;
+        Path reportFolder = reportsRoot.resolve(folderPrefix);
+        int suffix = 2;
+        while (Files.exists(reportFolder)) {
+            reportFolder = reportsRoot.resolve(folderPrefix + "-" + suffix);
+            suffix++;
+        }
+        Files.createDirectory(reportFolder);
 
-        printWinDist("Basegame Win Dist", statB.getWinDist());
-        printWinDist("Freegame Win Dist", statF.getWinDist());
-        printWinDist("Total Game Win Dist", statT.getWinDist());
+        try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
+                reportFolder.resolve("simulation_stats.txt"), StandardCharsets.UTF_8))) {
+            printRegularStats(output, simConfig);
+        }
 
+        try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
+                reportFolder.resolve("win_distributions.csv"), StandardCharsets.UTF_8))) {
+            output.println("Distribution,Win,Hits");
+            writeWinDistributionRows(output, "Total Game", statT.getWinDist());
+            output.println();
+            writeWinDistributionRows(output, "Basegame", statB.getWinDist());
+            output.println();
+            writeWinDistributionRows(output, "Freegame", statF.getWinDist());
+        }
+
+        try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
+                reportFolder.resolve("win_distribution_aggregated.csv"), StandardCharsets.UTF_8))) {
+            output.println("Distribution,Range Min,Range Max,Hits,% Of Winnings,% Of Hits,Frequency,RTP,Total Win");
+            double totalStaked = simConfig.rounds * simConfig.stake;
+            writeAggregatedWinDistributionRows(output, "Total Game", statT, totalStaked);
+            output.println();
+            writeAggregatedWinDistributionRows(output, "Basegame", statB, totalStaked);
+            output.println();
+            writeAggregatedWinDistributionRows(output, "Freegame", statF, totalStaked);
+        }
+
+        return reportFolder;
+    }
+
+    private void writeWinDistributionRows(PrintWriter output, String distribution,
+            Map<Double, Long> winDist) {
+        new TreeMap<>(winDist).forEach((win, count) ->
+                output.printf(Locale.ROOT, "%s,%.2f,%d%n", distribution, win, count));
+    }
+
+    private void writeAggregatedWinDistributionRows(PrintWriter output, String distribution,
+            standardStats stats, double totalStaked) {
+        List<standardStats.WinBand> bands = stats.getAggregatedWinDistribution(totalStaked);
+        for (int i = 0; i < bands.size(); i++) {
+            output.print(distribution + ",");
+            writeAggregatedWinBand(output, i, bands.get(i));
+        }
+    }
+
+    public void printToConsole(SimConfig simConfig) {
+        PrintWriter console = new PrintWriter(System.out, true);
+        if (simConfig.exportReport) {
+            printRegularStats(console, simConfig);
+            try {
+                Path reportFolder = createReportFiles(simConfig);
+                System.out.println("Detailed report written to: " + reportFolder);
+            } catch (IOException exception) {
+                throw new RuntimeException("Could not create simulation report files", exception);
+            }
+            return;
+        }
+
+        printRegularStats(console, simConfig);
         double totalStaked = simConfig.rounds * simConfig.stake;
-        printAggregatedWinDist("Basegame - Win Distribution Aggregated", statB, totalStaked);
-        printAggregatedWinDist("Freegame - Win Distribution Aggregated", statF, totalStaked);
-        printAggregatedWinDist("Total - Win Distribution Aggregated", statT, totalStaked);
+        printWinDist(console, "Basegame Win Dist", statB.getWinDist());
+        printWinDist(console, "Freegame Win Dist", statF.getWinDist());
+        printWinDist(console, "Total Game Win Dist", statT.getWinDist());
+        printAggregatedWinDist(console, "Basegame - Win Distribution Aggregated", statB, totalStaked);
+        printAggregatedWinDist(console, "Freegame - Win Distribution Aggregated", statF, totalStaked);
+        printAggregatedWinDist(console, "Total - Win Distribution Aggregated", statT, totalStaked);
+        console.flush();
     }
 }
