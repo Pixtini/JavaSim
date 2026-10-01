@@ -1,3 +1,5 @@
+package reporting;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +12,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import config.SimConfig;
+import result.SimulationResult;
+import stats.StandardStats;
 
 public class Print {
     private static final DateTimeFormatter REPORT_FOLDER_TIME =

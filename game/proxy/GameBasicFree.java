@@ -1,3 +1,5 @@
+package game.proxy;
+
 import java.util.Random;
 import config.GameConfig;
 

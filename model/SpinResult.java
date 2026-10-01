@@ -1,3 +1,5 @@
+package model;
+
 public final class SpinResult {
 
     private final double win;

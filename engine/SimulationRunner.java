@@ -1,5 +1,12 @@
-import config.GameConfig;
+package engine;
+
 import config.SimConfig;
+import game.Game;
+import game.GameSession;
+import model.GameRoundResult;
+import model.SpinResult;
+import result.SimulationResult;
+import stats.StandardStats;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,11 +18,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public final class SimulationRunner {
     private final SimConfig simConfig;
-    private final GameConfig gameConfig;
+    private final Game game;
 
-    public SimulationRunner(SimConfig simConfig, GameConfig gameConfig) {
+    public SimulationRunner(SimConfig simConfig, Game game) {
         this.simConfig = simConfig;
-        this.gameConfig = gameConfig;
+        this.game = game;
     }
 
     public SimulationResult run() {
@@ -25,9 +32,10 @@ public final class SimulationRunner {
             simConfig.seed = ThreadLocalRandom.current().nextLong();
         }
 
-        StandardStats totalGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
-        StandardStats baseGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
-        StandardStats freeGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
+        int[] paytable = game.getPaytable();
+        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable);
+        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable);
+        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable);
 
         int workerCount = Math.min(simConfig.threads, simConfig.partitions);
         ExecutorService executor = Executors.newFixedThreadPool(workerCount);
@@ -69,15 +77,16 @@ public final class SimulationRunner {
 
     private PartitionStats runPartition(int partitionId, long rounds) {
         Random random = new Random(seedForPartition(simConfig.seed, partitionId));
-        GameBasicBase baseGame = new GameBasicBase(gameConfig, random);
-        GameBasicFree freeGame = new GameBasicFree(gameConfig, random);
+        GameSession gameSession = game.createSession(random);
 
-        StandardStats totalGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
-        StandardStats baseGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
-        StandardStats freeGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
+        int[] paytable = game.getPaytable();
+        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable);
+        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable);
+        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable);
 
         for (long round = 0; round < rounds; round++) {
-            SpinResult baseResult = baseGame.spin();
+            GameRoundResult roundResult = gameSession.playRound();
+            SpinResult baseResult = roundResult.getBaseGameResult();
             baseGameStats.addResult(baseResult);
             baseGameStats.recordWinInDistribution(baseResult.getWin());
 
@@ -86,8 +95,7 @@ public final class SimulationRunner {
                 freeGameStats.recordFreegameTrigger();
                 double freeGameWin = 0.0;
 
-                for (int freeSpin = 0; freeSpin < gameConfig.freeSpinAmount; freeSpin++) {
-                    SpinResult freeResult = freeGame.spin();
+                for (SpinResult freeResult : roundResult.getFreeGameResults()) {
                     freeGameStats.addResult(freeResult);
                     freeGameWin += freeResult.getWin();
                     totalWin += freeResult.getWin();

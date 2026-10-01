@@ -1,3 +1,7 @@
+package result;
+
+import stats.StandardStats;
+
 public final class SimulationResult {
 
     private final StandardStats totalGameStats;

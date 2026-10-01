@@ -1,5 +1,16 @@
+import engine.SimulationRunner;
 import config.GameConfig;
 import config.SimConfig;
+import game.Game;
+import game.GameSession;
+import game.proxy.BasicProxyGame;
+import java.util.List;
+import java.util.Random;
+import model.GameRoundResult;
+import model.SpinResult;
+import reporting.Print;
+import result.SimulationResult;
+import stats.StandardStats;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +27,7 @@ public final class SimulationTests {
         testStatisticsAndMerge();
         testWinBandBoundaries();
         testReproducibilityAcrossThreadCounts();
+        testEngineWithIndependentGameImplementation();
         testFreshSeedAndConsoleOutput();
         testReportFilesAndMergedCounts();
         System.out.println("Passed " + assertions + " assertions.");
@@ -69,20 +81,49 @@ public final class SimulationTests {
         SimConfig multiThreadConfig = simulationConfig(4, 24, 2_000, 8675309L);
 
         SimulationResult singleThreadResult = new SimulationRunner(
-                singleThreadConfig, new GameConfig()).run();
+                singleThreadConfig, new BasicProxyGame(new GameConfig())).run();
         SimulationResult multiThreadResult = new SimulationRunner(
-                multiThreadConfig, new GameConfig()).run();
+                multiThreadConfig, new BasicProxyGame(new GameConfig())).run();
 
         assertSameStats(singleThreadResult.getBaseGameStats(), multiThreadResult.getBaseGameStats(), "basegame");
         assertSameStats(singleThreadResult.getFreeGameStats(), multiThreadResult.getFreeGameStats(), "freegame");
         assertSameStats(singleThreadResult.getTotalGameStats(), multiThreadResult.getTotalGameStats(), "total game");
     }
 
+    private static void testEngineWithIndependentGameImplementation() {
+        Game fixedOutcomeGame = new Game() {
+            @Override
+            public GameSession createSession(Random random) {
+                return () -> new GameRoundResult(
+                        new SpinResult(1.0, 1, true),
+                        List.of(new SpinResult(2.0, 1, false)));
+            }
+
+            @Override
+            public int[] getPaytable() {
+                return new int[] {0, 0};
+            }
+        };
+
+        SimConfig config = simulationConfig(1, 1, 2, 456L);
+        SimulationResult result = new SimulationRunner(config, fixedOutcomeGame).run();
+
+        check(result.getBaseGameStats().getTotalWinnings() == 2.0,
+                "engine records base results from a non-proxy game");
+        check(result.getFreeGameStats().getFreegameTriggers() == 2,
+                "engine records triggered freegames from a non-proxy game");
+        check(result.getFreeGameStats().getRounds() == 2,
+                "engine records each returned freegame spin");
+        check(result.getTotalGameStats().getWinDist().equals(Map.of(3.0, 2L)),
+                "engine combines base and freegame wins per round");
+    }
+
     private static void testFreshSeedAndConsoleOutput() throws Exception {
         SimConfig config = simulationConfig(2, 8, 256, Long.MIN_VALUE);
         config.usePreviousSeed = false;
         config.exportReport = false;
-        SimulationResult result = new SimulationRunner(config, new GameConfig()).run();
+        SimulationResult result = new SimulationRunner(
+                config, new BasicProxyGame(new GameConfig())).run();
         Path reportRoot = Files.createTempDirectory("sim-no-report-test-");
 
         try {
@@ -104,7 +145,8 @@ public final class SimulationTests {
     private static void testReportFilesAndMergedCounts() throws Exception {
         SimConfig config = simulationConfig(3, 12, 600, 123456L);
         config.exportReport = true;
-        SimulationResult result = new SimulationRunner(config, new GameConfig()).run();
+        SimulationResult result = new SimulationRunner(
+                config, new BasicProxyGame(new GameConfig())).run();
         Path reportRoot = Files.createTempDirectory("sim-report-tests-");
 
         try {

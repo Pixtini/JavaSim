@@ -1,13 +1,13 @@
 # Next steps
 
-## 1. Make game logic pluggable
+## 1. Include complete run configuration in reports
 
-`SimulationRunner` currently constructs `GameBasicBase` and `GameBasicFree` directly. Define a small game contract for running a base spin and its triggered freegame spins, then have the runner depend on that contract. This will let future slot games provide their own reel, payline, and bonus rules without changing parallel execution or statistics collection. Keep `GameBasic` as the simple probability proxy.
+The report records rounds, stake, seed, partitions, and elapsed time, but not all game settings or worker count. Include the selected game's configuration and worker count so a report captures the inputs needed to reproduce and interpret a run. The game contract is now in place; keep game-specific settings with each game's implementation.
 
-## 2. Include complete run configuration in reports
+## 2. Add a symbol-based game implementation
 
-The report records rounds, stake, seed, partitions, and elapsed time, but not all `GameConfig` values or worker count. Add those settings so a report contains the inputs needed to reproduce and interpret the run.
+Implement a small slot game with reel or symbol outcomes, basegame wins, and randomly triggered freegames behind `game.Game` and `game.GameSession`. Keep the probability proxy as a separate implementation and use the new game to exercise the contract end to end.
 
-## 3. Add a larger game example
+## 3. Add contract-focused tests
 
-Once the game contract is in place, implement a small symbol-based game with basegame wins and randomly triggered freegames. Use it to exercise the simulator beyond the current payout proxy and test its stats and report output end to end.
+Use a small test game implementation to verify the engine handles basegame outcomes, triggered freegame outcomes, and seeded sessions without depending on proxy-specific classes.

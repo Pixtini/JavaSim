@@ -1,5 +1,8 @@
+package game.proxy;
+
 import java.util.Random;
 import config.GameConfig;
+import model.SpinResult;
 
 public class GameBasicBase extends GameBasic {
 
