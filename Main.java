@@ -8,9 +8,9 @@ public class Main {
         SimConfig simConfig = new SimConfig();
         GameConfig gameConfig = new GameConfig();
 
-        standardStats statT = new standardStats();
-        standardStats statB = new standardStats();
-        standardStats statF = new standardStats();
+        standardStats statT = new standardStats(simConfig.stake, gameConfig.paytable);
+        standardStats statB = new standardStats(simConfig.stake, gameConfig.paytable);
+        standardStats statF = new standardStats(simConfig.stake, gameConfig.paytable);
 
         for (long i = 0; i < simConfig.rounds; i++) {
 
@@ -20,19 +20,19 @@ public class Main {
 
             statB.addResult(result);
 
-            double totalWin = result.win;
+            double totalWin = result.getWin();
 
-            if (result.freeSpinFlag){
+            if (result.hasFreeSpin()){
                 
-                statF.freegameTriggers++;    
+                statF.recordFreegameTrigger();
 
                 for (int j = 0; j < gameConfig.freeSpinAmount; j++){
                     
                     gameBasicFree freeGame = new gameBasicFree();
                     spinResult resultFree = freeGame.spin();
                     
-                    statF.addResult(result);
-                    totalWin += resultFree.win;
+                    statF.addResult(resultFree);
+                    totalWin += resultFree.getWin();
                 }
             }
             

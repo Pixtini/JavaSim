@@ -1,46 +1,36 @@
 import java.util.HashMap;
 import java.util.Map;
-import config.SimConfig;
-import config.GameConfig;
-
-
 public class standardStats {
 
-    private final spinResult result;
-    double totalWinnings;
-    double rtp;
-    double totalStaked;
-    long rounds;
-    long hits;
-    double freespins;
-    int freegameTriggers;
-    int[] paytable;
-    double standardDeviation;
-    Map<Double, Integer> winDist = new HashMap<>();
+    private double totalWinnings;
+    private double rtp;
+    private double totalStaked;
+    private long rounds;
+    private long hits;
+    private int freegameTriggers;
+    private int[] paytable;
+    private double standardDeviation;
+    private final Map<Double, Long> winDist = new HashMap<>();
     
 
-    public standardStats() {
-        GameConfig gameConfig = new GameConfig();
-        this.result = new spinResult(0.0 ,0,false);
-        this.rounds = 0;
-        this.totalWinnings = 0.0;
-        this.paytable = gameConfig.paytable;
-        this.freespins = 0.0;
-        this.hits = 0;
-
+    public standardStats(double stake, int[] paytable) {
+        this.totalStaked = 0.0;
+        this.paytable = paytable.clone();
+        this.stake = stake;
     }
 
+    private final double stake;
+
     public void addResult(spinResult result) {
-        this.totalWinnings += result.win;
-        this.paytable[result.winSize]++;
+        this.totalWinnings += result.getWin();
+        this.paytable[result.getWinSize()]++;
         this.rounds++;
-        winDist(result.win);
+        winDist(result.getWin());
 
     }
 
     public void calculateStats() {
-        SimConfig simConfig = new SimConfig();
-        this.totalStaked = rounds * simConfig.stake;
+        this.totalStaked = rounds * stake;
         this.rtp = totalWinnings / totalStaked;
         this.hits = rounds - paytable[0];
         this.standardDeviation = standardDeviation(winDist);
@@ -48,12 +38,50 @@ public class standardStats {
 
     } 
 
-    public double standardDeviation(Map<Double, Integer> winDist) {
+    public double getTotalWinnings() {
+        return totalWinnings;
+    }
+
+    public double getRtp() {
+        calculateStats();
+        return rtp;
+    }
+
+    public long getRounds() {
+        return rounds;
+    }
+
+    public long getHits() {
+        calculateStats();
+        return hits;
+    }
+
+    public int[] getPaytable() {
+        return paytable.clone();
+    }
+
+    public int getFreegameTriggers() {
+        return freegameTriggers;
+    }
+
+    public void recordFreegameTrigger() {
+        freegameTriggers++;
+    }
+
+    public double getStandardDeviation() {
+        return standardDeviation(winDist);
+    }
+
+    public Map<Double, Long> getWinDist() {
+        return Map.copyOf(winDist);
+    }
+
+    public double standardDeviation(Map<Double, Long> winDist) {
         long totalCount = 0;
         double weightedTotal = 0.0;
 
-        for (Map.Entry<Double, Integer> entry : winDist.entrySet()) {
-            int count = entry.getValue();
+        for (Map.Entry<Double, Long> entry : winDist.entrySet()) {
+            long count = entry.getValue();
             totalCount += count;
             weightedTotal += entry.getKey() * count;
         }
@@ -64,7 +92,7 @@ public class standardStats {
 
         double mean = weightedTotal / totalCount;
         double weightedSquaredDifferences = 0.0;
-        for (Map.Entry<Double, Integer> entry : winDist.entrySet()) {
+        for (Map.Entry<Double, Long> entry : winDist.entrySet()) {
             double difference = entry.getKey() - mean;
             weightedSquaredDifferences += difference * difference * entry.getValue();
         }
@@ -74,12 +102,7 @@ public class standardStats {
     }
 
     public void winDist(double win) {
-        if (winDist.containsKey(win)){
-            winDist.computeIfPresent(win, (key, value) -> value + 1);
-        }
-        else{
-            winDist.put(win, 1);
-        }
+        winDist.merge(win, 1L, Long::sum);
 
     } 
 
