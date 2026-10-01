@@ -94,4 +94,6 @@ Any task is not finished until Architecture.md has been updated.
 
 Any task is not finished until nextsteps.md has been updated with a suggestion of the most effective next change within less than 100 words. 
 
-Any change that was previously listed in nextsteps.md must be cleared for clarity and adding another suggestion. 
+Any change that was previously listed in nextsteps.md must be cleared for clarity and adding another suggestion.
+
+Remember at all time, that this is meant to act as the simulator a slot game. Any creation within the simulator itself must respect that new games will be added with a Basegame and Randomly triggered FG modes.

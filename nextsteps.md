@@ -1,20 +1,13 @@
 # Next steps
 
-## 1. Add focused automated tests
+## 1. Make game logic pluggable
 
-This is the most effective next change. Test `standardStats` calculations, win-band boundaries, and merging of worker-local statistics. Confirm that fixed partitions give identical results across thread counts with the same seed, that fresh-seed mode records the effective seed, and that reports contain the merged totals.
+`SimulationRunner` currently constructs `GameBasicBase` and `GameBasicFree` directly. Define a small game contract for running a base spin and its triggered freegame spins, then have the runner depend on that contract. This will let future slot games provide their own reel, payline, and bonus rules without changing parallel execution or statistics collection. Keep `GameBasic` as the simple probability proxy.
 
-## 2. Validate simulation configuration and distribution ranges
+## 2. Include complete run configuration in reports
 
-- Reject invalid round counts and stakes before starting a run.
-- Check that the paytable has a bucket for every possible win-size index.
-- Ensure the final aggregate band covers all possible wins; it currently ends at 10,000,000.
-- Define RTP behavior when there are zero rounds.
+The report records rounds, stake, seed, partitions, and elapsed time, but not all `GameConfig` values or worker count. Add those settings so a report contains the inputs needed to reproduce and interpret the run.
 
-## 3. Benchmark large simulations
+## 3. Add a larger game example
 
-Measure throughput and memory at increasing round counts, including 100 million rounds. Tune worker and partition defaults from those results, and profile per-spin allocations before optimizing them.
-
-## 4. Clean up naming and unused code
-
-As files are next touched, adopt Java class naming conventions (`StandardStats`, `Print`, `GameBasic`, and `SpinResult`) and remove unused imports and fields. Coordinate renames so file names and callers stay aligned.
+Once the game contract is in place, implement a small symbol-based game with basegame wins and randomly triggered freegames. Use it to exercise the simulator beyond the current payout proxy and test its stats and report output end to end.

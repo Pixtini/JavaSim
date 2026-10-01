@@ -11,37 +11,45 @@ import java.util.Map;
 import java.util.TreeMap;
 import config.SimConfig;
 
-public class print {
+public class Print {
     private static final DateTimeFormatter REPORT_FOLDER_TIME =
             DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
 
-    private final standardStats statB;
-    private final standardStats statF;
-    private final standardStats statT;
+    private final StandardStats baseGameStats;
+    private final StandardStats freeGameStats;
+    private final StandardStats totalGameStats;
+    private final SimulationResult simulationResult;
+    private final Path reportsRoot;
 
-    public print(standardStats statB, standardStats statF, standardStats statT) {
-        this.statB = statB;
-        this.statF = statF;
-        this.statT = statT;
+    public Print(SimulationResult simulationResult) {
+        this(simulationResult, Path.of("reports"));
+    }
+
+    public Print(SimulationResult simulationResult, Path reportsRoot) {
+        this.simulationResult = simulationResult;
+        this.baseGameStats = simulationResult.getBaseGameStats();
+        this.freeGameStats = simulationResult.getFreeGameStats();
+        this.totalGameStats = simulationResult.getTotalGameStats();
+        this.reportsRoot = reportsRoot;
     }
 
     private void printSimulationStats(PrintWriter output, long rounds, double stake) {
-        double totalWinnings = statB.getTotalWinnings() + statF.getTotalWinnings();
-        long totalSpins = statB.getRounds() + statF.getRounds();
+        double totalWinnings = baseGameStats.getTotalWinnings() + freeGameStats.getTotalWinnings();
+        long totalSpins = baseGameStats.getRounds() + freeGameStats.getRounds();
 
         output.println("TotalGame");
         output.println("--------");
         output.println("Rounds: " + rounds);
         output.println("Spins: " + totalSpins);
-        output.println("FG Triggers: " + statF.getFreegameTriggers());
+        output.println("FG Triggers: " + freeGameStats.getFreegameTriggers());
         output.println("Total staked: £" + (rounds * stake));
         output.println("Total winnings: £" + totalWinnings);
         output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", (totalWinnings / (rounds * stake)) * 100);
-        output.printf(Locale.ROOT, "Standard Deviation: %.2f%n", statF.getStandardDeviation());
+        output.printf(Locale.ROOT, "Standard Deviation: %.2f%n", freeGameStats.getStandardDeviation());
         output.println();
     }
 
-    private void printStats(PrintWriter output, standardStats stats, String type) {
+    private void printStats(PrintWriter output, StandardStats stats, String type) {
         output.println(type);
         output.println("--------");
         output.println("Rounds: " + stats.getRounds());
@@ -54,18 +62,20 @@ public class print {
 
     private void printRegularStats(PrintWriter output, SimConfig simConfig) {
         printSimulationStats(output, simConfig.rounds, simConfig.stake);
-        printStats(output, statB, "Basegame");
-        printStats(output, statF, "Freegame");
+        printStats(output, baseGameStats, "Basegame");
+        printStats(output, freeGameStats, "Freegame");
         output.flush();
     }
 
     private void printRunSettings(PrintWriter output, SimConfig simConfig) {
         output.println("Logical partitions: " + simConfig.partitions);
         output.println("Seed: " + simConfig.seed);
+        output.printf(Locale.ROOT, "Time Taken: %.3f seconds%n",
+                simulationResult.getElapsedNanos() / 1_000_000_000.0);
     }
 
     private void writeAggregatedWinBand(PrintWriter output, int index,
-            standardStats.WinBand band) {
+            StandardStats.WinBand band) {
         String rangeMin = index == 0
                 ? String.format(Locale.ROOT, "%.2f", band.getLowerBound())
                 : String.format(Locale.ROOT, "> %.2f", band.getLowerBound());
@@ -83,7 +93,6 @@ public class print {
     }
 
     private Path createReportFiles(SimConfig simConfig) throws IOException {
-        Path reportsRoot = Path.of("reports");
         Files.createDirectories(reportsRoot);
         String timestamp = LocalDateTime.now().format(REPORT_FOLDER_TIME);
         String folderPrefix = "simulation-" + timestamp;
@@ -104,22 +113,22 @@ public class print {
         try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
                 reportFolder.resolve("win_distributions.csv"), StandardCharsets.UTF_8))) {
             output.println("Distribution,Win,Hits");
-            writeWinDistributionRows(output, "Total Game", statT.getWinDist());
+            writeWinDistributionRows(output, "Total Game", totalGameStats.getWinDist());
             output.println();
-            writeWinDistributionRows(output, "Basegame", statB.getWinDist());
+            writeWinDistributionRows(output, "Basegame", baseGameStats.getWinDist());
             output.println();
-            writeWinDistributionRows(output, "Freegame", statF.getWinDist());
+            writeWinDistributionRows(output, "Freegame", freeGameStats.getWinDist());
         }
 
         try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
                 reportFolder.resolve("win_distribution_aggregated.csv"), StandardCharsets.UTF_8))) {
             output.println("Distribution,Range Min,Range Max,Hits,% Of Winnings,% Of Hits,Frequency,RTP,Total Win");
             double totalStaked = simConfig.rounds * simConfig.stake;
-            writeAggregatedWinDistributionRows(output, "Total Game", statT, totalStaked);
+            writeAggregatedWinDistributionRows(output, "Total Game", totalGameStats, totalStaked);
             output.println();
-            writeAggregatedWinDistributionRows(output, "Basegame", statB, totalStaked);
+            writeAggregatedWinDistributionRows(output, "Basegame", baseGameStats, totalStaked);
             output.println();
-            writeAggregatedWinDistributionRows(output, "Freegame", statF, totalStaked);
+            writeAggregatedWinDistributionRows(output, "Freegame", freeGameStats, totalStaked);
         }
 
         return reportFolder;
@@ -132,8 +141,8 @@ public class print {
     }
 
     private void writeAggregatedWinDistributionRows(PrintWriter output, String distribution,
-            standardStats stats, double totalStaked) {
-        List<standardStats.WinBand> bands = stats.getAggregatedWinDistribution(totalStaked);
+            StandardStats stats, double totalStaked) {
+        List<StandardStats.WinBand> bands = stats.getAggregatedWinDistribution(totalStaked);
         for (int i = 0; i < bands.size(); i++) {
             output.print(distribution + ",");
             writeAggregatedWinBand(output, i, bands.get(i));

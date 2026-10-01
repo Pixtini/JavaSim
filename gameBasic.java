@@ -1,17 +1,17 @@
 import java.util.Random;
 import config.GameConfig;
 
-public class gameBasic {
+public class GameBasic {
 
     protected final GameConfig gameConfig;
     private final Random random;
 
-    public gameBasic(GameConfig gameConfig, Random random) {
+    public GameBasic(GameConfig gameConfig, Random random) {
         this.gameConfig = gameConfig;
         this.random = random;
     }
 
-    public spinResult spin() {
+    public SpinResult spin() {
         return spinForRoll(nextRoll());
     }
 
@@ -19,7 +19,7 @@ public class gameBasic {
         return random.nextDouble();
     }
 
-    protected final spinResult spinForRoll(double roll) {
+    protected final SpinResult spinForRoll(double roll) {
         int winSize;
         double win;
 
@@ -37,6 +37,6 @@ public class gameBasic {
             winSize = 3;
         }
 
-        return new spinResult(win, winSize, false);
+        return new SpinResult(win, winSize, false);
     }
 }

@@ -13,7 +13,7 @@ The current implementation separates game configuration, simulation configuratio
 Holds game-specific values used by the example game:
 
 - Win amounts and their cumulative probability thresholds.
-- The paytable buckets used by `standardStats`.
+- The paytable buckets used by `StandardStats`.
 - The number of free spins awarded by a freegame trigger.
 
 ### `config.SimConfig`
@@ -34,9 +34,9 @@ Holds simulation-wide values:
 
 After all tasks finish, the runner merges each partition's statistics in partition-ID order. Fixed partitions and ordered merging keep results reproducible when the same seed, settings, and partition count are used, even if the worker-thread count changes. The effective seed and logical partition count are printed at the end of the console output and `simulation_stats.txt`.
 
-`Main` creates configuration, invokes the runner, and passes the merged results to `print`. Each partition runs its assigned basegame rounds and:
+`Main` creates configuration, invokes the runner, and passes the merged results to `Print`. Each partition runs its assigned basegame rounds and:
 
-1. Runs `gameBasicBase.spin()` and records that base spin in basegame statistics.
+1. Runs `GameBasicBase.spin()` and records that base spin in basegame statistics.
 2. If the result triggers free spins, runs the configured number of free spins and records each individual free spin in freegame totals and paytable statistics.
 3. Records one freegame distribution result equal to the sum of the free spins awarded by that trigger.
 4. Records one total-game distribution result equal to the basegame win plus any freegame wins for the round.
@@ -49,25 +49,25 @@ This means the three win distributions have different observation units: basegam
 
 ## Game and result classes
 
-### `gameBasic`
+### `GameBasic`
 
-Generates a spin win using `GameConfig` thresholds and amounts. It returns an immutable `spinResult`.
+Generates a spin win using `GameConfig` thresholds and amounts. It returns an immutable `SpinResult`.
 
-### `gameBasicBase`
+### `GameBasicBase`
 
-Uses `gameBasic` for the base spin and sets the free-spin flag based on the basegame roll.
+Uses `GameBasic` for the base spin and sets the free-spin flag based on the basegame roll.
 
-### `gameBasicFree`
+### `GameBasicFree`
 
-Uses the common spin logic in `gameBasic` for each free spin.
+Uses the common spin logic in `GameBasic` for each free spin.
 
-### `spinResult`
+### `SpinResult`
 
 An immutable value for one spin. It contains the win amount, the paytable win-size index, and whether the spin triggers free spins.
 
 ## Statistics
 
-### `standardStats`
+### `StandardStats`
 
 Accumulates spin counts, total winnings, paytable awards, freegame trigger counts, and a win distribution. It receives the stake and paytable when constructed rather than creating configuration objects itself.
 
@@ -88,20 +88,29 @@ The percentage of hits and frequency use each distribution's own observation cou
 
 ## Reporting
 
-### `print`
+### `Print`
 
-Formats the regular summary and detailed distributions. It receives the same `SimConfig` instance used by `Main`, so the report uses the simulation's rounds, stake, and output mode.
+Formats the regular summary and detailed distributions. It receives the same `SimConfig` instance used by `Main`, so the report uses the simulation's rounds, stake, output mode, and timing from `SimulationResult`.
 
-When `exportReport` is `false`, the console receives only the regular summary statistics and effective seed. No report files are created.
+When `exportReport` is `false`, the console receives only the regular summary statistics and run settings. No report files are created.
 
-When `exportReport` is `true`, the console receives the regular summary statistics, a path to the generated report folder, and the effective seed at the bottom. Detailed files are written under `reports/` in a timestamped `simulation-YYYY-MM-DD_HH-mm-ss` folder. A numeric suffix is added if another report already uses that timestamp. Each folder contains:
+When `exportReport` is `true`, the console receives the regular summary statistics, a path to the generated report folder, and the run settings at the bottom. Detailed files are written under `reports/` in a timestamped `simulation-YYYY-MM-DD_HH-mm-ss` folder. A numeric suffix is added if another report already uses that timestamp. Each folder contains:
 
-- `simulation_stats.txt`: the regular summary printed to the console.
+- `simulation_stats.txt`: the regular summary printed to the console, followed by logical partition count, effective seed, and total simulation time.
 - `win_distributions.csv`: raw win amounts and hit counts.
 - `win_distribution_aggregated.csv`: aggregated win-band values.
 
 Both CSVs group their sections in this order, with a blank row between sections: **Total Game, Basegame, Freegame**. The generated `reports/` directory and compiled `.class` files are ignored by Git.
 
+## Tests
+
+`tests/SimulationTests.java` is a dependency-free test harness for statistics, win-band boundaries, deterministic merging across worker counts, seed reporting, console output, and generated report files. Run it with:
+
+```sh
+javac $(rg --files -g '*.java')
+java -cp .:tests SimulationTests
+```
+
 ## Current scope
 
-The code is an example simulation framework rather than a general-purpose engine. The game logic, configuration, statistics, and output are separated, while the orchestration loop remains in `Main`. Parallel execution and external configuration files are not currently implemented. See [nextsteps.md](../nextsteps.md) for the proposed order of improvements.
+The code is an example simulation framework rather than a general-purpose engine. `SimulationRunner` handles orchestration and parallel execution, while the game logic, configuration, statistics, and output remain separate. The current `GameBasic` classes are a simple probability proxy; future game implementations can add more detailed slot rules. See [nextsteps.md](../nextsteps.md) for the proposed order of improvements.

@@ -1,9 +1,9 @@
 import java.util.Random;
 import config.GameConfig;
 
-public class gameBasicFree extends gameBasic {
+public class GameBasicFree extends GameBasic {
 
-    public gameBasicFree(GameConfig gameConfig, Random random) {
+    public GameBasicFree(GameConfig gameConfig, Random random) {
         super(gameConfig, random);
     }
 }

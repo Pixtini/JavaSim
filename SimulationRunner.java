@@ -19,14 +19,15 @@ public final class SimulationRunner {
     }
 
     public SimulationResult run() {
+        long startNanos = System.nanoTime();
         validateConfig();
         if (!simConfig.usePreviousSeed) {
             simConfig.seed = ThreadLocalRandom.current().nextLong();
         }
 
-        standardStats totalGameStats = new standardStats(simConfig.stake, gameConfig.paytable);
-        standardStats baseGameStats = new standardStats(simConfig.stake, gameConfig.paytable);
-        standardStats freeGameStats = new standardStats(simConfig.stake, gameConfig.paytable);
+        StandardStats totalGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
+        StandardStats baseGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
+        StandardStats freeGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
 
         int workerCount = Math.min(simConfig.threads, simConfig.partitions);
         ExecutorService executor = Executors.newFixedThreadPool(workerCount);
@@ -59,20 +60,24 @@ public final class SimulationRunner {
             executor.shutdownNow();
         }
 
-        return new SimulationResult(totalGameStats, baseGameStats, freeGameStats);
+        return new SimulationResult(
+                totalGameStats,
+                baseGameStats,
+                freeGameStats,
+                System.nanoTime() - startNanos);
     }
 
     private PartitionStats runPartition(int partitionId, long rounds) {
         Random random = new Random(seedForPartition(simConfig.seed, partitionId));
-        gameBasicBase baseGame = new gameBasicBase(gameConfig, random);
-        gameBasicFree freeGame = new gameBasicFree(gameConfig, random);
+        GameBasicBase baseGame = new GameBasicBase(gameConfig, random);
+        GameBasicFree freeGame = new GameBasicFree(gameConfig, random);
 
-        standardStats totalGameStats = new standardStats(simConfig.stake, gameConfig.paytable);
-        standardStats baseGameStats = new standardStats(simConfig.stake, gameConfig.paytable);
-        standardStats freeGameStats = new standardStats(simConfig.stake, gameConfig.paytable);
+        StandardStats totalGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
+        StandardStats baseGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
+        StandardStats freeGameStats = new StandardStats(simConfig.stake, gameConfig.paytable);
 
         for (long round = 0; round < rounds; round++) {
-            spinResult baseResult = baseGame.spin();
+            SpinResult baseResult = baseGame.spin();
             baseGameStats.addResult(baseResult);
             baseGameStats.recordWinInDistribution(baseResult.getWin());
 
@@ -82,7 +87,7 @@ public final class SimulationRunner {
                 double freeGameWin = 0.0;
 
                 for (int freeSpin = 0; freeSpin < gameConfig.freeSpinAmount; freeSpin++) {
-                    spinResult freeResult = freeGame.spin();
+                    SpinResult freeResult = freeGame.spin();
                     freeGameStats.addResult(freeResult);
                     freeGameWin += freeResult.getWin();
                     totalWin += freeResult.getWin();
@@ -116,12 +121,12 @@ public final class SimulationRunner {
     }
 
     private static final class PartitionStats {
-        private final standardStats totalGameStats;
-        private final standardStats baseGameStats;
-        private final standardStats freeGameStats;
+        private final StandardStats totalGameStats;
+        private final StandardStats baseGameStats;
+        private final StandardStats freeGameStats;
 
-        private PartitionStats(standardStats totalGameStats,
-                standardStats baseGameStats, standardStats freeGameStats) {
+        private PartitionStats(StandardStats totalGameStats,
+                StandardStats baseGameStats, StandardStats freeGameStats) {
             this.totalGameStats = totalGameStats;
             this.baseGameStats = baseGameStats;
             this.freeGameStats = freeGameStats;

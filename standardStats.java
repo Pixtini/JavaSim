@@ -1,9 +1,9 @@
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class standardStats {
+public class StandardStats {
 
     private static final double[] WIN_BAND_UPPER_BOUNDS = {
             0, 1, 2, 3, 5, 10, 20, 50, 100, 200,
@@ -12,44 +12,28 @@ public class standardStats {
     };
 
     private double totalWinnings;
-    private double rtp;
-    private double totalStaked;
     private long rounds;
-    private long hits;
     private long freegameTriggers;
-    private int[] paytable;
-    private double standardDeviation;
+    private final int[] paytable;
     private final Map<Double, Long> winDist = new HashMap<>();
-    
+    private final double stake;
 
-    public standardStats(double stake, int[] paytable) {
-        this.totalStaked = 0.0;
+    public StandardStats(double stake, int[] paytable) {
         this.paytable = paytable.clone();
         this.stake = stake;
     }
 
-    private final double stake;
-
-    public void addResult(spinResult result) {
+    public void addResult(SpinResult result) {
         this.totalWinnings += result.getWin();
         this.paytable[result.getWinSize()]++;
         this.rounds++;
     }
 
-    public void calculateStats() {
-        this.totalStaked = rounds * stake;
-        this.rtp = totalWinnings / totalStaked;
-        this.hits = rounds - paytable[0];
-        this.standardDeviation = standardDeviation(winDist);
-
-
-    } 
-
     public double getTotalWinnings() {
         return totalWinnings;
     }
 
-    public void mergeFrom(standardStats other) {
+    public void mergeFrom(StandardStats other) {
         if (paytable.length != other.paytable.length) {
             throw new IllegalArgumentException("Cannot merge statistics with different paytable sizes");
         }
@@ -64,8 +48,8 @@ public class standardStats {
     }
 
     public double getRtp() {
-        calculateStats();
-        return rtp;
+        double totalStaked = rounds * stake;
+        return totalWinnings / totalStaked;
     }
 
     public long getRounds() {
@@ -73,8 +57,7 @@ public class standardStats {
     }
 
     public long getHits() {
-        calculateStats();
-        return hits;
+        return rounds - paytable[0];
     }
 
     public int[] getPaytable() {
@@ -179,7 +162,7 @@ public class standardStats {
         public double getTotalWin() { return totalWin; }
     }
 
-    public double standardDeviation(Map<Double, Long> winDist) {
+    private double standardDeviation(Map<Double, Long> winDist) {
         long totalCount = 0;
         double weightedTotal = 0.0;
 

@@ -1,10 +1,10 @@
-public final class spinResult {
+public final class SpinResult {
 
     private final double win;
     private final int winSize;
     private final boolean freeSpinFlag;
 
-    public spinResult(double win, int winSize, boolean freeSpinFlag) {
+    public SpinResult(double win, int winSize, boolean freeSpinFlag) {
         this.win = win;
         this.winSize = winSize;
         this.freeSpinFlag = freeSpinFlag;

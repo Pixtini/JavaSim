@@ -8,10 +8,7 @@ public class Main {
         GameConfig gameConfig = new GameConfig();
 
         SimulationResult result = new SimulationRunner(simConfig, gameConfig).run();
-        print printer = new print(
-                result.getBaseGameStats(),
-                result.getFreeGameStats(),
-                result.getTotalGameStats());
+        Print printer = new Print(result);
         printer.printToConsole(simConfig);
     }
 }

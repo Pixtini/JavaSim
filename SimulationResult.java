@@ -1,25 +1,31 @@
 public final class SimulationResult {
 
-    private final standardStats totalGameStats;
-    private final standardStats baseGameStats;
-    private final standardStats freeGameStats;
+    private final StandardStats totalGameStats;
+    private final StandardStats baseGameStats;
+    private final StandardStats freeGameStats;
+    private final long elapsedNanos;
 
-    public SimulationResult(standardStats totalGameStats,
-            standardStats baseGameStats, standardStats freeGameStats) {
+    public SimulationResult(StandardStats totalGameStats,
+            StandardStats baseGameStats, StandardStats freeGameStats, long elapsedNanos) {
         this.totalGameStats = totalGameStats;
         this.baseGameStats = baseGameStats;
         this.freeGameStats = freeGameStats;
+        this.elapsedNanos = elapsedNanos;
     }
 
-    public standardStats getTotalGameStats() {
+    public StandardStats getTotalGameStats() {
         return totalGameStats;
     }
 
-    public standardStats getBaseGameStats() {
+    public StandardStats getBaseGameStats() {
         return baseGameStats;
     }
 
-    public standardStats getFreeGameStats() {
+    public StandardStats getFreeGameStats() {
         return freeGameStats;
+    }
+
+    public long getElapsedNanos() {
+        return elapsedNanos;
     }
 }
