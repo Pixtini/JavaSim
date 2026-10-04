@@ -166,6 +166,8 @@ Prefer:
 over:
     Changing an existing common function.
 
+Proactively place reusable game math in GMF. When implementing a game, assess each new helper for a reusable algorithm, even if this is its first use. Keep the game’s configuration, rule choices, and result adaptation in its module; put the reusable calculation in GMF and pass those choices in as configuration. Keep a mechanic game-specific only when its behavior is genuinely unique or a common abstraction would require speculative rules. Prefer adding a new GMF component over changing an existing one when that reduces regression risk.
+
 ---
 
 ## Game-Specific Behaviour

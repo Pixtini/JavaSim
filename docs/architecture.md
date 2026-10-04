@@ -11,8 +11,8 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 - `game/`: game contracts (`Game`, `GameSession`), selection factory, shared game result types, and implementations.
 - `game/model/`: spin and base-round results passed from game sessions to the simulation layer.
 - `game/proxy/`: current probability-based example game and its `BasicProxyConfig`. Each future game should keep its own configuration with its implementation.
-- `game/expandingwild/`: first reel-based game, with separate basegame, freegame, config, and detailed spin results. Reel strips are configured as integer symbol-ID lists and translated to GMF `Symbol` values by the game config.
-- `GameModuleFramework/`: reusable symbols, reel strips and grids, payline evaluation, scatter counting and trigger evaluation, wild expansion, additive multiplier helpers, and generic weighted-table draws.
+- `game/expandingwild/`: first reel-based game, with separate basegame, freegame, config, config adapter, and detailed spin results. Reel strips are configured as integer symbol-ID lists and translated to GMF `Symbol` values by a game-side adapter.
+- `GameModuleFramework/`: reusable symbols, reel strips and grids, payline evaluation and win selection, paytable award metadata, scatter counting and trigger evaluation, wild expansion, additive multiplier helpers, and generic weighted-table draws.
 - `simulation/`: generic Monte Carlo execution and output.
 - `simulation/config/`: simulation-wide settings.
 - `simulation/engine/`: orchestration, worker threads, seeded partitions, and aggregation.
@@ -41,6 +41,7 @@ Holds simulation-wide values:
 - `seed`: stored seed used when `usePreviousSeed` is enabled; `simulation.engine.SimulationRunner` replaces it with a randomly generated seed otherwise.
 - `usePreviousSeed`: selects between replaying the configured seed and generating a new seed for this run.
 - `exportReport`: selects console-only detailed output or file-based detailed reporting.
+- `showAwards`: controls whether basegame and freegame award counts appear in the regular console and text report.
 - `threads`: maximum worker threads used to process partitions.
 - `partitions`: fixed logical work partitions used for deterministic seeding and result merging.
 
@@ -50,14 +51,14 @@ Holds simulation-wide values:
 
 After all tasks finish, the runner merges each partition's statistics in partition-ID order. Fixed partitions and ordered merging keep results reproducible when the same seed, settings, and partition count are used, even if the worker-thread count changes. The effective seed and logical partition count are printed at the end of the console output and `simulation_stats.txt`.
 
-`Main` creates `SimConfig`, asks `GameFactory` for the selected game, invokes the runner, and passes the merged results to `Print`. The factory creates the selected implementation together with its game-specific config. Each partition runs its assigned basegame rounds through `GameSession.playRound()`. The session returns a `GameRoundResult` containing the basegame result and all freegame spin results triggered by that basegame spin. The engine then:
+`Main` creates `SimConfig`, asks `GameFactory` for the selected game, invokes the runner, and passes the merged results to `Print`. The factory creates the selected implementation together with its game-specific config. Each partition runs its assigned basegame rounds through `GameSession.playRound(totalRoundStake)`. Games that use stake-scaled paytables receive the configured stake; the default interface implementation preserves games whose payouts do not depend on stake. The session returns a `GameRoundResult` containing the basegame result and all freegame spin results triggered by that basegame spin. The engine then:
 
 1. Records the base spin in basegame statistics.
-2. If the base result triggers free spins, records the trigger and each returned free spin in freegame totals and paytable statistics.
+2. If the base result triggers free spins, records the trigger and each returned free spin in freegame totals, paytable buckets, and any named award categories returned with the spin.
 3. Records one freegame distribution result equal to the sum of the free spins returned for that trigger.
 4. Records one total-game distribution result equal to the basegame win plus any freegame wins for the round.
 
-This means the three win distributions have different observation units: basegame entries are base rounds, freegame entries are triggered freegames, and total-game entries are base rounds. A round without a freegame has no freegame distribution entry.
+This means the three win distributions have different observation units: basegame entries are base rounds, freegame entries are triggered freegames, and total-game entries are base rounds. A round without a freegame has no freegame distribution entry. Freegame RTP uses one basegame stake exposure per base round, not one stake per free spin.
 
 ### `simulation.engine.SimulationRunner` and `simulation.result.SimulationResult`
 
@@ -71,7 +72,7 @@ Maps the `SimConfig.gameId` selection to a game implementation and constructs it
 
 ### `game.Game` and `game.GameSession`
 
-`Game` provides the paytable shape required by generic statistics and creates a `GameSession` for a supplied random stream. Each session plays one basegame round, including any randomly triggered freegame spins, and returns a `GameRoundResult`. The engine knows the shared round/result contract but does not construct specific game classes.
+`Game` provides the paytable bucket shape, optional named award labels, and creates a `GameSession` for a supplied random stream. Each `SpinResult` can carry zero or more award labels; statistics aggregate every occurrence, including multiple same-category line awards in one spin. Sessions can receive the total round stake so game-specific paytables can scale line awards from it. Each session plays one basegame round, including any randomly triggered freegame spins, and returns a `GameRoundResult`. The engine knows the shared round/result contract but does not construct specific game classes.
 
 ### `game.proxy.BasicProxyGame`
 
@@ -87,7 +88,7 @@ Implements the existing game contract with a 5x5 reel game. It keeps basegame an
 
 ### `GameModuleFramework`
 
-Provides small reusable components used by the reel game: `Symbol`, `ReelStrip`, `ReelGrid`, `WildExpansion`, `Payline`, `Paytable`, `PaylineEvaluator`, `ScatterCounter`, `ScatterTrigger`, `AdditiveMultipliers`, and `probability.WeightedTable` for sampling configured outcomes with relative weights. `game.expandingwild.config.ExpandingWildConfig` owns the game's symbols, symbol-ID mapping, reel strips, paylines, paytable, and feature settings; game-specific trigger awards and result aggregation remain in the game module.
+Provides small reusable components used by the reel game: `Symbol`, `ReelStrip`, `ReelGrid`, `WildExpansion`, `Payline`, `Paytable`, `PaytableAward`, `PaylineEvaluator`, and `PaylineWinCalculator`. The generic calculator stake-scales line candidates, accepts a candidate-specific multiplier function, and resolves candidate wins using a `LineWinSelectionPolicy` (Expanding Wild selects the highest final payout). GMF also provides `ScatterCounter`, `ScatterTrigger`, `AdditiveMultipliers`, and `probability.WeightedTable`. The game config owns its symbols, symbol-ID mapping, integer reel strips, paylines, paytable, and feature settings; a game adapter converts integer strips into GMF reels. Multiplier assignment and result adaptation remain in the game module.
 
 ### `game.model.SpinResult` and `game.model.GameRoundResult`
 
@@ -97,9 +98,9 @@ Immutable results for an individual spin and a complete basegame round. A round 
 
 ### `simulation.stats.StandardStats`
 
-Accumulates spin counts, total winnings, paytable awards, freegame trigger counts, and a win distribution. It receives the stake and paytable when constructed rather than creating configuration objects itself.
+Accumulates spin counts, total winnings, generic paytable buckets, named award counts, freegame trigger counts, stake exposure, and a win distribution. It receives the stake, paytable shape, and award labels when constructed rather than creating game configuration objects itself.
 
-`addResult` records one individual spin in the regular totals and paytable. `recordWinInDistribution` separately records the value that represents one observation in a distribution. This separation lets freegame totals count each free spin while its distribution counts one sum per triggered freegame.
+`addResult` records one individual spin in regular totals, paytable buckets, and named award counts. `recordWinInDistribution` separately records the value that represents one observation in a distribution. This separation lets freegame totals count each free spin while its distribution counts one sum per triggered freegame. Freegame RTP divides its winnings by basegame stake exposure recorded by the runner.
 
 The win distributions map each win amount to a `long` frequency. Standard deviation is computed from the distribution. Aggregated win-band rows are also calculated from the distribution using the configured ranges: zero, then `(0, 1]`, `(1, 2]`, `(2, 3]`, `(3, 5]`, and successive bands through `(25,000, 10,000,000]`.
 
@@ -118,7 +119,7 @@ The percentage of hits and frequency use each distribution's own observation cou
 
 ### `simulation.reporting.Print`
 
-Formats the regular summary and detailed distributions. It receives the same `SimConfig` instance used by `Main`, so the report uses the simulation's rounds, stake, output mode, and timing from `SimulationResult`.
+Formats the regular summary and detailed distributions. It prints named award counts when a game supplies award labels, falling back to generic paytable buckets for games such as the probability proxy. The `showAwards` setting controls whether these award lines appear in console and text output. Total-game standard deviation is calculated from the total-game distribution. It receives the same `SimConfig` instance used by `Main`, so the report uses the simulation's rounds, stake, output mode, and timing from `SimulationResult`.
 
 When `exportReport` is `false`, the console receives only the regular summary statistics and run settings, including the selected game ID. No report files are created.
 

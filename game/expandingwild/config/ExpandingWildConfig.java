@@ -3,7 +3,6 @@ package game.expandingwild.config;
 import GameModuleFramework.paylines.Payline;
 import GameModuleFramework.paylines.Paytable;
 import GameModuleFramework.probability.WeightedTable;
-import GameModuleFramework.reels.ReelStrip;
 import GameModuleFramework.symbols.Symbol;
 import java.util.List;
 import java.util.Map;
@@ -65,13 +64,6 @@ public final class ExpandingWildConfig {
             List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8),
             List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 12));
 
-    /** Converts the spreadsheet-friendly ID strips into the common symbol-based reel type. */
-    public List<ReelStrip> getBaseReelStrips() {
-        return baseReelStrips.stream()
-                .map(ids -> new ReelStrip(ids.stream().map(ExpandingWildConfig::fromId).toList()))
-                .toList();
-    }
-
     public List<Payline> paylines = List.of(
             new Payline(2, 2, 2, 2, 2),
             new Payline(0, 0, 0, 0, 0),
@@ -89,6 +81,7 @@ public final class ExpandingWildConfig {
             new Payline(1, 2, 3, 2, 1),
             new Payline(3, 2, 1, 2, 3));
 
+    /** Payout values are multipliers of total round stake, applied per winning line. */
     public Paytable paytable = new Paytable(Map.ofEntries(
             payout(0, 2.0, 5.0, 12.0),
             payout(1, 2.0, 6.0, 15.0),

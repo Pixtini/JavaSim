@@ -24,11 +24,16 @@ public final class ExpandingWildGameSession implements GameSession {
 
     @Override
     public GameRoundResult playRound() {
-        var baseResult = baseGame.spin();
+        return playRound(1.0);
+    }
+
+    @Override
+    public GameRoundResult playRound(double totalRoundStake) {
+        var baseResult = baseGame.spin(totalRoundStake);
         List<SpinResult> freeResults = new ArrayList<>();
         if (baseResult.hasFreeSpin()) {
             for (int freeGameIndex = 0; freeGameIndex < config.freeGamesAwarded; freeGameIndex++) {
-                freeResults.add(freeGame.spin());
+                freeResults.add(freeGame.spin(totalRoundStake));
             }
         }
         return new GameRoundResult(baseResult, freeResults);

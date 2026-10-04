@@ -29,4 +29,14 @@ public final class Paytable {
     public Iterable<Symbol> getSymbols() {
         return payouts.keySet();
     }
+
+    /** Returns configured symbol awards in stable symbol and match-count order. */
+    public List<PaytableAward> getAwards() {
+        return payouts.entrySet().stream()
+                .flatMap(symbolEntry -> symbolEntry.getValue().entrySet().stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .map(payoutEntry -> new PaytableAward(symbolEntry.getKey(),
+                                payoutEntry.getKey(), payoutEntry.getValue())))
+                .toList();
+    }
 }

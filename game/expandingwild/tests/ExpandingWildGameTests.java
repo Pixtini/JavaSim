@@ -4,6 +4,8 @@ import GameModuleFramework.features.AdditiveMultipliers;
 import GameModuleFramework.features.ScatterTrigger;
 import GameModuleFramework.paylines.Payline;
 import GameModuleFramework.paylines.PaylineEvaluator;
+import GameModuleFramework.paylines.PaylineWinCalculator;
+import GameModuleFramework.paylines.LineWinSelectionPolicy;
 import GameModuleFramework.paylines.Paytable;
 import GameModuleFramework.probability.WeightedTable;
 import GameModuleFramework.reels.ReelGrid;
@@ -14,6 +16,7 @@ import game.GameFactory;
 import game.expandingwild.ExpandingWildWinCalculator;
 import game.expandingwild.basegame.ExpandingWildBaseGame;
 import game.expandingwild.config.ExpandingWildConfig;
+import game.expandingwild.config.ExpandingWildConfigAdapter;
 import game.expandingwild.features.ExpandingWildFreeGame;
 import game.expandingwild.model.ExpandingWildLineWin;
 import game.expandingwild.model.ExpandingWildSpinResult;
@@ -36,7 +39,9 @@ public final class ExpandingWildGameTests {
         testScatterTrigger();
         testReelWindowWrapsAroundStrip();
         testPaylineRequiresUnbrokenRun();
+        testGenericPaylineWinSelectionAndAwards();
         testBannerExpandsAndMultipliersAdd();
+        testPaytableUsesTotalRoundStake();
         testFreeGameAssignsBannerMultipliers();
         testScatterTriggerAndScatterFreeFreegame();
         testGameRunsThroughSimulator();
@@ -138,6 +143,30 @@ public final class ExpandingWildGameTests {
                 "leading wilds can form their own shorter paying combination");
     }
 
+    private static void testGenericPaylineWinSelectionAndAwards() {
+        Symbol first = new Symbol("SELECT_A");
+        Symbol second = new Symbol("SELECT_C");
+        Symbol wild = new Symbol("SELECT_WILD");
+        Paytable paytable = new Paytable(Map.of(
+                first, Map.of(3, 25.0),
+                second, Map.of(5, 20.0)));
+        PaylineWinCalculator calculator = new PaylineWinCalculator(
+                paytable, List.of(new Payline(2, 2, 2, 2, 2)), wild,
+                LineWinSelectionPolicy.highestPayout());
+
+        var wins = calculator.calculate(rowGrid(
+                List.of(wild, wild, wild, second, second), 5, second), 2.0, candidate -> 1.0);
+
+        check(wins.size() == 1 && wins.get(0).candidate().symbol().equals(first),
+                "GMF selects the highest paying candidate on a line");
+        check(wins.get(0).baseWin() == 50.0 && wins.get(0).totalWin() == 50.0,
+                "GMF scales candidate payouts by total round stake");
+        check(paytable.getAwards().size() == 2
+                        && paytable.getAwards().get(0).matchingSymbols() == 3
+                        && paytable.getAwards().get(1).matchingSymbols() == 5,
+                "paytable exposes stable award categories for game reporting");
+    }
+
     private static void testBannerExpandsAndMultipliersAdd() {
         Symbol a = ExpandingWildConfig.fromId(0);
         List<List<Symbol>> reels = new ArrayList<>();
@@ -169,6 +198,26 @@ public final class ExpandingWildGameTests {
                 "no active banner multiplier leaves the line at one times");
     }
 
+    private static void testPaytableUsesTotalRoundStake() {
+        ExpandingWildConfig config = deterministicConfig();
+        ExpandingWildSpinResult baseResult = new ExpandingWildBaseGame(
+                config, new FixedRandom(0)).spin(2.5);
+        check(baseResult.getWin() == 75.0,
+                "base paytable multiplier scales by total round stake");
+
+        ExpandingWildSpinResult freeResult = new ExpandingWildFreeGame(
+                config, new FixedRandom(0)).spin(2.5);
+        check(freeResult.getWin() == 75.0,
+                "freegame paytable multiplier uses the triggering round stake");
+
+        GameRoundResult roundResult = new game.expandingwild.ExpandingWildGameSession(
+                config, new FixedRandom(0)).playRound(2.5);
+        check(roundResult.getBaseGameResult().getWin() == 75.0
+                        && roundResult.getFreeGameResults().stream()
+                                .allMatch(spin -> spin.getWin() == 75.0),
+                "a round passes the same total stake into its triggered free spins");
+    }
+
     private static void testScatterTriggerAndScatterFreeFreegame() {
         ExpandingWildConfig config = deterministicConfig();
         ExpandingWildSpinResult baseResult = new ExpandingWildBaseGame(
@@ -177,6 +226,8 @@ public final class ExpandingWildGameTests {
         check(baseResult.getScatterCount() == 3, "scatters on reels one, three, and five are counted");
         check(baseResult.hasFreeSpin(), "three visible scatters trigger the feature game");
         check(baseResult.getWin() == 30.0, "base line win is calculated from its five-symbol pay");
+        check(baseResult.getAwards().equals(List.of("T1 5oak")),
+                "base spin exposes its per-symbol line award to simulator stats");
 
         ExpandingWildSpinResult freeResult = new ExpandingWildFreeGame(
                 config, new FixedRandom(0)).spin();
@@ -261,6 +312,14 @@ public final class ExpandingWildGameTests {
         check(result.getTotalGameStats().getWinDist().values().stream()
                         .mapToLong(Long::longValue).sum() == simConfig.rounds,
                 "total-game distribution records one outcome per base round");
+        check(result.getBaseGameStats().getAwardCounts().size() == 30,
+                "simulation registers all regular symbol and match-length award categories");
+        check(result.getBaseGameStats().getAwardCounts().values().stream()
+                        .mapToLong(Long::longValue).sum() > 0,
+                "simulation aggregates per-line basegame awards");
+        check(result.getFreeGameStats().getAwardCounts().values().stream()
+                        .mapToLong(Long::longValue).sum() > 0,
+                "simulation aggregates per-line freegame awards");
 
         SimConfig singleThreadConfig = new SimConfig();
         singleThreadConfig.gameId = simConfig.gameId;
@@ -287,7 +346,8 @@ public final class ExpandingWildGameTests {
         check(symbolCount == 10, "default paytable defines ten regular symbols");
         ExpandingWildConfig defaultConfig = new ExpandingWildConfig();
         for (int reelIndex : defaultConfig.scatterReels) {
-            ReelStrip strip = defaultConfig.getBaseReelStrips().get(reelIndex);
+            ReelStrip strip = ExpandingWildConfigAdapter.toBaseReelStrips(defaultConfig)
+                    .get(reelIndex);
             for (int stop = 0; stop < strip.getSymbols().size(); stop++) {
                 List<Symbol> window = strip.spinWindow(new FixedRandom(stop), 5);
                 check(!(window.contains(ExpandingWildConfig.BANNER)

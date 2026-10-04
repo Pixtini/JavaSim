@@ -33,9 +33,10 @@ public final class SimulationRunner {
         }
 
         int[] paytable = game.getPaytable();
-        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable);
-        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable);
-        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable);
+        List<String> awardLabels = game.getAwardLabels();
+        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
+        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
+        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
 
         int workerCount = Math.min(simConfig.threads, simConfig.partitions);
         ExecutorService executor = Executors.newFixedThreadPool(workerCount);
@@ -80,12 +81,14 @@ public final class SimulationRunner {
         GameSession gameSession = game.createSession(random);
 
         int[] paytable = game.getPaytable();
-        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable);
-        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable);
-        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable);
+        List<String> awardLabels = game.getAwardLabels();
+        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
+        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
+        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
+        freeGameStats.recordStakeBasis(rounds * simConfig.stake);
 
         for (long round = 0; round < rounds; round++) {
-            GameRoundResult roundResult = gameSession.playRound();
+            GameRoundResult roundResult = gameSession.playRound(simConfig.stake);
             SpinResult baseResult = roundResult.getBaseGameResult();
             baseGameStats.addResult(baseResult);
             baseGameStats.recordWinInDistribution(baseResult.getWin());
@@ -96,7 +99,7 @@ public final class SimulationRunner {
                 double freeGameWin = 0.0;
 
                 for (SpinResult freeResult : roundResult.getFreeGameResults()) {
-                    freeGameStats.addResult(freeResult);
+                    freeGameStats.addResult(freeResult, 0.0);
                     freeGameWin += freeResult.getWin();
                     totalWin += freeResult.getWin();
                 }
@@ -112,6 +115,9 @@ public final class SimulationRunner {
     private void validateConfig() {
         if (simConfig.rounds <= 0) {
             throw new IllegalArgumentException("Simulation rounds must be greater than zero");
+        }
+        if (!Double.isFinite(simConfig.stake) || simConfig.stake <= 0.0) {
+            throw new IllegalArgumentException("Simulation stake must be finite and greater than zero");
         }
         if (simConfig.threads <= 0) {
             throw new IllegalArgumentException("Simulation thread count must be greater than zero");

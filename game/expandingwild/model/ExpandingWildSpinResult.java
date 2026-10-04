@@ -21,13 +21,14 @@ public final class ExpandingWildSpinResult extends SpinResult {
             List<ExpandingWildLineWin> lineWins,
             Map<Integer, Integer> bannerMultipliersByReel,
             boolean triggersFreeGames, boolean freeGameSpin) {
-        super(totalWin(lineWins), totalWin(lineWins) > 0.0 ? 1 : 0, triggersFreeGames);
+        super(totalWin(lineWins), totalWin(lineWins) > 0.0 ? 1 : 0,
+                triggersFreeGames, awardLabels(lineWins));
         this.stoppedGrid = stoppedGrid;
         this.expandedGrid = expandedGrid;
-        this.expandedBannerReels = Set.copyOf(expandedBannerReels);
+        this.expandedBannerReels = oneBased(expandedBannerReels);
         this.scatterCount = scatterCount;
         this.lineWins = List.copyOf(lineWins);
-        this.bannerMultipliersByReel = Map.copyOf(bannerMultipliersByReel);
+        this.bannerMultipliersByReel = oneBased(bannerMultipliersByReel);
         this.freeGameSpin = freeGameSpin;
     }
 
@@ -63,5 +64,19 @@ public final class ExpandingWildSpinResult extends SpinResult {
 
     private static double totalWin(List<ExpandingWildLineWin> wins) {
         return wins.stream().mapToDouble(ExpandingWildLineWin::totalWin).sum();
+    }
+
+    private static List<String> awardLabels(List<ExpandingWildLineWin> wins) {
+        return wins.stream().map(ExpandingWildLineWin::awardLabel).toList();
+    }
+
+    private static Set<Integer> oneBased(Set<Integer> reelIndexes) {
+        return reelIndexes.stream().map(index -> index + 1)
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+    }
+
+    private static Map<Integer, Integer> oneBased(Map<Integer, Integer> reelMultipliers) {
+        return reelMultipliers.entrySet().stream().collect(java.util.stream.Collectors.toUnmodifiableMap(
+                entry -> entry.getKey() + 1, Map.Entry::getValue));
     }
 }

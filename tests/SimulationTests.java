@@ -27,6 +27,7 @@ public final class SimulationTests {
     public static void main(String[] args) throws Exception {
         testStatisticsAndMerge();
         testWinBandBoundaries();
+        testRtpDeviationAndNamedAwardReporting();
         testReproducibilityAcrossThreadCounts();
         testConfiguredGameSelection();
         testEngineWithIndependentGameImplementation();
@@ -54,6 +55,8 @@ public final class SimulationTests {
         check(combined.getRounds() == 3, "merged round count");
         check(combined.getTotalWinnings() == 7.0, "merged winnings");
         checkClose(combined.getRtp(), 7.0 / 6.0, "merged RTP");
+        checkClose(combined.getRtpForTotalStake(10.0), 0.7,
+                "RTP can use an explicit basegame stake basis");
         check(combined.getHits() == 2, "merged hit count");
         check(Arrays.equals(combined.getPaytable(), new int[] {1, 0, 1, 1}), "merged paytable");
         check(combined.getFreegameTriggers() == 2, "merged freegame trigger count");
@@ -76,6 +79,42 @@ public final class SimulationTests {
         checkClose(bands.get(1).getPercentOfHits(), 100.0 / 6.0, "band hit percentage");
         checkClose(bands.get(1).getFrequency(), 6.0, "band frequency");
         checkClose(bands.get(1).getRtp(), 100.0 / 6.0, "band RTP");
+    }
+
+    private static void testRtpDeviationAndNamedAwardReporting() throws Exception {
+        StandardStats totalStats = new StandardStats(1.0, new int[2]);
+        totalStats.recordWinInDistribution(0.0);
+        totalStats.recordWinInDistribution(10.0);
+
+        StandardStats baseStats = new StandardStats(1.0, new int[2]);
+        baseStats.addResult(new SpinResult(0.0, 0, false));
+        baseStats.addResult(new SpinResult(0.0, 0, false));
+
+        StandardStats freeStats = new StandardStats(1.0, new int[2],
+                List.of("T1 3oak", "T1 5oak"));
+        freeStats.recordStakeBasis(2.0);
+        freeStats.addResult(new SpinResult(2.0, 1, false, List.of("T1 3oak")), 0.0);
+        freeStats.addResult(new SpinResult(4.0, 1, false, List.of("T1 5oak")), 0.0);
+        checkClose(freeStats.getRtp(), 3.0,
+                "freegame stats divide by the recorded basegame stake basis");
+
+        SimulationResult result = new SimulationResult(totalStats, baseStats, freeStats, 0L);
+        SimConfig config = simulationConfig(1, 1, 2, 101L);
+        config.showAwards = true;
+        String output = captureConsole(() -> new Print(result).printToConsole(config));
+        String freegameSection = output.substring(output.indexOf("Freegame"), output.indexOf("Game:"));
+
+        check(freegameSection.contains("Simulated RTP: 300.0000%"),
+                "freegame RTP uses total basegame stake rather than free-spin count");
+        check(output.contains("Standard Deviation: 5.00"),
+                "printed standard deviation uses the total-game distribution");
+        check(freegameSection.contains("Awards: {T1 3oak=1, T1 5oak=1}"),
+                "named per-spin awards are aggregated and printed");
+
+        config.showAwards = false;
+        String withoutAwards = captureConsole(() -> new Print(result).printToConsole(config));
+        check(!withoutAwards.contains("Awards:"),
+                "showAwards disables award lines in console output");
     }
 
     private static void testReproducibilityAcrossThreadCounts() {
@@ -116,6 +155,8 @@ public final class SimulationTests {
                 "engine records triggered freegames from a non-proxy game");
         check(result.getFreeGameStats().getRounds() == 2,
                 "engine records each returned freegame spin");
+        checkClose(result.getFreeGameStats().getRtp(), 2.0,
+                "freegame RTP uses total basegame stake across the round exposure");
         check(result.getTotalGameStats().getWinDist().equals(Map.of(3.0, 2L)),
                 "engine combines base and freegame wins per round");
     }
@@ -165,6 +206,7 @@ public final class SimulationTests {
     private static void testReportFilesAndMergedCounts() throws Exception {
         SimConfig config = simulationConfig(3, 12, 600, 123456L);
         config.exportReport = true;
+        config.showAwards = false;
         SimulationResult result = new SimulationRunner(
                 config, new BasicProxyGame(new BasicProxyConfig())).run();
         Path reportRoot = Files.createTempDirectory("sim-report-tests-");
@@ -190,6 +232,8 @@ public final class SimulationTests {
             check(statsText.contains("Seed: " + config.seed), "stats file reports the seed");
             check(statsText.contains("Game: basic-proxy"), "stats file reports the selected game ID");
             check(statsText.contains("Time Taken: "), "stats file reports elapsed time");
+            check(!statsText.contains("Awards:"),
+                    "showAwards also controls the saved simulation stats file");
             check(statsText.indexOf("Seed: ") < statsText.indexOf("Time Taken: "), "file timing follows seed");
             checkSectionOrder(distributionsCsv, "raw distribution CSV");
             checkSectionOrder(aggregatedCsv, "aggregated distribution CSV");

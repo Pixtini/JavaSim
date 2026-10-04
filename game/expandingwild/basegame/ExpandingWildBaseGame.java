@@ -6,6 +6,7 @@ import GameModuleFramework.reels.WildExpansion;
 import GameModuleFramework.features.ScatterTrigger;
 import game.expandingwild.ExpandingWildWinCalculator;
 import game.expandingwild.config.ExpandingWildConfig;
+import game.expandingwild.config.ExpandingWildConfigAdapter;
 import game.expandingwild.model.ExpandingWildSpinResult;
 import java.util.Map;
 import java.util.List;
@@ -22,7 +23,7 @@ public final class ExpandingWildBaseGame {
     public ExpandingWildBaseGame(ExpandingWildConfig config, Random random) {
         this.config = config;
         this.random = random;
-        this.reelStrips = config.getBaseReelStrips();
+        this.reelStrips = ExpandingWildConfigAdapter.toBaseReelStrips(config);
         this.scatterTrigger = new ScatterTrigger(
                 ExpandingWildConfig.SCATTER,
                 config.freeGameTriggerScatterCount,
@@ -32,17 +33,21 @@ public final class ExpandingWildBaseGame {
     }
 
     public ExpandingWildSpinResult spin() {
+        return spin(1.0);
+    }
+
+    public ExpandingWildSpinResult spin(double totalRoundStake) {
         ReelGrid stoppedGrid = ReelGrid.spin(
                 reelStrips, config.visibleRows, random);
         ScatterTrigger.Result scatterResult = scatterTrigger.evaluate(stoppedGrid);
         WildExpansion.Result expansion = WildExpansion.expandColumns(
                 stoppedGrid, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);
-        var lineWins = winCalculator.calculate(expansion.grid(), Map.of());
+        var lineWins = winCalculator.calculate(expansion.grid(), Map.of(), totalRoundStake);
 
         return new ExpandingWildSpinResult(
                 stoppedGrid,
                 expansion.grid(),
-                oneBasedReels(expansion.expandedReels()),
+                expansion.expandedReels(),
                 scatterResult.scatterCount(),
                 lineWins,
                 Map.of(),
@@ -50,8 +55,4 @@ public final class ExpandingWildBaseGame {
                 false);
     }
 
-    private static java.util.Set<Integer> oneBasedReels(java.util.Set<Integer> reelIndexes) {
-        return reelIndexes.stream().map(reel -> reel + 1)
-                .collect(java.util.stream.Collectors.toUnmodifiableSet());
-    }
 }

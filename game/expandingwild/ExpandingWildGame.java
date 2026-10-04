@@ -4,7 +4,9 @@ import game.Game;
 import game.GameSession;
 import GameModuleFramework.probability.WeightedTable;
 import game.expandingwild.config.ExpandingWildConfig;
+import game.expandingwild.config.ExpandingWildConfigAdapter;
 import java.util.Random;
+import java.util.List;
 
 /** Five-reel expanding wild game module. */
 public final class ExpandingWildGame implements Game {
@@ -26,12 +28,19 @@ public final class ExpandingWildGame implements Game {
         return new int[] {0, 0};
     }
 
+    @Override
+    public List<String> getAwardLabels() {
+        return config.paytable.getAwards().stream()
+                .map(award -> award.symbol().id() + " " + award.matchingSymbols() + "oak")
+                .toList();
+    }
+
     private void validateConfig() {
         if (config.reelCount <= 0 || config.visibleRows <= 0
                 || config.baseReelStrips.size() != config.reelCount) {
             throw new IllegalArgumentException("Expanding wild config must define its 5-reel grid");
         }
-        config.getBaseReelStrips(); // Also validates every configured symbol ID.
+        ExpandingWildConfigAdapter.toBaseReelStrips(config); // Validates configured symbol IDs.
         if (config.paylines.isEmpty()) {
             throw new IllegalArgumentException("Expanding wild config must define paylines");
         }

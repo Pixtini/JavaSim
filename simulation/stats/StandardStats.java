@@ -2,8 +2,10 @@ package simulation.stats;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 import game.model.SpinResult;
 
 public class StandardStats {
@@ -19,17 +21,42 @@ public class StandardStats {
     private long freegameTriggers;
     private final int[] paytable;
     private final Map<Double, Long> winDist = new HashMap<>();
+    private final Map<String, Long> awardCounts = new LinkedHashMap<>();
     private final double stake;
+    private double totalStakeBasis;
 
     public StandardStats(double stake, int[] paytable) {
+        this(stake, paytable, List.of());
+    }
+
+    public StandardStats(double stake, int[] paytable, List<String> awardLabels) {
         this.paytable = paytable.clone();
         this.stake = stake;
+        for (String awardLabel : awardLabels) {
+            if (awardCounts.putIfAbsent(awardLabel, 0L) != null) {
+                throw new IllegalArgumentException("Duplicate award label: " + awardLabel);
+            }
+        }
     }
 
     public void addResult(SpinResult result) {
+        addResult(result, stake);
+    }
+
+    /** Adds a spin result and the stake contribution attributed to this stats series. */
+    public void addResult(SpinResult result, double stakeContribution) {
         this.totalWinnings += result.getWin();
         this.paytable[result.getWinSize()]++;
         this.rounds++;
+        this.totalStakeBasis += stakeContribution;
+        for (String award : result.getAwards()) {
+            awardCounts.merge(award, 1L, Long::sum);
+        }
+    }
+
+    /** Adds stake exposure without adding a separately staked result, for freegame RTP. */
+    public void recordStakeBasis(double stakeContribution) {
+        totalStakeBasis += stakeContribution;
     }
 
     public double getTotalWinnings() {
@@ -44,15 +71,21 @@ public class StandardStats {
         totalWinnings += other.totalWinnings;
         rounds += other.rounds;
         freegameTriggers += other.freegameTriggers;
+        totalStakeBasis += other.totalStakeBasis;
         for (int i = 0; i < paytable.length; i++) {
             paytable[i] += other.paytable[i];
         }
+        other.awardCounts.forEach((award, count) -> awardCounts.merge(award, count, Long::sum));
         other.winDist.forEach((win, count) -> winDist.merge(win, count, Long::sum));
     }
 
     public double getRtp() {
-        double totalStaked = rounds * stake;
-        return totalWinnings / totalStaked;
+        return getRtpForTotalStake(totalStakeBasis);
+    }
+
+    /** Calculates RTP against a caller-supplied stake basis, such as basegame stake. */
+    public double getRtpForTotalStake(double totalStake) {
+        return totalWinnings / totalStake;
     }
 
     public long getRounds() {
@@ -65,6 +98,11 @@ public class StandardStats {
 
     public int[] getPaytable() {
         return paytable.clone();
+    }
+
+    /** Returns named award counts, including configured categories with zero hits. */
+    public Map<String, Long> getAwardCounts() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(awardCounts));
     }
 
     public long getFreegameTriggers() {

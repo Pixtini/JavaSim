@@ -6,6 +6,7 @@ import GameModuleFramework.reels.WildExpansion;
 import GameModuleFramework.probability.WeightedTable;
 import game.expandingwild.ExpandingWildWinCalculator;
 import game.expandingwild.config.ExpandingWildConfig;
+import game.expandingwild.config.ExpandingWildConfigAdapter;
 import game.expandingwild.model.ExpandingWildSpinResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,7 +25,7 @@ public final class ExpandingWildFreeGame {
     public ExpandingWildFreeGame(ExpandingWildConfig config, Random random) {
         this.config = config;
         this.random = random;
-        this.freeGameReels = config.getBaseReelStrips().stream()
+        this.freeGameReels = ExpandingWildConfigAdapter.toBaseReelStrips(config).stream()
                 .map(reel -> reel.without(ExpandingWildConfig.SCATTER))
                 .toList();
         this.bannerMultiplierTable = new WeightedTable<>(config.bannerMultiplierWeights);
@@ -33,16 +34,20 @@ public final class ExpandingWildFreeGame {
     }
 
     public ExpandingWildSpinResult spin() {
+        return spin(1.0);
+    }
+
+    public ExpandingWildSpinResult spin(double totalRoundStake) {
         ReelGrid stoppedGrid = ReelGrid.spin(freeGameReels, config.visibleRows, random);
         WildExpansion.Result expansion = WildExpansion.expandColumns(
                 stoppedGrid, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);
         Map<Integer, Integer> multipliers = assignBannerMultipliers(expansion);
-        var lineWins = winCalculator.calculate(expansion.grid(), multipliers);
+        var lineWins = winCalculator.calculate(expansion.grid(), multipliers, totalRoundStake);
 
         return new ExpandingWildSpinResult(
                 stoppedGrid,
                 expansion.grid(),
-                oneBasedReels(expansion.expandedReels()),
+                expansion.expandedReels(),
                 0,
                 lineWins,
                 multipliers,
@@ -56,13 +61,9 @@ public final class ExpandingWildFreeGame {
 
         Map<Integer, Integer> multipliers = new LinkedHashMap<>();
         for (int reelIndex : expandedReels) {
-            multipliers.put(reelIndex + 1, bannerMultiplierTable.draw(random));
+            multipliers.put(reelIndex, bannerMultiplierTable.draw(random));
         }
         return Map.copyOf(multipliers);
     }
 
-    private static java.util.Set<Integer> oneBasedReels(java.util.Set<Integer> reelIndexes) {
-        return reelIndexes.stream().map(reel -> reel + 1)
-                .collect(java.util.stream.Collectors.toUnmodifiableSet());
-    }
 }

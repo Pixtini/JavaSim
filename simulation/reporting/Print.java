@@ -49,25 +49,30 @@ public class Print {
         output.println("Total staked: £" + (rounds * stake));
         output.println("Total winnings: £" + totalWinnings);
         output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", (totalWinnings / (rounds * stake)) * 100);
-        output.printf(Locale.ROOT, "Standard Deviation: %.2f%n", freeGameStats.getStandardDeviation());
+        output.printf(Locale.ROOT, "Standard Deviation: %.2f%n", totalGameStats.getStandardDeviation());
         output.println();
     }
 
-    private void printStats(PrintWriter output, StandardStats stats, String type) {
+    private void printStats(PrintWriter output, StandardStats stats, String type,
+            boolean showAwards) {
         output.println(type);
         output.println("--------");
         output.println("Rounds: " + stats.getRounds());
         output.println("Total winnings: £" + stats.getTotalWinnings());
         output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", stats.getRtp() * 100);
-        output.println("Awards: " + java.util.Arrays.toString(stats.getPaytable()));
+        if (showAwards) {
+            output.println("Awards: " + (stats.getAwardCounts().isEmpty()
+                    ? java.util.Arrays.toString(stats.getPaytable())
+                    : stats.getAwardCounts()));
+        }
         output.println("Hits: " + stats.getHits());
         output.println();
     }
 
     private void printRegularStats(PrintWriter output, SimConfig simConfig) {
         printSimulationStats(output, simConfig.rounds, simConfig.stake);
-        printStats(output, baseGameStats, "Basegame");
-        printStats(output, freeGameStats, "Freegame");
+        printStats(output, baseGameStats, "Basegame", simConfig.showAwards);
+        printStats(output, freeGameStats, "Freegame", simConfig.showAwards);
         output.flush();
     }
 

@@ -4,13 +4,13 @@
 
 This is the first reel-based game module and a test of the `GameModuleFramework` (GMF) foundation. The module is registered as `expanding-wild` and is now the default selected game; set `simulation.config.SimConfig.gameId` to `"basic-proxy"` to run the probability proxy.
 
-The implementation uses a 5-reel by 5-row window, ten regular symbols (`T1`–`T5` and `L1`–`L5`), 15 left-to-right paylines, an expanding banner wild, and a basegame scatter trigger. `ExpandingWildConfig` contains the symbol definitions and mapping as well as all game settings. Reel strips are integer ID lists, so they can be pasted from spreadsheet output: 0–4 map to `T1`–`T5`, 5–9 map to `L1`–`L5`, 10 is `BANNER`, 11 is `WILD`, and 12 is `SCATTER`. The configuration is intentionally small and is not balanced.
+The implementation uses a 5-reel by 5-row window, ten regular symbols (`T1`–`T5` and `L1`–`L5`), 15 left-to-right paylines, an expanding banner wild, and a basegame scatter trigger. `ExpandingWildConfig` contains the symbol definitions and mapping as well as all game settings. Reel strips are integer ID lists, so they can be pasted from spreadsheet output: 0–4 map to `T1`–`T5`, 5–9 map to `L1`–`L5`, 10 is `BANNER`, 11 is `WILD`, and 12 is `SCATTER`. `ExpandingWildConfigAdapter` translates these compact strips into GMF reel strips. The configuration is intentionally small and is not balanced.
 
 ## Rules implemented
 
 - A spin independently stops one configured circular strip for each of the five reels. The five symbols beginning at each stop form the visible reel.
 - A banner anywhere in a stopped reel expands that reel to five wilds after all reels stop. Each default reel strip has one banner.
-- Paylines are read left to right. A win must start on reel one and continue without a mismatch. Only 3, 4, and 5 matching reels pay. Each line awards its best paying symbol once, including wild substitutions.
+- Paylines are read left to right. A win must start on reel one and continue without a mismatch. Only configured match lengths pay. GMF's `PaylineWinCalculator` applies total-round stake and candidate multipliers, then its configured selection policy awards the highest final payout once per line, including wild substitutions. The game adapts selected GMF wins into `ExpandingWildLineWin` values.
 - The 15 line paths below are zero-based visible row indexes, one row per reel:
 
   ```text
@@ -29,26 +29,26 @@ The chosen free-spin award and line paths are example values because the request
 
 ## Example paytable
 
-Values are credits per winning line, before any freegame banner multiplier. They are deliberately simple and are not scaled to the simulator's total round stake.
+Each value is a multiplier of the total basegame round stake, paid for each winning line before any freegame banner multiplier. For example, T1 paying 2.0 for three of a kind awards `2.0 × total round stake` on that line. The values are deliberately simple and are not balanced.
 
 | Symbol | 3 of a kind | 4 of a kind | 5 of a kind |
 | --- | ---: | ---: | ---: |
-| A | 2 | 5 | 12 |
-| B | 2 | 6 | 15 |
-| C | 2.5 | 7 | 18 |
-| D | 3 | 8 | 20 |
-| E | 3 | 9 | 24 |
-| F | 3.5 | 10 | 28 |
-| G | 4 | 12 | 32 |
-| H | 4 | 14 | 36 |
-| I | 5 | 16 | 40 |
-| J | 5 | 18 | 45 |
+| T1 | 2 | 5 | 12 |
+| T2 | 2 | 6 | 15 |
+| T3 | 2.5 | 7 | 18 |
+| T4 | 3 | 8 | 20 |
+| T5 | 3 | 9 | 24 |
+| L1 | 3.5 | 10 | 28 |
+| L2 | 4 | 12 | 32 |
+| L3 | 4 | 14 | 36 |
+| L4 | 5 | 16 | 40 |
+| L5 | 5 | 18 | 45 |
 
 ## Results
 
-`ExpandingWildSpinResult` extends the shared `SpinResult` with the stopped and expanded grids, scatter count, expanded banner reels, freegame mode, and selected payline wins. Each line win retains its symbol, match length, base paytable value, applied multiplier, and final win. `GameRoundResult` returns the base result and each free spin result through the existing game contract.
+`ExpandingWildSpinResult` extends the shared `SpinResult` with the stopped and expanded grids, scatter count, expanded banner reels, freegame mode, and selected payline wins. Each line win retains its symbol, match length, stake-scaled win before banner multipliers, applied multiplier, and final win. It also exposes one named award label per winning line for generic statistics. `GameRoundResult` returns the base result and each free spin result through the existing game contract. The runner passes the same total basegame round stake to the base spin and all triggered free spins.
 
-The shared simulator currently accepts one paytable index per spin. This module maps it to loss or win so existing hit counts and win distributions work. That does not provide the 30 symbol-by-match-length award counts, and the runner currently discards the detailed game result after accumulating its generic statistics. Those are simulator-framework gaps; no simulation engine or generic statistics changes were made for this game.
+Each spin result carries one named award label per winning payline, such as `T1 3oak`. The shared statistics collector aggregates these categories independently for basegame and freegame spins; each hit is a paid line, so one spin can add multiple award hits. The generic loss/win bucket remains available for hit-rate calculations. The runner still discards other detailed game data after aggregating statistics.
 
 ## Verification and observed behavior
 
@@ -62,16 +62,12 @@ A seeded 1,000,000-round simulation used seed `4042026`, 32 partitions, and four
 - Freegame winnings: 195,640,722.00.
 - Total winnings: 234,071,570.50; reported overall RTP against a stake of 1 per base round is 23,407.16%.
 
-The very high RTP is expected from the deliberately unbalanced example: line payouts are applied to all 15 paylines without splitting the round stake across lines, and freegame banner multipliers can add to as much as 50x on a line with five banners. It is a math/configuration result, not a simulator crash or aggregation mismatch.
+The very high RTP is expected from the deliberately unbalanced example: each winning line applies its paytable multiplier to the full round stake, without splitting the stake across the 15 paylines, and freegame banner multipliers can add to as much as 50x on a line with five banners. It is a math/configuration result, not a simulator crash or aggregation mismatch.
 
 The run exposed reporting issues in existing generic simulation code:
 
-- Freegame RTP divides freegame winnings by the number of free spins times the configured stake. Since these free spins are not separately staked, that value is not the freegame contribution against basegame stake.
-- The total-game standard deviation printed by `Print` is currently read from the freegame distribution instead of the total-game distribution.
-- The Awards line can only show the module's loss/win buckets, not its per-symbol 3/4/5-of-a-kind awards.
-
-These are documented follow-ups for the simulation framework and were not changed as part of this game task.
+The console and report now calculate freegame RTP against the total basegame stake exposure, and total-game standard deviation uses the total-game distribution. The Awards lines show the 30 per-symbol 3/4/5-of-a-kind categories and count each paid line.
 
 ## Suggested simulator work
 
-Before using reports for symbol-level analysis, the simulator needs a game-result aggregation hook that can collect multiple line awards from one spin and preserve game-specific detail for optional report output. It should also define how total round stake maps to line stake and calculate freegame contribution against basegame stake. These changes are recommendations only and have not been made here.
+The simulator aggregates named awards but does not retain full game-specific outcomes for export. An optional detailed report could include stopped grids, expanded reels, banner multipliers, scatter counts, and selected winning paylines.
