@@ -2,6 +2,8 @@ package game;
 
 import game.proxy.BasicProxyConfig;
 import game.proxy.BasicProxyGame;
+import game.expandingwild.ExpandingWildGame;
+import game.expandingwild.config.ExpandingWildConfig;
 
 /** Selects a game implementation and constructs it with that game's configuration. */
 public final class GameFactory {
@@ -15,6 +17,7 @@ public final class GameFactory {
 
         return switch (gameId) {
             case "basic-proxy" -> new BasicProxyGame(new BasicProxyConfig());
+            case "expanding-wild" -> new ExpandingWildGame(new ExpandingWildConfig());
             default -> throw new IllegalArgumentException("Unknown game ID: " + gameId);
         };
     }

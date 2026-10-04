@@ -11,6 +11,8 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 - `game/`: game contracts (`Game`, `GameSession`), selection factory, shared game result types, and implementations.
 - `game/model/`: spin and base-round results passed from game sessions to the simulation layer.
 - `game/proxy/`: current probability-based example game and its `BasicProxyConfig`. Each future game should keep its own configuration with its implementation.
+- `game/expandingwild/`: first reel-based game, with separate basegame, freegame, config, and detailed spin results. Reel strips are configured as integer symbol-ID lists and translated to GMF `Symbol` values by the game config.
+- `GameModuleFramework/`: reusable symbols, reel strips and grids, payline evaluation, scatter counting and trigger evaluation, wild expansion, additive multiplier helpers, and generic weighted-table draws.
 - `simulation/`: generic Monte Carlo execution and output.
 - `simulation/config/`: simulation-wide settings.
 - `simulation/engine/`: orchestration, worker threads, seeded partitions, and aggregation.
@@ -33,7 +35,7 @@ Holds settings used only by the probability-based proxy:
 
 Holds simulation-wide values:
 
-- `gameId`: selects which game `Main` asks `game.GameFactory` to construct. Each factory entry creates that game's own configuration and implementation.
+- `gameId`: selects which game `Main` asks `game.GameFactory` to construct. It defaults to `expanding-wild`; set it to `basic-proxy` to run the probability proxy. Each factory entry creates that game's own configuration and implementation.
 - `rounds`: number of basegame rounds to simulate.
 - `stake`: stake per basegame round.
 - `seed`: stored seed used when `usePreviousSeed` is enabled; `simulation.engine.SimulationRunner` replaces it with a randomly generated seed otherwise.
@@ -79,6 +81,14 @@ Implements `Game` using the simple probability-based proxy rules. Its session ow
 
 These classes implement the proxy's individual spin logic. They are an example game implementation, not dependencies of the simulation engine.
 
+### `game.expandingwild.ExpandingWildGame`
+
+Implements the existing game contract with a 5x5 reel game. It keeps basegame and freegame logic separate, uses GMF for reel/grid and payline math, expands visible banners into full-height wild reels, and draws each freegame banner multiplier from a game-configured weighted table before adding participating multipliers on paylines. See [ExpandingWildGame.md](../game/expandingwild/ExpandingWildGame.md) for its chosen example paytable, paylines, tests, and known limits.
+
+### `GameModuleFramework`
+
+Provides small reusable components used by the reel game: `Symbol`, `ReelStrip`, `ReelGrid`, `WildExpansion`, `Payline`, `Paytable`, `PaylineEvaluator`, `ScatterCounter`, `ScatterTrigger`, `AdditiveMultipliers`, and `probability.WeightedTable` for sampling configured outcomes with relative weights. `game.expandingwild.config.ExpandingWildConfig` owns the game's symbols, symbol-ID mapping, reel strips, paylines, paytable, and feature settings; game-specific trigger awards and result aggregation remain in the game module.
+
 ### `game.model.SpinResult` and `game.model.GameRoundResult`
 
 Immutable results for an individual spin and a complete basegame round. A round result contains one basegame spin and the list of freegame spins it triggered.
@@ -122,11 +132,12 @@ Both CSVs group their sections in this order, with a blank row between sections:
 
 ## Tests
 
-`tests/SimulationTests.java` is a dependency-free test harness for statistics, win-band boundaries, deterministic merging across worker counts, configured game selection, running a game implementation independent of the proxy, seed reporting, console output, and generated report files. Run it with:
+`tests/SimulationTests.java` covers generic statistics, deterministic merging, game selection, and reports. `game/expandingwild/tests/ExpandingWildGameTests.java` covers GMF mechanics, game rules, and a seeded simulator run. Run both suites with:
 
 ```sh
-javac *.java tests/SimulationTests.java
+javac *.java tests/*.java game/expandingwild/tests/*.java
 java -cp .:tests SimulationTests
+java game.expandingwild.tests.ExpandingWildGameTests
 ```
 
 From the repository root, the normal launch flow is:
@@ -140,4 +151,4 @@ java Main
 
 ## Current scope
 
-The code is an example simulation framework rather than a general-purpose engine. `simulation.engine.SimulationRunner` handles orchestration and parallel execution through the `game.Game` / `game.GameSession` contract. The current `game.proxy` implementation is a simple probability proxy; a heavier slot engine can implement the contract and own its basegame and randomly triggered freegame rules. See [nextsteps.md](../nextsteps.md) for the proposed order of improvements.
+The code is an example simulation framework rather than a general-purpose engine. `simulation.engine.SimulationRunner` handles orchestration and parallel execution through the `game.Game` / `game.GameSession` contract. Both `game.proxy` and `game.expandingwild` implement that contract. The initial `GameModuleFramework` package contains reusable reel and line-win math; new generic mechanics should be added only when another game can use them. See [nextsteps.md](../nextsteps.md) for the proposed order of improvements.

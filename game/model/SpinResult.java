@@ -1,6 +1,6 @@
 package game.model;
 
-public final class SpinResult {
+public class SpinResult {
 
     private final double win;
     private final int winSize;

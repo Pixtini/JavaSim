@@ -1,13 +1,21 @@
 # Next steps
 
-## 1. Include complete run configuration in reports
+## 1. Capture per-line paytable awards in statistics
 
-The report records the selected game ID, rounds, stake, seed, partitions, and elapsed time, but not the worker count or the selected game's settings. Add the worker count and a game-provided configuration summary so reports capture the inputs needed to reproduce and interpret a run. Keep each game's configuration beside its implementation.
+The expanding wild game records detailed per-line wins in its result, but generic stats reduce each spin to one loss/win bucket. Add a path for multiple line awards and game-specific result details. Also fix total-game standard deviation to use total-game outcomes and calculate freegame RTP against basegame stake.
 
-## 2. Add a symbol-based game implementation
+## 2. Define line stake and RTP conventions
 
-Implement a small slot game with reel or symbol outcomes, basegame wins, and randomly triggered freegames behind `game.Game` and `game.GameSession`. Keep the probability proxy as a separate implementation and use the new game to exercise the contract end to end.
+Decide whether configured paytable values are credits per line or multiples of total round stake, then pass the relevant stake context to games or represent it in game configuration. Report freegame contribution against basegame stake.
 
-## 3. Add contract-focused tests
+## 3. Add game-specific report exports
 
-Use a small test game implementation to verify the engine handles basegame outcomes, triggered freegame outcomes, and seeded sessions without depending on proxy-specific classes.
+Provide an optional expanding wild detail report containing stopped grids, expanded reels, banner multipliers, scatter counts, and the selected paylines that paid. Preserve the current generic summary alongside it.
+
+## 4. Generate the game config from spreadsheet data
+
+Build an importer that generates or refreshes the single `ExpandingWildConfig` source from spreadsheet tables for symbols, reel strips, paylines, paytable values, scatter-trigger settings, and weighted outcomes. Validate symbol IDs and report the source sheet, row, and column for invalid values.
+
+## 5. Include weighted multiplier tables in run reports
+
+Add the selected game's multiplier values and relative weights to its report metadata. This makes the odds used by a simulation visible beside its seed and other run settings.

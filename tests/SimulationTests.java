@@ -209,6 +209,7 @@ public final class SimulationTests {
 
     private static SimConfig simulationConfig(int threads, int partitions, long rounds, long seed) {
         SimConfig config = new SimConfig();
+        config.gameId = "basic-proxy";
         config.threads = threads;
         config.partitions = partitions;
         config.rounds = rounds;
