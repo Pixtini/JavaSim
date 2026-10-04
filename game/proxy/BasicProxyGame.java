@@ -1,15 +1,14 @@
 package game.proxy;
 
-import game.config.GameConfig;
 import game.Game;
 import game.GameSession;
 import java.util.Random;
 
 /** Probability-based example game, separate from the simulation engine. */
 public final class BasicProxyGame implements Game {
-    private final GameConfig gameConfig;
+    private final BasicProxyConfig gameConfig;
 
-    public BasicProxyGame(GameConfig gameConfig) {
+    public BasicProxyGame(BasicProxyConfig gameConfig) {
         this.gameConfig = gameConfig;
     }
 

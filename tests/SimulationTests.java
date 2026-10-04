@@ -1,9 +1,10 @@
-import game.config.GameConfig;
 import simulation.config.SimConfig;
 import simulation.engine.SimulationRunner;
 import game.Game;
+import game.GameFactory;
 import game.GameSession;
 import game.proxy.BasicProxyGame;
+import game.proxy.BasicProxyConfig;
 import java.util.List;
 import java.util.Random;
 import game.model.GameRoundResult;
@@ -27,6 +28,7 @@ public final class SimulationTests {
         testStatisticsAndMerge();
         testWinBandBoundaries();
         testReproducibilityAcrossThreadCounts();
+        testConfiguredGameSelection();
         testEngineWithIndependentGameImplementation();
         testFreshSeedAndConsoleOutput();
         testReportFilesAndMergedCounts();
@@ -81,9 +83,9 @@ public final class SimulationTests {
         SimConfig multiThreadConfig = simulationConfig(4, 24, 2_000, 8675309L);
 
         SimulationResult singleThreadResult = new SimulationRunner(
-                singleThreadConfig, new BasicProxyGame(new GameConfig())).run();
+                singleThreadConfig, new BasicProxyGame(new BasicProxyConfig())).run();
         SimulationResult multiThreadResult = new SimulationRunner(
-                multiThreadConfig, new BasicProxyGame(new GameConfig())).run();
+                multiThreadConfig, new BasicProxyGame(new BasicProxyConfig())).run();
 
         assertSameStats(singleThreadResult.getBaseGameStats(), multiThreadResult.getBaseGameStats(), "basegame");
         assertSameStats(singleThreadResult.getFreeGameStats(), multiThreadResult.getFreeGameStats(), "freegame");
@@ -118,17 +120,35 @@ public final class SimulationTests {
                 "engine combines base and freegame wins per round");
     }
 
+    private static void testConfiguredGameSelection() {
+        SimConfig config = simulationConfig(1, 2, 10, 789L);
+        config.gameId = "basic-proxy";
+        Game selectedGame = GameFactory.create(config.gameId);
+        SimulationResult result = new SimulationRunner(config, selectedGame).run();
+
+        check(result.getBaseGameStats().getRounds() == config.rounds,
+                "selected game runs through the simulation engine");
+        boolean unknownGameRejected = false;
+        try {
+            GameFactory.create("missing-game");
+        } catch (IllegalArgumentException exception) {
+            unknownGameRejected = true;
+        }
+        check(unknownGameRejected, "unknown selected games are rejected");
+    }
+
     private static void testFreshSeedAndConsoleOutput() throws Exception {
         SimConfig config = simulationConfig(2, 8, 256, Long.MIN_VALUE);
         config.usePreviousSeed = false;
         config.exportReport = false;
         SimulationResult result = new SimulationRunner(
-                config, new BasicProxyGame(new GameConfig())).run();
+                config, new BasicProxyGame(new BasicProxyConfig())).run();
         Path reportRoot = Files.createTempDirectory("sim-no-report-test-");
 
         try {
             check(config.seed != Long.MIN_VALUE, "fresh-seed mode replaces the configured seed");
             String console = captureConsole(() -> new Print(result, reportRoot).printToConsole(config));
+            check(console.contains("Game: basic-proxy"), "console prints the selected game ID");
             check(console.contains("Seed: " + config.seed), "console prints the effective seed");
             check(console.contains("Time Taken: "), "console prints elapsed simulation time");
             check(console.indexOf("Seed: ") < console.indexOf("Time Taken: "), "time follows the seed");
@@ -146,7 +166,7 @@ public final class SimulationTests {
         SimConfig config = simulationConfig(3, 12, 600, 123456L);
         config.exportReport = true;
         SimulationResult result = new SimulationRunner(
-                config, new BasicProxyGame(new GameConfig())).run();
+                config, new BasicProxyGame(new BasicProxyConfig())).run();
         Path reportRoot = Files.createTempDirectory("sim-report-tests-");
 
         try {
@@ -168,6 +188,7 @@ public final class SimulationTests {
             String aggregatedCsv = Files.readString(aggregatedFile);
 
             check(statsText.contains("Seed: " + config.seed), "stats file reports the seed");
+            check(statsText.contains("Game: basic-proxy"), "stats file reports the selected game ID");
             check(statsText.contains("Time Taken: "), "stats file reports elapsed time");
             check(statsText.indexOf("Seed: ") < statsText.indexOf("Time Taken: "), "file timing follows seed");
             checkSectionOrder(distributionsCsv, "raw distribution CSV");

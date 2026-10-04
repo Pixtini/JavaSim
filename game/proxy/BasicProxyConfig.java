@@ -1,6 +1,6 @@
-package game.config;
+package game.proxy;
 
-public class GameConfig {
+public class BasicProxyConfig {
 
     public double[] winSize = {1.0 , 2.0, 5.0};
     // Cumulative roll thresholds: 90% no win, then 5% small, 4% medium, 1% big.

@@ -42,6 +42,8 @@ Keep these concerns separate:
 
 Game implementations should not contain generic simulation or statistics logic.
 
+Simulation implementations should not contain generic Game logic.
+
 ## Java
 
 - Use modern Java conventions.
@@ -57,6 +59,8 @@ Game implementations should not contain generic simulation or statistics logic.
 - Use packages consistently.
 
 - Optimise for time complexity where possible. 
+
+- Comment code in a professional manner while maintaining readability.
 
 ## Simulation
 
@@ -96,4 +100,4 @@ Any task is not finished until nextsteps.md has been updated with a suggestion o
 
 Any change that was previously listed in nextsteps.md must be cleared for clarity and adding another suggestion.
 
-Remember at all time, that this is meant to act as the simulator a slot game. Any creation within the simulator itself must respect that new games will be added with a Basegame and Randomly triggered FG modes.
+Remember at all time, that this is meant to act as the simulator for a slot game. Any creation within the simulator itself must respect that new games will be added with a Basegame and Randomly triggered FG modes.

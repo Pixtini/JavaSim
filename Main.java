@@ -1,5 +1,5 @@
-import game.config.GameConfig;
-import game.proxy.BasicProxyGame;
+import game.Game;
+import game.GameFactory;
 import simulation.config.SimConfig;
 import simulation.engine.SimulationRunner;
 import simulation.reporting.Print;
@@ -9,10 +9,10 @@ public class Main {
 
     public static void main(String[] args) {
         SimConfig simConfig = new SimConfig();
-        GameConfig gameConfig = new GameConfig();
+        Game game = GameFactory.create(simConfig.gameId);
 
         SimulationResult result = new SimulationRunner(
-                simConfig, new BasicProxyGame(gameConfig)).run();
+                simConfig, game).run();
         Print printer = new Print(result);
         printer.printToConsole(simConfig);
     }

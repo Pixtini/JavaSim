@@ -1,15 +1,14 @@
 package game.proxy;
 
 import java.util.Random;
-import game.config.GameConfig;
 import game.model.SpinResult;
 
 public class GameBasic {
 
-    protected final GameConfig gameConfig;
+    protected final BasicProxyConfig gameConfig;
     private final Random random;
 
-    public GameBasic(GameConfig gameConfig, Random random) {
+    public GameBasic(BasicProxyConfig gameConfig, Random random) {
         this.gameConfig = gameConfig;
         this.random = random;
     }

@@ -1,12 +1,11 @@
 package game.proxy;
 
 import java.util.Random;
-import game.config.GameConfig;
 import game.model.SpinResult;
 
 public class GameBasicBase extends GameBasic {
 
-    public GameBasicBase(GameConfig gameConfig, Random random) {
+    public GameBasicBase(BasicProxyConfig gameConfig, Random random) {
         super(gameConfig, random);
     }
 

@@ -72,6 +72,7 @@ public class Print {
     }
 
     private void printRunSettings(PrintWriter output, SimConfig simConfig) {
+        output.println("Game: " + simConfig.gameId);
         output.println("Logical partitions: " + simConfig.partitions);
         output.println("Seed: " + simConfig.seed);
         output.printf(Locale.ROOT, "Time Taken: %.3f seconds%n",

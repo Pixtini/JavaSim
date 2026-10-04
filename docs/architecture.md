@@ -2,16 +2,15 @@
 
 ## Overview
 
-The project is a small Java Monte Carlo game simulation. `Main` wires configuration and a game implementation into `SimulationRunner`, then passes the merged basegame, freegame, and total-game statistics to the reporting class.
+The project is a small Java Monte Carlo game simulation. `Main` reads the selected game ID from `SimConfig`, asks `GameFactory` to create that game with its own config, and passes it to `SimulationRunner`. It then passes the merged statistics to the reporting class.
 
 The source is grouped into separate game and simulation layers. `Main.java` stays in the default package at the repository root as the launch point; it wires game configuration and an implementation into the simulation layer. The simulation engine depends on the game contract, while game rules stay inside game implementations.
 
 ## Source layout
 
-- `game/`: game contracts (`Game`, `GameSession`), game-specific configuration and result types, and implementations.
-- `game/config/`: settings used by the current game implementation.
+- `game/`: game contracts (`Game`, `GameSession`), selection factory, shared game result types, and implementations.
 - `game/model/`: spin and base-round results passed from game sessions to the simulation layer.
-- `game/proxy/`: current probability-based example game. A heavier slot game can implement the same contract in its own package.
+- `game/proxy/`: current probability-based example game and its `BasicProxyConfig`. Each future game should keep its own configuration with its implementation.
 - `simulation/`: generic Monte Carlo execution and output.
 - `simulation/config/`: simulation-wide settings.
 - `simulation/engine/`: orchestration, worker threads, seeded partitions, and aggregation.
@@ -22,9 +21,9 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 
 ## Configuration
 
-### `game.config.GameConfig`
+### `game.proxy.BasicProxyConfig`
 
-Holds game-specific values used by the example game:
+Holds settings used only by the probability-based proxy:
 
 - Win amounts and their cumulative probability thresholds.
 - The paytable buckets used by `StandardStats`.
@@ -34,6 +33,7 @@ Holds game-specific values used by the example game:
 
 Holds simulation-wide values:
 
+- `gameId`: selects which game `Main` asks `game.GameFactory` to construct. Each factory entry creates that game's own configuration and implementation.
 - `rounds`: number of basegame rounds to simulate.
 - `stake`: stake per basegame round.
 - `seed`: stored seed used when `usePreviousSeed` is enabled; `simulation.engine.SimulationRunner` replaces it with a randomly generated seed otherwise.
@@ -48,7 +48,7 @@ Holds simulation-wide values:
 
 After all tasks finish, the runner merges each partition's statistics in partition-ID order. Fixed partitions and ordered merging keep results reproducible when the same seed, settings, and partition count are used, even if the worker-thread count changes. The effective seed and logical partition count are printed at the end of the console output and `simulation_stats.txt`.
 
-`Main` creates configuration and the chosen `Game` implementation, invokes the runner, and passes the merged results to `Print`. Each partition runs its assigned basegame rounds through `GameSession.playRound()`. The session returns a `GameRoundResult` containing the basegame result and all freegame spin results triggered by that basegame spin. The engine then:
+`Main` creates `SimConfig`, asks `GameFactory` for the selected game, invokes the runner, and passes the merged results to `Print`. The factory creates the selected implementation together with its game-specific config. Each partition runs its assigned basegame rounds through `GameSession.playRound()`. The session returns a `GameRoundResult` containing the basegame result and all freegame spin results triggered by that basegame spin. The engine then:
 
 1. Records the base spin in basegame statistics.
 2. If the base result triggers free spins, records the trigger and each returned free spin in freegame totals and paytable statistics.
@@ -60,6 +60,10 @@ This means the three win distributions have different observation units: basegam
 ### `simulation.engine.SimulationRunner` and `simulation.result.SimulationResult`
 
 `SimulationRunner` validates the worker settings, resolves the seed, submits fixed partitions to an executor, and merges partition-local statistics in partition order. `SimulationResult` carries the three merged statistics collectors back to `Main` for reporting.
+
+### `game.GameFactory`
+
+Maps the `SimConfig.gameId` selection to a game implementation and constructs it with its game-specific configuration. `Main` passes the resulting `Game` to the runner and does not import a game's config class. Register future game implementations here with their own configuration classes.
 
 ## Game and result classes
 
@@ -106,11 +110,11 @@ The percentage of hits and frequency use each distribution's own observation cou
 
 Formats the regular summary and detailed distributions. It receives the same `SimConfig` instance used by `Main`, so the report uses the simulation's rounds, stake, output mode, and timing from `SimulationResult`.
 
-When `exportReport` is `false`, the console receives only the regular summary statistics and run settings. No report files are created.
+When `exportReport` is `false`, the console receives only the regular summary statistics and run settings, including the selected game ID. No report files are created.
 
-When `exportReport` is `true`, the console receives the regular summary statistics, a path to the generated report folder, and the run settings at the bottom. Detailed files are written under `reports/` in a timestamped `simulation-YYYY-MM-DD_HH-mm-ss` folder. A numeric suffix is added if another report already uses that timestamp. Each folder contains:
+When `exportReport` is `true`, the console receives the regular summary statistics, a path to the generated report folder, and the run settings at the bottom, including the selected game ID. Detailed files are written under `reports/` in a timestamped `simulation-YYYY-MM-DD_HH-mm-ss` folder. A numeric suffix is added if another report already uses that timestamp. Each folder contains:
 
-- `simulation_stats.txt`: the regular summary printed to the console, followed by logical partition count, effective seed, and total simulation time.
+- `simulation_stats.txt`: the regular summary printed to the console, followed by selected game ID, logical partition count, effective seed, and total simulation time.
 - `win_distributions.csv`: raw win amounts and hit counts.
 - `win_distribution_aggregated.csv`: aggregated win-band values.
 
@@ -118,7 +122,7 @@ Both CSVs group their sections in this order, with a blank row between sections:
 
 ## Tests
 
-`tests/SimulationTests.java` is a dependency-free test harness for statistics, win-band boundaries, deterministic merging across worker counts, running a game implementation independent of the proxy, seed reporting, console output, and generated report files. Run it with:
+`tests/SimulationTests.java` is a dependency-free test harness for statistics, win-band boundaries, deterministic merging across worker counts, configured game selection, running a game implementation independent of the proxy, seed reporting, console output, and generated report files. Run it with:
 
 ```sh
 javac *.java tests/SimulationTests.java
