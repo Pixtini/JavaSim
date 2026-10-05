@@ -1,12 +1,12 @@
 # Next steps
 
-## 1. Cover GMF policy and multiplier variation
+## 1. Add cancellation to exhaustive runs
 
-Add deterministic tests for custom `LineWinSelectionPolicy` implementations and candidate-specific multiplier functions. This protects the new reusable payline calculator while keeping each game’s award rule explicit at its configuration boundary.
+Allow a full reelset run to stop cleanly on user request and preserve the completed-combination count in a partial result. Exhaustive runs can include hundreds of millions of combinations, so interruption should not lose all progress already computed.
 
 ## 2. Add game-specific report exports
 
-Provide an optional expanding wild detail report containing stopped grids, expanded reels, banner multipliers, scatter counts, and the selected paylines that paid. Preserve the current summary and `showAwards` toggle alongside it.
+Add a CSV export for the full reelset award matrix, feature-trigger count, total winnings, and RTP. This lets large exact-run results be inspected and compared without relying on console output.
 
 ## 3. Generate the game config from spreadsheet data
 

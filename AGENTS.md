@@ -92,6 +92,8 @@ Do not redesign existing architecture unless the task requires it.
 
 Do not modify unrelated files.
 
+Do not make lasting edits to any game config unless specifically asked to do so. You may make changes to test but must revert.
+
 Before implementing a significant architectural change, explain the proposed approach first.
 
 Any task is not finished until Architecture.md has been updated.

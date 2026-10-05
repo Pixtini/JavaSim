@@ -32,11 +32,11 @@ public final class ExpandingWildConfig {
 
     public final int reelCount = 5;
     public final int visibleRows = 5;
-    public int freeGamesAwarded = 8;
+    public int freeGamesAwarded = 5;
     /** One row per multiplier: the value followed by its relative draw weight. */
     public List<WeightedTable.Entry<Integer>> bannerMultiplierWeights = List.of(
-            new WeightedTable.Entry<>(2, 1),
-            new WeightedTable.Entry<>(3, 1),
+            new WeightedTable.Entry<>(2, 1000),
+            new WeightedTable.Entry<>(3, 1000),
             new WeightedTable.Entry<>(4, 1),
             new WeightedTable.Entry<>(5, 1),
             new WeightedTable.Entry<>(6, 1),
@@ -56,13 +56,41 @@ public final class ExpandingWildConfig {
         return symbol;
     }
 
-    /** Reel strips as compact numeric symbol IDs, suitable for spreadsheet editing. */
+    /**
+     * Reel strips as compact numeric symbol IDs. All reels use the same 60-stop
+     * sequence; the scatter stop is retained only on reels 1, 3, and 5.
+     */
     public List<List<Integer>> baseReelStrips = List.of(
-            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2, 3, 4, 5, 12),
-            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2, 3, 4, 5, 6),
-            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 3, 4, 5, 6, 12),
-            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8),
-            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 12));
+            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 12, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 12, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 12, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
 
     public List<Payline> paylines = List.of(
             new Payline(2, 2, 2, 2, 2),
@@ -83,16 +111,16 @@ public final class ExpandingWildConfig {
 
     /** Payout values are multipliers of total round stake, applied per winning line. */
     public Paytable paytable = new Paytable(Map.ofEntries(
-            payout(0, 2.0, 5.0, 12.0),
-            payout(1, 2.0, 6.0, 15.0),
-            payout(2, 2.5, 7.0, 18.0),
-            payout(3, 3.0, 8.0, 20.0),
-            payout(4, 3.0, 9.0, 24.0),
-            payout(5, 3.5, 10.0, 28.0),
-            payout(6, 4.0, 12.0, 32.0),
-            payout(7, 4.0, 14.0, 36.0),
-            payout(8, 5.0, 16.0, 40.0),
-            payout(9, 5.0, 18.0, 45.0)));
+            payout(0, 5.0, 10.0, 20.0),
+            payout(1, 2.0, 3.0, 5.0),
+            payout(2, 1.0, 2.0, 3.0),
+            payout(3, 0.5, 1.0, 2.0),
+            payout(4, 0.2, 0.5, 1.0),
+            payout(5, 0.1, 0.2, 0.5),
+            payout(6, 0.1, 0.2, 0.5),
+            payout(7, 0.1, 0.2, 0.5),
+            payout(8, 0.1, 0.2, 0.5),
+            payout(9, 0.1, 0.2, 0.5)));
 
     private static Map.Entry<Symbol, Map<Integer, Double>> payout(
             int symbolId, double three, double four, double five) {

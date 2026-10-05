@@ -24,7 +24,17 @@ public final class ReelStrip {
             throw new IllegalArgumentException("Window height must be positive");
         }
 
-        int stop = random.nextInt(symbols.size());
+        return windowAt(random.nextInt(symbols.size()), windowHeight);
+    }
+
+    /** Returns the visible window for a specific zero-based stop on this circular reel. */
+    public List<Symbol> windowAt(int stop, int windowHeight) {
+        if (stop < 0 || stop >= symbols.size()) {
+            throw new IllegalArgumentException("Reel stop is outside the strip");
+        }
+        if (windowHeight <= 0) {
+            throw new IllegalArgumentException("Window height must be positive");
+        }
         List<Symbol> window = new ArrayList<>(windowHeight);
         for (int row = 0; row < windowHeight; row++) {
             window.add(symbols.get((stop + row) % symbols.size()));

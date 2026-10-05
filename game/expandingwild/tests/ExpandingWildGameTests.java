@@ -35,6 +35,7 @@ public final class ExpandingWildGameTests {
 
     public static void main(String[] args) {
         testSymbolIdMapping();
+        testDefaultReelLengthAndSymbolCounts();
         testWeightedTableDrawAndValidation();
         testScatterTrigger();
         testReelWindowWrapsAroundStrip();
@@ -61,6 +62,34 @@ public final class ExpandingWildGameTests {
                         && ExpandingWildConfig.fromId(11).equals(ExpandingWildConfig.WILD)
                         && ExpandingWildConfig.fromId(12).equals(ExpandingWildConfig.SCATTER),
                 "special symbol IDs map to banner, wild, and scatter");
+    }
+
+    private static void testDefaultReelLengthAndSymbolCounts() {
+        List<List<Integer>> strips = new ExpandingWildConfig().baseReelStrips;
+        List<Integer> normalizedFirstReel = strips.get(0).stream()
+                .map(id -> id == 12 ? 5 : id).toList();
+        for (int reelIndex = 0; reelIndex < strips.size(); reelIndex++) {
+            List<Integer> strip = strips.get(reelIndex);
+            check(strip.size() == 60, "each configured reel contains sixty stops");
+            check(strip.stream().filter(id -> id == 10).count() == 1,
+                    "each configured reel contains one expanding banner");
+            long expectedScatters = reelIndex % 2 == 0 ? 1 : 0;
+            check(strip.stream().filter(id -> id == 12).count() == expectedScatters,
+                    "only reels one, three, and five contain a scatter");
+            check(strip.stream().map(id -> id == 12 ? 5 : id).toList()
+                            .equals(normalizedFirstReel),
+                    "reels share the same stop sequence apart from ineligible scatters");
+        }
+
+        Map<Integer, Long> counts = strips.get(0).stream().collect(
+                java.util.stream.Collectors.groupingBy(id -> id, java.util.TreeMap::new,
+                        java.util.stream.Collectors.counting()));
+        check(counts.equals(Map.ofEntries(
+                        Map.entry(0, 5L), Map.entry(1, 6L), Map.entry(2, 6L),
+                        Map.entry(3, 6L), Map.entry(4, 6L), Map.entry(5, 5L),
+                        Map.entry(6, 6L), Map.entry(7, 6L), Map.entry(8, 6L),
+                        Map.entry(9, 6L), Map.entry(10, 1L), Map.entry(12, 1L))),
+                "eligible reel symbol counts match the configured distribution");
     }
 
     private static void testWeightedTableDrawAndValidation() {
@@ -243,6 +272,16 @@ public final class ExpandingWildGameTests {
 
     private static void testFreeGameAssignsBannerMultipliers() {
         ExpandingWildConfig config = deterministicConfig();
+        config.bannerMultiplierWeights = List.of(
+                new WeightedTable.Entry<>(2, 1),
+                new WeightedTable.Entry<>(3, 1),
+                new WeightedTable.Entry<>(4, 1),
+                new WeightedTable.Entry<>(5, 1),
+                new WeightedTable.Entry<>(6, 1),
+                new WeightedTable.Entry<>(7, 1),
+                new WeightedTable.Entry<>(8, 1),
+                new WeightedTable.Entry<>(9, 1),
+                new WeightedTable.Entry<>(10, 1));
         config.baseReelStrips = List.of(
                 List.of(10, 0, 0, 0, 0),
                 List.of(10, 0, 0, 0, 0),
@@ -304,8 +343,9 @@ public final class ExpandingWildGameTests {
         check(result.getFreeGameStats().getFreegameTriggers() > 0,
                 "seeded simulation reaches the scatter feature");
         check(result.getFreeGameStats().getRounds()
-                        == result.getFreeGameStats().getFreegameTriggers() * 8,
-                "simulation records eight free spins per trigger");
+                        == result.getFreeGameStats().getFreegameTriggers()
+                                * new ExpandingWildConfig().freeGamesAwarded,
+                "simulation records the configured number of free spins per trigger");
         double totalWin = result.getTotalGameStats().getWinDist().entrySet().stream()
                 .mapToDouble(entry -> entry.getKey() * entry.getValue())
                 .sum();

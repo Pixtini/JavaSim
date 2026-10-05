@@ -7,6 +7,7 @@ import game.GameSession;
 import simulation.config.SimConfig;
 import simulation.result.SimulationResult;
 import simulation.stats.StandardStats;
+import toolkit.progress.ProgressBar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,6 +42,8 @@ public final class SimulationRunner {
         int workerCount = Math.min(simConfig.threads, simConfig.partitions);
         ExecutorService executor = Executors.newFixedThreadPool(workerCount);
         List<Future<PartitionStats>> partitionResults = new ArrayList<>(simConfig.partitions);
+        ProgressBar progress = new ProgressBar(
+                "Monte Carlo", simConfig.rounds, System.err);
         long baseRoundsPerPartition = simConfig.rounds / simConfig.partitions;
         long extraRounds = simConfig.rounds % simConfig.partitions;
 
@@ -50,7 +53,7 @@ public final class SimulationRunner {
                         + (partitionId < extraRounds ? 1 : 0);
                 int currentPartitionId = partitionId;
                 partitionResults.add(executor.submit(
-                        () -> runPartition(currentPartitionId, partitionRounds)));
+                        () -> runPartition(currentPartitionId, partitionRounds, progress)));
             }
 
             // Merge by partition ID, not by completion order, for repeatable floating-point totals.
@@ -67,6 +70,7 @@ public final class SimulationRunner {
             throw new IllegalStateException("A simulation partition failed", exception.getCause());
         } finally {
             executor.shutdownNow();
+            progress.close();
         }
 
         return new SimulationResult(
@@ -76,7 +80,7 @@ public final class SimulationRunner {
                 System.nanoTime() - startNanos);
     }
 
-    private PartitionStats runPartition(int partitionId, long rounds) {
+    private PartitionStats runPartition(int partitionId, long rounds, ProgressBar progress) {
         Random random = new Random(seedForPartition(simConfig.seed, partitionId));
         GameSession gameSession = game.createSession(random);
 
@@ -87,6 +91,7 @@ public final class SimulationRunner {
         StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
         freeGameStats.recordStakeBasis(rounds * simConfig.stake);
 
+        long pendingProgress = 0;
         for (long round = 0; round < rounds; round++) {
             GameRoundResult roundResult = gameSession.playRound(simConfig.stake);
             SpinResult baseResult = roundResult.getBaseGameResult();
@@ -107,7 +112,15 @@ public final class SimulationRunner {
                 freeGameStats.recordWinInDistribution(freeGameWin);
             }
             totalGameStats.recordWinInDistribution(totalWin);
+
+            pendingProgress++;
+            if (pendingProgress == 65_536) {
+                progress.advance(pendingProgress);
+                pendingProgress = 0;
+            }
         }
+
+        progress.advance(pendingProgress);
 
         return new PartitionStats(totalGameStats, baseGameStats, freeGameStats);
     }

@@ -1,7 +1,8 @@
 package game.expandingwild;
 
-import game.Game;
 import game.GameSession;
+import game.ExhaustiveReelGame;
+import game.expandingwild.basegame.ExpandingWildBaseGame;
 import GameModuleFramework.probability.WeightedTable;
 import game.expandingwild.config.ExpandingWildConfig;
 import game.expandingwild.config.ExpandingWildConfigAdapter;
@@ -9,7 +10,7 @@ import java.util.Random;
 import java.util.List;
 
 /** Five-reel expanding wild game module. */
-public final class ExpandingWildGame implements Game {
+public final class ExpandingWildGame implements ExhaustiveReelGame {
     private final ExpandingWildConfig config;
 
     public ExpandingWildGame(ExpandingWildConfig config) {
@@ -33,6 +34,22 @@ public final class ExpandingWildGame implements Game {
         return config.paytable.getAwards().stream()
                 .map(award -> award.symbol().id() + " " + award.matchingSymbols() + "oak")
                 .toList();
+    }
+
+    @Override
+    public int getReelCount() {
+        return config.baseReelStrips.size();
+    }
+
+    @Override
+    public int getStopCount(int reelIndex) {
+        return config.baseReelStrips.get(reelIndex).size();
+    }
+
+    @Override
+    public StopEvaluator createStopEvaluator() {
+        ExpandingWildBaseGame baseGame = new ExpandingWildBaseGame(config, new Random(0));
+        return baseGame::spinAtStops;
     }
 
     private void validateConfig() {

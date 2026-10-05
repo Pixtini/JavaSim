@@ -39,6 +39,16 @@ public final class ExpandingWildBaseGame {
     public ExpandingWildSpinResult spin(double totalRoundStake) {
         ReelGrid stoppedGrid = ReelGrid.spin(
                 reelStrips, config.visibleRows, random);
+        return evaluate(stoppedGrid, totalRoundStake);
+    }
+
+    /** Evaluates one exact set of reel stops without consuming the random stream. */
+    public ExpandingWildSpinResult spinAtStops(int[] reelStops, double totalRoundStake) {
+        ReelGrid stoppedGrid = ReelGrid.atStops(reelStrips, config.visibleRows, reelStops);
+        return evaluate(stoppedGrid, totalRoundStake);
+    }
+
+    private ExpandingWildSpinResult evaluate(ReelGrid stoppedGrid, double totalRoundStake) {
         ScatterTrigger.Result scatterResult = scatterTrigger.evaluate(stoppedGrid);
         WildExpansion.Result expansion = WildExpansion.expandColumns(
                 stoppedGrid, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);

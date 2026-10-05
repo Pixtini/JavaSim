@@ -35,6 +35,18 @@ public final class ReelGrid {
         return new ReelGrid(stoppedReels);
     }
 
+    /** Builds a grid from an exact zero-based stop index for each reel. */
+    public static ReelGrid atStops(List<ReelStrip> strips, int height, int[] stops) {
+        if (strips.size() != stops.length) {
+            throw new IllegalArgumentException("One stop index is required for each reel");
+        }
+        List<List<Symbol>> stoppedReels = new ArrayList<>(strips.size());
+        for (int reel = 0; reel < strips.size(); reel++) {
+            stoppedReels.add(strips.get(reel).windowAt(stops[reel], height));
+        }
+        return new ReelGrid(stoppedReels);
+    }
+
     public int getReelCount() {
         return reels.size();
     }

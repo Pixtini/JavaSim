@@ -19,6 +19,8 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 - `simulation/result/`: completed simulation output returned by the engine.
 - `simulation/stats/`: incremental statistics and win-distribution calculations.
 - `simulation/reporting/`: console formatting and report file creation.
+- `toolkit/viewer/`: command-line win finder and screen printer for interactive game inspection.
+- `toolkit/reelset/`: exact Cartesian reel-stop enumerator and full-cycle aggregate results.
 - `Main.java`: root-level application entry point.
 
 ## Configuration
@@ -84,11 +86,17 @@ These classes implement the proxy's individual spin logic. They are an example g
 
 ### `game.expandingwild.ExpandingWildGame`
 
-Implements the existing game contract with a 5x5 reel game. It keeps basegame and freegame logic separate, uses GMF for reel/grid and payline math, expands visible banners into full-height wild reels, and draws each freegame banner multiplier from a game-configured weighted table before adding participating multipliers on paylines. See [ExpandingWildGame.md](../game/expandingwild/ExpandingWildGame.md) for its chosen example paytable, paylines, tests, and known limits.
+Implements the existing game contract with a 5x5 reel game. It keeps basegame and freegame logic separate, uses GMF for reel/grid and payline math, expands visible banners into full-height wild reels, and draws each freegame banner multiplier from a game-configured weighted table before adding participating multipliers on paylines. Its example config uses one shared 60-stop sequence across the five reels, with scatter stops only on reels 1, 3, and 5. See [ExpandingWildGame.md](../game/expandingwild/ExpandingWildGame.md) for strip symbol counts, paytable, paylines, tests, and known limits.
 
 ### `GameModuleFramework`
 
 Provides small reusable components used by the reel game: `Symbol`, `ReelStrip`, `ReelGrid`, `WildExpansion`, `Payline`, `Paytable`, `PaytableAward`, `PaylineEvaluator`, and `PaylineWinCalculator`. The generic calculator stake-scales line candidates, accepts a candidate-specific multiplier function, and resolves candidate wins using a `LineWinSelectionPolicy` (Expanding Wild selects the highest final payout). GMF also provides `ScatterCounter`, `ScatterTrigger`, `AdditiveMultipliers`, and `probability.WeightedTable`. The game config owns its symbols, symbol-ID mapping, integer reel strips, paylines, paytable, and feature settings; a game adapter converts integer strips into GMF reels. Multiplier assignment and result adaptation remain in the game module.
+
+### `toolkit.viewer`
+
+`ViewerMain` accepts a registered game ID and optional spin limit and stake. `WinFinder` creates a random game session and searches basegame and triggered freegame results until it finds the first positive-win screen or reaches the limit. `WinScreenPrinter` renders Expanding Wild's expanded grid and line details; games that provide only shared `SpinResult` data display their win and named awards. Run it from the project root with `java toolkit.viewer.ViewerMain expanding-wild`.
+
+`FullReelsetMain` runs every unique stop-index combination for a game implementing `ExhaustiveReelGame`. `FullReelsetSimulator` partitions the Cartesian index range across workers, evaluates only the basegame outcome, totals win-award hits and RTP, and counts feature triggers without executing those features. `ReelsetReportPrinter` presents award hits as a matrix with symbols in rows and match lengths in columns. `ReelStrip.windowAt` and `ReelGrid.atStops` provide the deterministic GMF stop-to-screen path. Both exhaustive and Monte Carlo runners use `toolkit.progress.ProgressBar` for large workloads; progress is written to standard error and small runs stay quiet. Run the exhaustive tool with `java toolkit.reelset.FullReelsetMain expanding-wild 1.0 8`.
 
 ### `game.model.SpinResult` and `game.model.GameRoundResult`
 
