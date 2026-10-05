@@ -1,6 +1,10 @@
 # Java compiler output
 *.class
 
+*.xlsx
+
+
+
 # Common build output directories
 /build/
 /out/
