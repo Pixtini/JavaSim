@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import toolkit.progress.ProgressBar;
 
-/** Exhaustively evaluates each unique combination of reel stop positions. */
+/** Exhaustively evaluates each unique stop combination in every configured reel set. */
 public final class FullReelsetSimulator {
     public ReelsetSimulationResult simulate(
             ExhaustiveReelGame game, double stake, int workerCount) {
@@ -23,15 +23,12 @@ public final class FullReelsetSimulator {
             throw new IllegalArgumentException("Worker count must be greater than zero");
         }
 
-        int reelCount = game.getReelCount();
-        int[] stopCounts = new int[reelCount];
-        long combinations = 1;
-        for (int reel = 0; reel < reelCount; reel++) {
-            stopCounts[reel] = game.getStopCount(reel);
-            if (stopCounts[reel] <= 0) {
-                throw new IllegalArgumentException("Every reel must have at least one stop");
-            }
-            combinations = Math.multiplyExact(combinations, stopCounts[reel]);
+        List<SetScenario> scenarios = buildScenarios(game);
+        long combinations = scenarios.stream().mapToLong(SetScenario::combinations).sum();
+        long weightedCombinations = 0;
+        for (SetScenario scenario : scenarios) {
+            weightedCombinations = Math.addExact(weightedCombinations,
+                    Math.multiplyExact(scenario.combinations(), scenario.weight()));
         }
 
         int tasks = (int) Math.min(combinations, workerCount);
@@ -48,7 +45,7 @@ public final class FullReelsetSimulator {
                 long rangeEnd = rangeStart + rangeSize;
                 start = rangeEnd;
                 futures.add(executor.submit(() -> evaluateRange(
-                        game, stopCounts, rangeStart, rangeEnd, stake, progress)));
+                        game, scenarios, rangeStart, rangeEnd, stake, progress)));
             }
 
             Map<String, Long> awardHits = new LinkedHashMap<>();
@@ -62,8 +59,8 @@ public final class FullReelsetSimulator {
                 partial.awardHits().forEach((label, count) ->
                         awardHits.merge(label, count, Math::addExact));
             }
-            return new ReelsetSimulationResult(combinations, featureTriggers,
-                    combinations * stake, totalWinnings, awardHits);
+            return new ReelsetSimulationResult(combinations, weightedCombinations,
+                    featureTriggers, weightedCombinations * stake, totalWinnings, awardHits);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Full reelset simulation was interrupted", exception);
@@ -75,32 +72,82 @@ public final class FullReelsetSimulator {
         }
     }
 
+    /** Number of unique set-and-stop outcomes evaluated, before applying selector weights. */
     public static long countCombinations(ExhaustiveReelGame game) {
-        long combinations = 1;
-        for (int reel = 0; reel < game.getReelCount(); reel++) {
-            combinations = Math.multiplyExact(combinations, game.getStopCount(reel));
-        }
-        return combinations;
+        return buildScenarios(game).stream().mapToLong(SetScenario::combinations).sum();
     }
 
-    private WorkerResult evaluateRange(ExhaustiveReelGame game, int[] stopCounts,
+    /** Number of selector-weighted outcomes represented by the complete evaluation. */
+    public static long countWeightedCombinations(ExhaustiveReelGame game) {
+        long weighted = 0;
+        for (SetScenario scenario : buildScenarios(game)) {
+            weighted = Math.addExact(weighted,
+                    Math.multiplyExact(scenario.combinations(), scenario.weight()));
+        }
+        return weighted;
+    }
+
+    private static List<SetScenario> buildScenarios(ExhaustiveReelGame game) {
+        List<SetScenario> scenarios = new ArrayList<>();
+        long start = 0;
+        for (int setIndex = 0; setIndex < game.getReelSetCount(); setIndex++) {
+            long weight = game.getReelSetWeight(setIndex);
+            if (weight <= 0) {
+                continue;
+            }
+            int[] stopCounts = new int[game.getReelCount()];
+            long combinations = 1;
+            for (int reel = 0; reel < stopCounts.length; reel++) {
+                stopCounts[reel] = game.getStopCount(setIndex, reel);
+                if (stopCounts[reel] <= 0) {
+                    throw new IllegalArgumentException("Every reel must have at least one stop");
+                }
+                combinations = Math.multiplyExact(combinations, stopCounts[reel]);
+            }
+            long end = Math.addExact(start, combinations);
+            scenarios.add(new SetScenario(setIndex, stopCounts, combinations, weight, start, end));
+            start = end;
+        }
+        if (scenarios.isEmpty()) {
+            throw new IllegalArgumentException("At least one reel set must have positive selector weight");
+        }
+        long combinationsPerSet = scenarios.get(0).combinations();
+        if (scenarios.stream().anyMatch(
+                scenario -> scenario.combinations() != combinationsPerSet)) {
+            throw new IllegalArgumentException(
+                    "Weighted full-reelset evaluation requires selectable sets to have the same "
+                            + "number of stop combinations");
+        }
+        return List.copyOf(scenarios);
+    }
+
+    private WorkerResult evaluateRange(ExhaustiveReelGame game, List<SetScenario> scenarios,
             long start, long end, double stake, ProgressBar progress) {
-        ExhaustiveReelGame.StopEvaluator evaluator = game.createStopEvaluator();
-        int[] stops = new int[stopCounts.length];
+        int[] stops = new int[game.getReelCount()];
         Map<String, Long> awardHits = new LinkedHashMap<>();
         long featureTriggers = 0;
         double totalWinnings = 0.0;
         long pendingProgress = 0;
+        int scenarioIndex = 0;
+        ExhaustiveReelGame.StopEvaluator evaluator = null;
 
-        for (long combination = start; combination < end; combination++) {
-            decodeStops(combination, stopCounts, stops);
+        for (long outcome = start; outcome < end; outcome++) {
+            while (outcome >= scenarios.get(scenarioIndex).end()) {
+                scenarioIndex++;
+                evaluator = null;
+            }
+            SetScenario scenario = scenarios.get(scenarioIndex);
+            if (evaluator == null) {
+                evaluator = game.createStopEvaluator(scenario.setIndex());
+            }
+            decodeStops(outcome - scenario.start(), scenario.stopCounts(), stops);
             SpinResult result = evaluator.evaluate(stops, stake);
-            totalWinnings += result.getWin();
+            totalWinnings += result.getWin() * scenario.weight();
             if (result.hasFreeSpin()) {
-                featureTriggers++;
+                featureTriggers = Math.addExact(featureTriggers, scenario.weight());
             }
             for (String award : result.getAwards()) {
-                awardHits.merge(award, 1L, Long::sum);
+                awardHits.merge(award, scenario.weight(), Math::addExact);
             }
             pendingProgress++;
             if (pendingProgress == 65_536) {
@@ -119,6 +166,9 @@ public final class FullReelsetSimulator {
             remaining /= stopCounts[reel];
         }
     }
+
+    private record SetScenario(int setIndex, int[] stopCounts, long combinations,
+            long weight, long start, long end) {}
 
     private record WorkerResult(long combinations, long featureTriggers,
             double totalWinnings, Map<String, Long> awardHits) {}

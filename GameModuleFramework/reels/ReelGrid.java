@@ -28,11 +28,19 @@ public final class ReelGrid {
     }
 
     public static ReelGrid spin(List<ReelStrip> strips, int height, Random random) {
+        return spinWithStops(strips, height, random).grid();
+    }
+
+    /** Spins every reel and also returns the stop indices consumed from the RNG. */
+    public static SpinOutcome spinWithStops(List<ReelStrip> strips, int height, Random random) {
         List<List<Symbol>> stoppedReels = new ArrayList<>(strips.size());
-        for (ReelStrip strip : strips) {
-            stoppedReels.add(strip.spinWindow(random, height));
+        int[] stops = new int[strips.size()];
+        for (int reel = 0; reel < strips.size(); reel++) {
+            ReelStrip strip = strips.get(reel);
+            stops[reel] = random.nextInt(strip.getSymbols().size());
+            stoppedReels.add(strip.windowAt(stops[reel], height));
         }
-        return new ReelGrid(stoppedReels);
+        return new SpinOutcome(new ReelGrid(stoppedReels), stops);
     }
 
     /** Builds a grid from an exact zero-based stop index for each reel. */
@@ -65,5 +73,16 @@ public final class ReelGrid {
 
     public List<Symbol> getReel(int reel) {
         return reels.get(reel);
+    }
+
+    public record SpinOutcome(ReelGrid grid, int[] stops) {
+        public SpinOutcome {
+            stops = stops.clone();
+        }
+
+        @Override
+        public int[] stops() {
+            return stops.clone();
+        }
     }
 }

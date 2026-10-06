@@ -27,9 +27,11 @@ public final class FullReelsetMain {
             }
 
             long combinations = FullReelsetSimulator.countCombinations(reelGame);
+            long weightedCombinations = FullReelsetSimulator.countWeightedCombinations(reelGame);
             System.out.printf("Game: %s%n", args[0]);
-            System.out.printf("Reel stops: %s%n", reelStops(reelGame));
-            System.out.printf("Unique combinations: %d%n", combinations);
+            System.out.printf("Reel sets: %s%n", reelStops(reelGame));
+            System.out.printf("Set-stop outcomes evaluated: %d%n", combinations);
+            System.out.printf("Selector-weighted outcome count: %d%n", weightedCombinations);
             System.out.printf("Evaluating with %d workers...%n", workers);
 
             ReelsetSimulationResult result = new FullReelsetSimulator()
@@ -46,11 +48,18 @@ public final class FullReelsetMain {
 
     private static String reelStops(ExhaustiveReelGame game) {
         StringBuilder text = new StringBuilder();
-        for (int reel = 0; reel < game.getReelCount(); reel++) {
-            if (reel > 0) {
-                text.append(" × ");
+        for (int set = 0; set < game.getReelSetCount(); set++) {
+            if (set > 0) {
+                text.append("; ");
             }
-            text.append(game.getStopCount(reel));
+            text.append("set ").append(set).append(" (weight ")
+                    .append(game.getReelSetWeight(set)).append("): ");
+            for (int reel = 0; reel < game.getReelCount(); reel++) {
+                if (reel > 0) {
+                    text.append(" × ");
+                }
+                text.append(game.getStopCount(set, reel));
+            }
         }
         return text.toString();
     }

@@ -15,4 +15,19 @@ public interface Game {
     default List<String> getAwardLabels() {
         return List.of();
     }
+
+    /** Number of basegame reel sets whose results should be reported separately. */
+    default int getBaseGameSetCount() {
+        return 0;
+    }
+
+    /** Number of freegame reel sets whose results should be reported separately. */
+    default int getFreeGameSetCount() {
+        return 0;
+    }
+
+    /** Maximum complete-round win as a multiple of the configured round stake. */
+    default double getMaxWinMultiplier() {
+        return Double.POSITIVE_INFINITY;
+    }
 }

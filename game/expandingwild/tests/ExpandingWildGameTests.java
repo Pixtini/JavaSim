@@ -65,14 +65,15 @@ public final class ExpandingWildGameTests {
     }
 
     private static void testDefaultReelLengthAndSymbolCounts() {
-        List<List<Integer>> strips = new ExpandingWildConfig().baseReelStrips;
+        ExpandingWildConfig defaultConfig = new ExpandingWildConfig();
+        List<List<Integer>> strips = defaultConfig.baseGame.sets.get(0).reelStrips;
         List<Integer> normalizedFirstReel = strips.get(0).stream()
                 .map(id -> id == 12 ? 5 : id).toList();
         for (int reelIndex = 0; reelIndex < strips.size(); reelIndex++) {
             List<Integer> strip = strips.get(reelIndex);
             check(strip.size() == 60, "each configured reel contains sixty stops");
-            check(strip.stream().filter(id -> id == 10).count() == 1,
-                    "each configured reel contains one expanding banner");
+            check(strip.stream().noneMatch(id -> id == 10 || id == 11),
+                    "basegame set zero contains no wild symbols");
             long expectedScatters = reelIndex % 2 == 0 ? 1 : 0;
             check(strip.stream().filter(id -> id == 12).count() == expectedScatters,
                     "only reels one, three, and five contain a scatter");
@@ -85,11 +86,21 @@ public final class ExpandingWildGameTests {
                 java.util.stream.Collectors.groupingBy(id -> id, java.util.TreeMap::new,
                         java.util.stream.Collectors.counting()));
         check(counts.equals(Map.ofEntries(
-                        Map.entry(0, 5L), Map.entry(1, 6L), Map.entry(2, 6L),
+                        Map.entry(0, 6L), Map.entry(1, 6L), Map.entry(2, 6L),
                         Map.entry(3, 6L), Map.entry(4, 6L), Map.entry(5, 5L),
                         Map.entry(6, 6L), Map.entry(7, 6L), Map.entry(8, 6L),
-                        Map.entry(9, 6L), Map.entry(10, 1L), Map.entry(12, 1L))),
+                        Map.entry(9, 6L), Map.entry(12, 1L))),
                 "eligible reel symbol counts match the configured distribution");
+        check(defaultConfig.baseGame.sets.get(1).reelStrips.stream()
+                        .allMatch(reel -> reel.contains(10) && !reel.contains(12)),
+                "basegame set one contains banners and no scatters");
+        check(defaultConfig.baseGame.setSelectionWeights.equals(List.of(
+                        new WeightedTable.Entry<>(0, 3),
+                        new WeightedTable.Entry<>(1, 1))),
+                "basegame sets are selected at three-to-one relative weight");
+        check(defaultConfig.freeGame.setSelectionWeights.equals(
+                        defaultConfig.baseGame.setSelectionWeights),
+                "freegame sets use the same three-to-one relative selection weight");
     }
 
     private static void testWeightedTableDrawAndValidation() {
@@ -272,7 +283,8 @@ public final class ExpandingWildGameTests {
 
     private static void testFreeGameAssignsBannerMultipliers() {
         ExpandingWildConfig config = deterministicConfig();
-        config.bannerMultiplierWeights = List.of(
+        config.freeGame.setSelectionWeights = List.of(new WeightedTable.Entry<>(1, 1));
+        config.freeGame.sets.get(1).bannerMultiplierWeights = List.of(
                 new WeightedTable.Entry<>(2, 1),
                 new WeightedTable.Entry<>(3, 1),
                 new WeightedTable.Entry<>(4, 1),
@@ -282,7 +294,7 @@ public final class ExpandingWildGameTests {
                 new WeightedTable.Entry<>(8, 1),
                 new WeightedTable.Entry<>(9, 1),
                 new WeightedTable.Entry<>(10, 1));
-        config.baseReelStrips = List.of(
+        config.freeGame.sets.get(1).reelStrips = List.of(
                 List.of(10, 0, 0, 0, 0),
                 List.of(10, 0, 0, 0, 0),
                 List.of(10, 0, 0, 0, 0),
@@ -309,7 +321,7 @@ public final class ExpandingWildGameTests {
         check(maximumResult.getLineWins().get(0).multiplier() == 50.0,
                 "five maximum banner multipliers add to fifty times");
 
-        config.bannerMultiplierWeights = List.of(
+        config.freeGame.sets.get(1).bannerMultiplierWeights = List.of(
                 new WeightedTable.Entry<>(2, 1),
                 new WeightedTable.Entry<>(10, 3));
         ExpandingWildSpinResult lowWeightedResult = new ExpandingWildFreeGame(
@@ -343,9 +355,9 @@ public final class ExpandingWildGameTests {
         check(result.getFreeGameStats().getFreegameTriggers() > 0,
                 "seeded simulation reaches the scatter feature");
         check(result.getFreeGameStats().getRounds()
-                        == result.getFreeGameStats().getFreegameTriggers()
+                        <= result.getFreeGameStats().getFreegameTriggers()
                                 * new ExpandingWildConfig().freeGamesAwarded,
-                "simulation records the configured number of free spins per trigger");
+                "simulation records no more than the configured free spins per trigger");
         double totalWin = result.getTotalGameStats().getWinDist().entrySet().stream()
                 .mapToDouble(entry -> entry.getKey() * entry.getValue())
                 .sum();
@@ -386,7 +398,7 @@ public final class ExpandingWildGameTests {
         check(symbolCount == 10, "default paytable defines ten regular symbols");
         ExpandingWildConfig defaultConfig = new ExpandingWildConfig();
         for (int reelIndex : defaultConfig.scatterReels) {
-            ReelStrip strip = ExpandingWildConfigAdapter.toBaseReelStrips(defaultConfig)
+            ReelStrip strip = ExpandingWildConfigAdapter.toReelStrips(defaultConfig.baseGame.sets.get(0))
                     .get(reelIndex);
             for (int stop = 0; stop < strip.getSymbols().size(); stop++) {
                 List<Symbol> window = strip.spinWindow(new FixedRandom(stop), 5);
@@ -410,12 +422,18 @@ public final class ExpandingWildGameTests {
     private static ExpandingWildConfig deterministicConfig() {
         ExpandingWildConfig config = new ExpandingWildConfig();
         config.freeGamesAwarded = 2;
-        config.baseReelStrips = List.of(
+        config.baseGame.sets.get(0).reelStrips = List.of(
                 List.of(12, 0, 0, 0, 0),
                 List.of(0, 0, 0, 0, 0),
                 List.of(12, 0, 0, 0, 0),
                 List.of(0, 0, 0, 0, 0),
                 List.of(12, 0, 0, 0, 0));
+        config.freeGame.sets.get(0).reelStrips = List.of(
+                List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0));
         config.paylines = List.of(new Payline(1, 1, 1, 1, 1));
         config.paytable = new Paytable(
                 Map.of(ExpandingWildConfig.fromId(0), Map.of(3, 10.0, 4, 20.0, 5, 30.0)));

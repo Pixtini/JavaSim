@@ -32,20 +32,34 @@ public final class ExpandingWildConfig {
 
     public final int reelCount = 5;
     public final int visibleRows = 5;
+    /** Maximum round payout as a multiple of total round stake. */
+    public double maxWinMultiplier = 100.0;
     public int freeGamesAwarded = 5;
-    /** One row per multiplier: the value followed by its relative draw weight. */
-    public List<WeightedTable.Entry<Integer>> bannerMultiplierWeights = List.of(
-            new WeightedTable.Entry<>(2, 1000),
-            new WeightedTable.Entry<>(3, 1000),
-            new WeightedTable.Entry<>(4, 1),
-            new WeightedTable.Entry<>(5, 1),
-            new WeightedTable.Entry<>(6, 1),
-            new WeightedTable.Entry<>(7, 1),
-            new WeightedTable.Entry<>(8, 1),
-            new WeightedTable.Entry<>(9, 1),
-            new WeightedTable.Entry<>(10, 1));
     public final int freeGameTriggerScatterCount = 3;
     public final int[] scatterReels = {0, 2, 4};
+
+    /** Basegame modes. Set 0 has scatters and no banners; set 1 has banners and no scatters. */
+    public SpinModeConfig baseGame = new SpinModeConfig(
+            List.of(
+                    new SpinSetConfig(defaultBaseGameReels(), List.of()),
+                    new SpinSetConfig(defaultFreeGameReels(), List.of())),
+            List.of(new WeightedTable.Entry<>(0, 3), new WeightedTable.Entry<>(1, 1)));
+
+    /** Freegame modes. Set 0 has no banners; set 1 has banners and weighted multipliers. */
+    public SpinModeConfig freeGame = new SpinModeConfig(
+            List.of(
+                    new SpinSetConfig(defaultFreeGameNoWildReels(), List.of()),
+                    new SpinSetConfig(defaultFreeGameReels(), List.of(
+                    new WeightedTable.Entry<>(2, 1000),
+                    new WeightedTable.Entry<>(3, 1000),
+                    new WeightedTable.Entry<>(4, 1),
+                    new WeightedTable.Entry<>(5, 1),
+                    new WeightedTable.Entry<>(6, 1),
+                    new WeightedTable.Entry<>(7, 1),
+                    new WeightedTable.Entry<>(8, 1),
+                    new WeightedTable.Entry<>(9, 1),
+                    new WeightedTable.Entry<>(10, 1)))),
+            List.of(new WeightedTable.Entry<>(0, 3), new WeightedTable.Entry<>(1, 1)));
 
     /** Resolves a spreadsheet reel-symbol ID to its game symbol. */
     public static Symbol fromId(int id) {
@@ -56,41 +70,144 @@ public final class ExpandingWildConfig {
         return symbol;
     }
 
-    /**
-     * Reel strips as compact numeric symbol IDs. All reels use the same 60-stop
-     * sequence; the scatter stop is retained only on reels 1, 3, and 5.
-     */
-    public List<List<Integer>> baseReelStrips = List.of(
-            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+    /** Basegame set 0: regular symbols plus scatters, with banners replaced by T1. */
+    private static List<List<Integer>> defaultBaseGameReels() {
+        return List.of(
+            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 12, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 12, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-            List.of(10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 12, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+    }
+
+    /** Explicit scatter-free freegame strips; no runtime filtering is applied. */
+    private static List<List<Integer>> defaultFreeGameReels() {
+        return List.of(
+                List.of(
+                        10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0),
+                List.of(
+                        10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                List.of(
+                        10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0),
+                List.of(
+                        10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                List.of(
+                        10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0));
+    }
+
+    /** Freegame set 0: same explicit strip layout as set 1, without banner wilds. */
+    private static List<List<Integer>> defaultFreeGameNoWildReels() {
+        return List.of(
+                List.of(
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0),
+                List.of(
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                List.of(
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0),
+                List.of(
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                List.of(
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        0, 1, 2, 3, 4, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 0));
+    }
+
+    /** One mode's ordered set list and the weights used to select a set on every spin. */
+    public static final class SpinModeConfig {
+        public List<SpinSetConfig> sets;
+        public List<WeightedTable.Entry<Integer>> setSelectionWeights;
+
+        public SpinModeConfig(List<SpinSetConfig> sets,
+                List<WeightedTable.Entry<Integer>> setSelectionWeights) {
+            this.sets = sets;
+            this.setSelectionWeights = setSelectionWeights;
+        }
+    }
+
+    /** One mode-specific reel strip set and its optional banner multiplier weights. */
+    public static final class SpinSetConfig {
+        public List<List<Integer>> reelStrips;
+        public List<WeightedTable.Entry<Integer>> bannerMultiplierWeights;
+
+        public SpinSetConfig(List<List<Integer>> reelStrips,
+                List<WeightedTable.Entry<Integer>> bannerMultiplierWeights) {
+            this.reelStrips = reelStrips;
+            this.bannerMultiplierWeights = bannerMultiplierWeights;
+        }
+    }
 
     public List<Payline> paylines = List.of(
             new Payline(2, 2, 2, 2, 2),

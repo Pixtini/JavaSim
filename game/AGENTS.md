@@ -255,6 +255,14 @@ Configuration should define values such as:
 
 Game code should define how those values are used.
 
+When creating the config there should be:
+
+- Game wide config (Paytable, Win Cap, etc)
+- Set selection weight table for Base Game 
+    - Spin Config for each set (Reels, Weight tables for features, etc)
+- Set selection weight for Free Game 
+    - Spin Config for each set (Reels, Weight tables for features, etc)
+
 ---
 
 ## Separation From Simulation

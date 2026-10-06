@@ -19,6 +19,7 @@ public class StandardStats {
     private double totalWinnings;
     private long rounds;
     private long freegameTriggers;
+    private long winCaps;
     private final int[] paytable;
     private final Map<Double, Long> winDist = new HashMap<>();
     private final Map<String, Long> awardCounts = new LinkedHashMap<>();
@@ -71,6 +72,7 @@ public class StandardStats {
         totalWinnings += other.totalWinnings;
         rounds += other.rounds;
         freegameTriggers += other.freegameTriggers;
+        winCaps += other.winCaps;
         totalStakeBasis += other.totalStakeBasis;
         for (int i = 0; i < paytable.length; i++) {
             paytable[i] += other.paytable[i];
@@ -111,6 +113,14 @@ public class StandardStats {
 
     public void recordFreegameTrigger() {
         freegameTriggers++;
+    }
+
+    public long getWinCaps() {
+        return winCaps;
+    }
+
+    public void recordWinCap() {
+        winCaps++;
     }
 
     public double getStandardDeviation() {

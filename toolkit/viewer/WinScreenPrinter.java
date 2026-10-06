@@ -5,6 +5,8 @@ import GameModuleFramework.symbols.Symbol;
 import game.expandingwild.model.ExpandingWildLineWin;
 import game.expandingwild.model.ExpandingWildSpinResult;
 import game.model.SpinResult;
+import game.model.GameRoundResult;
+import simulation.replay.SavedGameplay;
 import java.io.PrintStream;
 import java.util.Locale;
 
@@ -29,13 +31,47 @@ public final class WinScreenPrinter {
         }
     }
 
+    /** Prints every recalculated screen in a saved round and its validation summary. */
+    public static void printReplay(SavedGameplay saved, GameRoundResult replayed,
+            boolean matches, PrintStream output) {
+        output.printf("Replay %d (%s)%n", saved.id(), saved.gameId());
+        printReplaySpin("Basegame", replayed.getBaseGameResult(), saved.stake(), output);
+        for (int index = 0; index < replayed.getFreeGameResults().size(); index++) {
+            printReplaySpin("Freegame spin " + (index + 1),
+                    replayed.getFreeGameResults().get(index), saved.stake(), output);
+        }
+        double featureWin = replayed.getFreeGameResults().stream()
+                .mapToDouble(SpinResult::getWin).sum();
+        double totalWin = replayed.getBaseGameResult().getWin() + featureWin;
+        output.printf(Locale.ROOT, "Recalculated total win: %.4f (%.4fx stake)%n",
+                totalWin, totalWin / saved.stake());
+        output.printf(Locale.ROOT,
+                "Recorded total/basegame/feature wins: %.4f / %.4f / %.4f%n",
+                saved.totalWin(), saved.baseGameWin(), saved.featureGameWin());
+        output.println("Replay validation: " + (matches ? "PASSED" : "FAILED"));
+    }
+
+    private static void printReplaySpin(String label, SpinResult spin,
+            double stake, PrintStream output) {
+        output.printf(Locale.ROOT, "%s (set %d): %.4f (%.4fx stake)%n",
+                label, spin.getSetIndex(), spin.getWin(), spin.getWin() / stake);
+        if (spin instanceof ExpandingWildSpinResult expanding) {
+            printGrid(expanding.getExpandedGrid(), output);
+            for (ExpandingWildLineWin lineWin : expanding.getLineWins()) {
+                printLineWin(lineWin, stake, output);
+            }
+        } else if (!spin.getAwards().isEmpty()) {
+            output.println("Awards: " + spin.getAwards());
+        }
+    }
+
     private static void printGrid(ReelGrid grid, PrintStream output) {
         output.println("Screen:");
-        StringBuilder border = new StringBuilder("+");
+        output.print("|");
         for (int reel = 0; reel < grid.getReelCount(); reel++) {
-            border.append("-----+");
+            output.printf(" %-3s |", "R" + (reel + 1));
         }
-        output.println(border);
+        output.println();
         for (int row = 0; row < grid.getHeight(); row++) {
             output.print("|");
             for (int reel = 0; reel < grid.getReelCount(); reel++) {
@@ -43,7 +79,6 @@ public final class WinScreenPrinter {
             }
             output.println();
         }
-        output.println(border);
     }
 
     private static void printLineWin(ExpandingWildLineWin lineWin,

@@ -12,6 +12,7 @@ public final class ReelsetReportPrinter {
     public static void print(ReelsetSimulationResult result, PrintStream output) {
         output.println("\nFull basegame reelset results (freegames not played)");
         output.printf("Combinations evaluated: %d%n", result.combinations());
+        output.printf("Selector-weighted outcomes: %d%n", result.weightedCombinations());
         output.printf("Freegame triggers: %d%n", result.featureTriggers());
         output.printf(java.util.Locale.ROOT, "Total stake: %.2f%n", result.totalStake());
         output.printf(java.util.Locale.ROOT, "Total winnings: %.2f%n", result.totalWinnings());

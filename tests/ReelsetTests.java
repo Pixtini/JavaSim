@@ -68,23 +68,33 @@ public final class ReelsetTests {
     private static void testExpandingWildCombinationCount() {
         ExhaustiveReelGame game = (ExhaustiveReelGame) GameFactory.create("expanding-wild");
         check(game.getReelCount() == 5, "expanding wild exposes five reels to the tool");
-        check(FullReelsetSimulator.countCombinations(game) == 777_600_000L,
-                "five 60-stop reels contain 60 to the fifth combinations");
+        check(FullReelsetSimulator.countCombinations(game) == 1_555_200_000L,
+                "full reelset count includes both equally sized basegame spin sets");
+        check(FullReelsetSimulator.countWeightedCombinations(game) == 3_110_400_000L,
+                "weighted combination count applies the 3:1 set selector");
 
         ExpandingWildConfig smallConfig = new ExpandingWildConfig();
-        smallConfig.baseReelStrips = List.of(
+        smallConfig.baseGame.sets.get(0).reelStrips = List.of(
                 List.of(12, 0, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0, 0),
                 List.of(12, 0, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0, 0),
                 List.of(12, 0, 0, 0, 0, 0));
+        smallConfig.baseGame.sets.get(1).reelStrips = List.of(
+                List.of(10, 0, 0, 0, 0, 0),
+                List.of(10, 0, 0, 0, 0, 0),
+                List.of(10, 0, 0, 0, 0, 0),
+                List.of(10, 0, 0, 0, 0, 0),
+                List.of(10, 0, 0, 0, 0, 0));
         smallConfig.paylines = List.of(new Payline(2, 2, 2, 2, 2));
         ReelsetSimulationResult smallRun = new FullReelsetSimulator().simulate(
                 new ExpandingWildGame(smallConfig), 1.0, 2);
-        check(smallRun.combinations() == 7_776,
-                "Expanding Wild evaluates each stop combination in a small complete run");
-        check(smallRun.featureTriggers() == 4_500,
-                "Expanding Wild records scatter triggers without playing freegames");
+        check(smallRun.combinations() == 15_552,
+                "Expanding Wild evaluates every stop combination in both small sets");
+        check(smallRun.weightedCombinations() == 31_104,
+                "Expanding Wild applies the selector weights to exhaustive outcomes");
+        check(smallRun.featureTriggers() == 13_500,
+                "Expanding Wild weights base set scatter triggers without playing freegames");
     }
 
     private static void testLargeRunProgressDisplay() {
