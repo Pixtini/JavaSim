@@ -38,6 +38,7 @@ import simulation.result.SimulationResult;
 import toolkit.reelset.FullReelsetSimulator;
 import toolkit.reelset.ReelsetReportPrinter;
 import toolkit.replay.ReplayerMain;
+import toolkit.player.PrototypePlayerFrame;
 import toolkit.viewer.WinFinder;
 import toolkit.viewer.WinScreenPrinter;
 
@@ -62,6 +63,7 @@ public final class ToolkitGUI extends JFrame {
         tabs.addTab("Win viewer", createViewerTab());
         tabs.addTab("Full reelset", createReelsetTab());
         tabs.addTab("Replay", createReplayTab());
+        tabs.addTab("Prototype player", createPlayerTab());
         add(tabs, BorderLayout.NORTH);
 
         outputArea.setEditable(false);
@@ -243,6 +245,25 @@ public final class ToolkitGUI extends JFrame {
                 showInputError(exception);
             }
         });
+        return panel;
+    }
+
+    private JPanel createPlayerTab() {
+        JPanel panel = new JPanel(new BorderLayout(12, 12));
+        panel.setBorder(BorderFactory.createEmptyBorder(18, 22, 18, 22));
+        JTextArea description = new JTextArea(
+                "Open a resizable player window for hands-on balancing. "
+                + "It plays Expanding Wild through its normal game session and shows "
+                + "the reel drop, winning lines, payout tracker, and freegame award screen. "
+                + "Player display adapters keep rendering separate from game calculations.");
+        description.setLineWrap(true);
+        description.setWrapStyleWord(true);
+        description.setEditable(false);
+        description.setOpaque(false);
+        panel.add(description, BorderLayout.CENTER);
+        JButton openPlayer = new JButton("Open prototype player");
+        openPlayer.addActionListener(event -> PrototypePlayerFrame.open());
+        panel.add(openPlayer, BorderLayout.SOUTH);
         return panel;
     }
 

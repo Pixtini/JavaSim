@@ -22,6 +22,8 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 - `toolkit/viewer/`: command-line win finder and screen printer for interactive game inspection.
 - `toolkit/reelset/`: exact Cartesian reel-stop enumerator and full-cycle aggregate results.
 - `toolkit/replay/`: saved-gameplay lookup, replay calculation, and validation.
+- `toolkit/progress/`: shared progress display for long-running simulation and reelset jobs.
+- `toolkit/player/`: balancing player presentation model, resizable reel viewport, and per-game adapters.
 - `ToolkitGUI.java`: root-level Swing launcher with tabs for simulation, win viewing, full reelset evaluation, and replay.
 - `Main.java`: root-level application entry point.
 
@@ -119,6 +121,8 @@ Immutable results for an individual spin and a complete basegame round. A round 
 
 Launch the desktop toolkit from the project root with `java ToolkitGUI` after compiling the project. Its Simulation tab exposes game ID, rounds, stake, seed reuse, report export, award display, worker threads, logical partitions, and saved-gameplay count. The Win viewer takes game ID, maximum spins, and stake; Full reelset takes game ID, stake, and workers; Replay takes a saved-gameplay CSV and gameplay ID. The GUI runs each operation on a background worker and streams its output into the window. Simulation reporting accepts a supplied writer so console output and report files stay consistent.
 
+The Prototype player tab opens a separate resizable play window. It can also be launched directly with `java toolkit.player.PlayerMain`. `PlayerGameAdapter` maps a normal game-session round into `PlayerDisplayData` (grid, awards, highlight positions, feature spins, and display metadata); the player renders that data without using simulation statistics or report generation. The first adapter is Expanding Wild. Positional wins support line, ways, or cluster highlighting, and the viewport sizes itself from the grid dimensions. It animates reel stops and win presentation after the game session has calculated the round.
+
 ## Statistics
 
 ### `simulation.stats.StandardStats`
@@ -159,12 +163,16 @@ Both CSVs group their sections in this order, with a blank row between sections:
 
 ## Tests
 
-`tests/SimulationTests.java` covers generic statistics, deterministic merging, game selection, and reports. `game/expandingwild/tests/ExpandingWildGameTests.java` covers GMF mechanics, game rules, and a seeded simulator run. Run both suites with:
+`tests/SimulationTests.java` covers generic statistics, deterministic merging, game selection, and reports. `game/expandingwild/tests/ExpandingWildGameTests.java` covers GMF mechanics, game rules, and a seeded simulator run. `ViewerTests`, `ReelsetTests`, and `ReplayTests` cover the toolkit flows; `PlayerTests` checks the player adapter and variable-size display model. Run the suites with:
 
 ```sh
 javac *.java tests/*.java game/expandingwild/tests/*.java
 java -cp .:tests SimulationTests
 java game.expandingwild.tests.ExpandingWildGameTests
+java -cp .:tests PlayerTests
+java -cp .:tests ViewerTests
+java -cp .:tests ReelsetTests
+java -cp .:tests ReplayTests
 ```
 
 From the repository root, the normal launch flow is:
@@ -181,3 +189,5 @@ Launch the GUI instead with `java ToolkitGUI`.
 ## Current scope
 
 The code is an example simulation framework rather than a general-purpose engine. `simulation.engine.SimulationRunner` handles orchestration and parallel execution through the `game.Game` / `game.GameSession` contract. Both `game.proxy` and `game.expandingwild` implement that contract. The initial `GameModuleFramework` package contains reusable reel and line-win math; new generic mechanics should be added only when another game can use them. See [nextsteps.md](../nextsteps.md) for the proposed order of improvements.
+
+Current boundaries to keep in mind: `GameRoundResult` and simulation accounting model one basegame result plus freegame spins, replay injection and the prototype player currently support Expanding Wild, and exhaustive reelset evaluation covers basegame outcomes only. Game configurations are Java data structures rather than externally loaded balance files. The GUI also has no cancellation control yet.
