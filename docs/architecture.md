@@ -11,8 +11,8 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 - `game/`: game contracts (`Game`, `GameSession`), selection factory, shared game result types, and implementations.
 - `game/model/`: spin and base-round results passed from game sessions to the simulation layer, including shared round win-cap application and cap-hit metadata.
 - `game/proxy/`: current probability-based example game and its `BasicProxyConfig`. Each future game should keep its own configuration with its implementation.
-- `game/expandingwild/`: first reel-based game, with separate basegame, freegame, config, config adapter, and detailed spin results. Its game-wide config is separated from basegame and freegame spin sets; each set contains explicit integer-ID reel strips and its multiplier settings. The adapter translates each set to GMF `Symbol` values.
-- `GameModuleFramework/`: reusable symbols, reel strips and grids, payline evaluation and win selection, paytable award metadata, scatter counting and trigger evaluation, wild expansion, additive multiplier helpers, and generic weighted-table draws.
+- `game/expandingwild/`: first reel-based game, with separate basegame, freegame, config, config adapter, and detailed spin results. Its game-wide config is separated from basegame and freegame spin sets; each set contains integer-ID regular-symbol strips, insertion rules, and multiplier settings. The adapter translates each set to GMF `Symbol` values.
+- `GameModuleFramework/`: reusable symbols, reel strips and grids, weighted symbol insertion, payline evaluation and win selection, paytable award metadata, scatter counting and trigger evaluation, wild expansion, additive multiplier helpers, and generic weighted-table draws.
 - `simulation/`: generic Monte Carlo execution and output.
 - `simulation/config/`: simulation-wide settings.
 - `simulation/engine/`: orchestration, worker threads, seeded partitions, and aggregation.
@@ -54,6 +54,54 @@ Holds simulation-wide values:
 
 ## Simulation flow
 
+A browser page with visual renderings of the documented Mermaid diagrams is available at [flowcharts.html](flowcharts.html). It includes simulation, game creation, math validation, replay debugging, and the architecture overview. The page loads Mermaid from a CDN, so browser access requires an internet connection.
+
+The standalone diagram, including both CLI and GUI entry points and the reporting export branches, is in [simulation-flow.md](simulation-flow.md).
+
+For the recommended steps to add a future game module, see [game-creation-flow.md](game-creation-flow.md).
+
+Use the fillable [game creation form](game-creation-form.md) to capture a new game's rules, configuration, implementation plan, tests, and validation evidence end to end.
+
+For the Expanding Wild rules, configuration, features, results, replay, and known math limitations, see [ExpandingWildGame.md](../game/expandingwild/ExpandingWildGame.md). It is the detailed game-specific reference and complements this framework overview.
+
+For validating game balance inputs and interpreting simulator output, see [game-math-validation-flow.md](game-math-validation-flow.md). For reconstructing and diagnosing saved rounds, see [replay-debugging-flow.md](replay-debugging-flow.md).
+
+```mermaid
+flowchart TD
+    A[Main] --> B[Read SimConfig and select game through GameFactory]
+    B --> C[SimulationRunner.run]
+    C --> D[Validate settings and resolve effective seed]
+    D --> E[Split rounds into fixed logical partitions]
+    E --> F[Run partitions on worker threads]
+    F --> G[Each partition creates its RNG, GameSession, and local stats]
+    G --> H[Play basegame round]
+    H --> K[Record basegame result, awards, and set stats]
+    K --> I{Did the round trigger freegames?}
+    I -- Yes --> J[Play and record each freegame spin]
+    I -- No --> L[Record triggered freegame distribution if applicable and total-round distribution]
+    J --> L
+    L --> M{Capture replay data for this round?}
+    M -- Yes --> N[Store complete replay events in partition result]
+    M -- No --> O[Continue to next assigned round]
+    N --> O
+    O --> P{More rounds in this partition?}
+    P -- Yes --> H
+    P -- No --> Q[Return partition-local stats and replay records]
+    Q --> R[Merge partitions in partition-ID order]
+    R --> S[Build SimulationResult with run time and effective seed]
+    S --> T[Print regular statistics]
+    T --> U{Report export enabled?}
+    U -- No --> V[Print run settings to console]
+    U -- Yes --> W[Create unique timestamped report folder]
+    W --> X[Write summary and win-distribution CSVs]
+    W --> Y{Replay records available?}
+    Y -- Yes --> Z[Write saved_gameplays.csv]
+    Y -- No --> AA[Skip replay CSV]
+    X --> AB[Print report path and run settings]
+    Z --> AB
+    AA --> AB
+```
+
 `simulation.engine.SimulationRunner` resolves the run's effective seed from `SimConfig.usePreviousSeed`. It divides the configured rounds into a fixed number of logical partitions and derives one seed from the run seed and each partition ID. Each task owns its `Random`, `GameSession`, statistics collectors, and at most the configured replay records for its round range. The game implementation creates sessions from the supplied random stream, keeping random sequences deterministic per partition. Tasks do not update shared statistics.
 
 After all tasks finish, the runner merges each partition's statistics in partition-ID order. Fixed partitions and ordered merging keep results reproducible when the same seed, settings, and partition count are used, even if the worker-thread count changes. The effective seed and logical partition count are printed at the end of the console output and `simulation_stats.txt`.
@@ -75,7 +123,7 @@ This means the three win distributions have different observation units: basegam
 
 `game.model.ReplayEvent` is a game-neutral envelope containing an event type, recorded win, and opaque game-owned payload. `GameRoundResult` returns the ordered replay events for the round, and `GameSession.replayRound` is the injection point used to recalculate them. A game may define any event types and payload schema; the simulation and CSV writer do not interpret that payload. `SavedGameplayCsv` writes one row per event with a repeated gameplay ID and round summary, allowing rounds with any number of feature events. A game that does not supply replay events is omitted from saved-gameplay output.
 
-Expanding Wild stores the selected set, reel stop per reel, and resolved banner multiplier choice in a versioned JSON payload. Replaying injects the recorded stops and multiplier values directly, then recalculates the line wins using the active paytable and win cap. The stored multiplier choices remain stable if the configured weight table changes; the recorded total, basegame, feature, and per-event wins are checked against the recalculated outcomes by `toolkit.replay.ReplayerMain`. Reports containing replayable rounds add `saved_gameplays.csv`; distribution CSV formats remain unchanged.
+Expanding Wild stores the selected set, reel stops, inserted symbol locations, and resolved banner multiplier choices in a versioned JSON payload. Replaying injects these recorded choices directly, then recalculates the line wins using the active paytable and win cap. Insertion heat-map and multiplier weights are not redrawn; the recorded total, basegame, feature, and per-event wins are checked against recalculated outcomes by `toolkit.replay.ReplayerMain`. Reports containing replayable rounds add `saved_gameplays.csv`; distribution CSV formats remain unchanged.
 
 Run the replayer from the project root with `java toolkit.replay.ReplayerMain reports/<report-folder>/saved_gameplays.csv <gameplay-id>`.
 
@@ -99,9 +147,9 @@ These classes implement the proxy's individual spin logic. They are an example g
 
 ### `game.expandingwild.ExpandingWildGame`
 
-Implements the existing game contract with a 5x5 reel game. It keeps basegame and freegame logic separate, uses GMF for reel/grid and payline math, expands visible banners into full-height wild reels, and draws each freegame banner multiplier from its freegame set's weighted table before adding participating multipliers on paylines. Its configuration caps each basegame round at the configured stake multiple; the session clips the spin that reaches the cap and stops further free spins. Basegame and freegame use separate explicit reel strips. See [ExpandingWildGame.md](../game/expandingwild/ExpandingWildGame.md) for strip symbol counts, paytable, paylines, tests, and known limits.
+Implements the existing game contract with a 5x5 reel game. It keeps basegame and freegame logic separate, uses GMF for weighted symbol insertion and reel/grid and payline math, expands visible banners into full-height wild reels, and draws each freegame banner multiplier from its freegame set's weighted table before adding participating multipliers on paylines. Its configuration caps each basegame round at the configured stake multiple; the session clips the spin that reaches the cap and stops further free spins. The full reelset tool deliberately evaluates only regular reel symbols and paytable wins, skipping all feature mechanics. See [ExpandingWildGame.md](../game/expandingwild/ExpandingWildGame.md) for insertion defaults, paytable, paylines, tests, and known limits.
 
-`ExpandingWildConfig` holds shared symbols, paytable, paylines, screen dimensions, scatter-trigger rules, freegame award count, and win cap. Its `baseGame` and `freeGame` mode configs each contain two independent `SpinSetConfig` values plus a weighted set selector (default 3:1 for set 0 to set 1). Basegame set 0 contains eligible scatters without banners; set 1 contains banners without scatters. Freegame set 0 has no wilds, and set 1 has banners and its own multiplier table. All four strips are explicit config data rather than being filtered at runtime.
+`ExpandingWildConfig` holds shared symbols, paytable, paylines, screen dimensions, scatter-trigger rules, freegame award count, and win cap. Its `baseGame` and `freeGame` mode configs each contain two independent `SpinSetConfig` values plus a weighted set selector (default 3:1 for set 0 to set 1). Every strip contains only regular symbols. Each set also has its own insertion rules: basegame set 0 inserts scatters on reels 1, 3, and 5; basegame and freegame set 1 insert banners; freegame set 0 inserts no specials. Insertion rules define count weights, a reel/row heat map, a per-reel maximum, and symbols that cannot be replaced.
 
 ### `GameModuleFramework`
 
@@ -119,9 +167,9 @@ Immutable results for an individual spin and a complete basegame round. A round 
 
 ### `ToolkitGUI`
 
-Launch the desktop toolkit from the project root with `java ToolkitGUI` after compiling the project. Its Simulation tab exposes game ID, rounds, stake, seed reuse, report export, award display, worker threads, logical partitions, and saved-gameplay count. The Win viewer takes game ID, maximum spins, and stake; Full reelset takes game ID, stake, and workers; Replay takes a saved-gameplay CSV and gameplay ID. The GUI runs each operation on a background worker and streams its output into the window. Simulation reporting accepts a supplied writer so console output and report files stay consistent.
+Launch the desktop toolkit from the project root with `java ToolkitGUI` after compiling the project. Its Simulation tab exposes game ID, rounds, stake, seed reuse, report export, award display, worker threads, logical partitions, and saved-gameplay count. The Win viewer takes game ID, maximum spins, and stake; Full reelset takes game ID, stake, and workers; Replay takes a saved-gameplay CSV and gameplay ID. A found Expanding Wild round can be opened in the prototype player; other games do not yet have player adapters. The GUI runs each operation on a background worker and streams its output into the window. Simulation reporting accepts a supplied writer so console output and report files stay consistent.
 
-The Prototype player tab opens a separate resizable play window. It can also be launched directly with `java toolkit.player.PlayerMain`. `PlayerGameAdapter` maps a normal game-session round into `PlayerDisplayData` (grid, awards, highlight positions, feature spins, and display metadata); the player renders that data without using simulation statistics or report generation. The first adapter is Expanding Wild. Positional wins support line, ways, or cluster highlighting, and the viewport sizes itself from the grid dimensions. It animates reel stops and win presentation after the game session has calculated the round.
+The Prototype player tab opens a separate resizable play window. It can also be launched directly with `java toolkit.player.PlayerMain`. `PlayerGameAdapter` maps a normal game-session round into `PlayerDisplayData` (stopped and transformed grids, awards, highlight positions, feature spins, and display metadata); the player renders that data without using simulation statistics or report generation. The first adapter is Expanding Wild. Positional wins support line, ways, or cluster highlighting, and the viewport sizes itself from the grid dimensions. The player maintains a local balance, supports manual or counted autoplay, and animates reels before revealing post-stop wild expansion and wins. Autoplay stop takes effect after the current complete round, including its triggered freegames. The viewer can preload its found Expanding Wild round as a no-cost preview; Replay Last Play charges the original stake and repeats that saved display outcome, including its feature spins.
 
 ## Statistics
 
@@ -163,7 +211,7 @@ Both CSVs group their sections in this order, with a blank row between sections:
 
 ## Tests
 
-`tests/SimulationTests.java` covers generic statistics, deterministic merging, game selection, and reports. `game/expandingwild/tests/ExpandingWildGameTests.java` covers GMF mechanics, game rules, and a seeded simulator run. `ViewerTests`, `ReelsetTests`, and `ReplayTests` cover the toolkit flows; `PlayerTests` checks the player adapter and variable-size display model. Run the suites with:
+`tests/SimulationTests.java` covers generic statistics, deterministic merging, game selection, and reports. `game/expandingwild/tests/ExpandingWildGameTests.java` covers GMF mechanics, game rules, and a seeded simulator run. `ViewerTests`, `ReelsetTests`, and `ReplayTests` cover the toolkit flows; `PlayerTests` checks the player adapter, found-round adaptation, variable-size display model, and separation of stopped reels from expanded wilds. Run the suites with:
 
 ```sh
 javac *.java tests/*.java game/expandingwild/tests/*.java

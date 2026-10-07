@@ -39,6 +39,8 @@ import toolkit.reelset.FullReelsetSimulator;
 import toolkit.reelset.ReelsetReportPrinter;
 import toolkit.replay.ReplayerMain;
 import toolkit.player.PrototypePlayerFrame;
+import toolkit.player.ExpandingWildPlayerAdapter;
+import toolkit.player.PlayerDisplayData;
 import toolkit.viewer.WinFinder;
 import toolkit.viewer.WinScreenPrinter;
 
@@ -51,6 +53,8 @@ public final class ToolkitGUI extends JFrame {
     private final java.util.List<JButton> runButtons = new java.util.ArrayList<>();
     private final JTextField replayCsv = new JTextField(28);
     private final JTextField replayId = new JTextField("1", 12);
+    private PlayerDisplayData.Round viewerFoundRound;
+    private double viewerFoundStake;
 
     private ToolkitGUI() {
         super("JavaSim Toolkit");
@@ -149,21 +153,54 @@ public final class ToolkitGUI extends JFrame {
         JComboBox<String> game = gameSelector();
         JSpinner spins = spinner(100L, 1L, Long.MAX_VALUE, 100L);
         JTextField stake = new JTextField("1.0", 14);
+        JButton openFoundPlay = new JButton("Open found play in prototype player");
+        openFoundPlay.setEnabled(false);
         addRow(panel, 0, "Game", game);
         addRow(panel, 1, "Maximum spins", spins);
         addRow(panel, 2, "Stake", stake);
-        JButton run = runButton("Find a winning screen", panel);
+        JButton run = new JButton("Find a winning screen");
+        runButtons.add(run);
+        openFoundPlay.addActionListener(event -> {
+            if (viewerFoundRound != null) {
+                PrototypePlayerFrame.openFoundPlay(viewerFoundRound, viewerFoundStake);
+            }
+        });
+        JPanel actions = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 0));
+        actions.add(run);
+        actions.add(openFoundPlay);
+        GridBagConstraints actionConstraints = new GridBagConstraints();
+        actionConstraints.gridx = 1;
+        actionConstraints.gridy = 3;
+        actionConstraints.anchor = GridBagConstraints.LINE_START;
+        actionConstraints.insets = new Insets(8, 0, 4, 5);
+        actionConstraints.gridwidth = 2;
+        panel.add(actions, actionConstraints);
         run.addActionListener(event -> {
             try {
                 String gameId = (String) game.getSelectedItem();
                 long maxSpins = ((Number) spins.getValue()).longValue();
                 double stakeValue = parsePositive(stake.getText(), "Stake");
+                viewerFoundRound = null;
+                openFoundPlay.setEnabled(false);
                 runTask("Win viewer", output -> {
                     Game selectedGame = GameFactory.create(gameId);
                     WinFinder.Result result = new WinFinder(selectedGame, new Random(),
                             stakeValue, maxSpins).find();
                     if (result.foundWin()) {
                         WinScreenPrinter.print(result, stakeValue, output);
+                        if (gameId.equals("expanding-wild")) {
+                            PlayerDisplayData.Round displayRound =
+                                    new ExpandingWildPlayerAdapter(new Random())
+                                            .adaptRound(result.winningRound());
+                            SwingUtilities.invokeLater(() -> {
+                                viewerFoundRound = displayRound;
+                                viewerFoundStake = stakeValue;
+                                openFoundPlay.setEnabled(true);
+                            });
+                        } else {
+                            output.println("Opening this game in the prototype player is not "
+                                    + "available yet.");
+                        }
                     } else {
                         output.printf("Win could not be found within %d spins.%n", maxSpins);
                     }

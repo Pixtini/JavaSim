@@ -2,6 +2,7 @@ package game.expandingwild.tests;
 
 import GameModuleFramework.features.AdditiveMultipliers;
 import GameModuleFramework.features.ScatterTrigger;
+import GameModuleFramework.features.SymbolInsertion;
 import GameModuleFramework.paylines.Payline;
 import GameModuleFramework.paylines.PaylineEvaluator;
 import GameModuleFramework.paylines.PaylineWinCalculator;
@@ -37,6 +38,7 @@ public final class ExpandingWildGameTests {
         testSymbolIdMapping();
         testDefaultReelLengthAndSymbolCounts();
         testWeightedTableDrawAndValidation();
+        testSymbolInsertionRespectsWeightsAndRestrictions();
         testScatterTrigger();
         testReelWindowWrapsAroundStrip();
         testPaylineRequiresUnbrokenRun();
@@ -65,41 +67,37 @@ public final class ExpandingWildGameTests {
     }
 
     private static void testDefaultReelLengthAndSymbolCounts() {
-        ExpandingWildConfig defaultConfig = new ExpandingWildConfig();
-        List<List<Integer>> strips = defaultConfig.baseGame.sets.get(0).reelStrips;
-        List<Integer> normalizedFirstReel = strips.get(0).stream()
-                .map(id -> id == 12 ? 5 : id).toList();
-        for (int reelIndex = 0; reelIndex < strips.size(); reelIndex++) {
-            List<Integer> strip = strips.get(reelIndex);
-            check(strip.size() == 60, "each configured reel contains sixty stops");
-            check(strip.stream().noneMatch(id -> id == 10 || id == 11),
-                    "basegame set zero contains no wild symbols");
-            long expectedScatters = reelIndex % 2 == 0 ? 1 : 0;
-            check(strip.stream().filter(id -> id == 12).count() == expectedScatters,
-                    "only reels one, three, and five contain a scatter");
-            check(strip.stream().map(id -> id == 12 ? 5 : id).toList()
-                            .equals(normalizedFirstReel),
-                    "reels share the same stop sequence apart from ineligible scatters");
+        ExpandingWildConfig config = new ExpandingWildConfig();
+        for (var mode : List.of(config.baseGame, config.freeGame)) {
+            for (var set : mode.sets) {
+                for (List<Integer> strip : set.reelStrips) {
+                    check(strip.size() == 60, "each configured reel contains sixty stops");
+                    check(strip.stream().allMatch(id -> id >= 0 && id <= 9),
+                            "reel strips contain only regular paying symbols");
+                    check(strip.stream().collect(java.util.stream.Collectors.groupingBy(
+                                    id -> id, java.util.stream.Collectors.counting()))
+                                    .equals(java.util.stream.IntStream.range(0, 10).boxed()
+                                            .collect(java.util.stream.Collectors.toMap(
+                                                    id -> id, ignored -> 6L))),
+                            "each regular symbol appears six times on each default reel");
+                }
+            }
         }
-
-        Map<Integer, Long> counts = strips.get(0).stream().collect(
-                java.util.stream.Collectors.groupingBy(id -> id, java.util.TreeMap::new,
-                        java.util.stream.Collectors.counting()));
-        check(counts.equals(Map.ofEntries(
-                        Map.entry(0, 6L), Map.entry(1, 6L), Map.entry(2, 6L),
-                        Map.entry(3, 6L), Map.entry(4, 6L), Map.entry(5, 5L),
-                        Map.entry(6, 6L), Map.entry(7, 6L), Map.entry(8, 6L),
-                        Map.entry(9, 6L), Map.entry(12, 1L))),
-                "eligible reel symbol counts match the configured distribution");
-        check(defaultConfig.baseGame.sets.get(1).reelStrips.stream()
-                        .allMatch(reel -> reel.contains(10) && !reel.contains(12)),
-                "basegame set one contains banners and no scatters");
-        check(defaultConfig.baseGame.setSelectionWeights.equals(List.of(
-                        new WeightedTable.Entry<>(0, 3),
-                        new WeightedTable.Entry<>(1, 1))),
+        check(config.baseGame.sets.get(0).symbolInsertions.size() == 1
+                        && config.baseGame.sets.get(0).symbolInsertions.get(0).symbol()
+                                .equals(ExpandingWildConfig.SCATTER),
+                "basegame set zero inserts scatters");
+        check(config.baseGame.sets.get(1).symbolInsertions.get(0).symbol()
+                        .equals(ExpandingWildConfig.BANNER)
+                        && config.freeGame.sets.get(1).symbolInsertions.get(0).symbol()
+                                .equals(ExpandingWildConfig.BANNER),
+                "basegame and freegame set one insert banners");
+        check(config.freeGame.sets.get(0).symbolInsertions.isEmpty(),
+                "freegame set zero inserts no special symbols");
+        check(config.baseGame.setSelectionWeights.equals(List.of(
+                        new WeightedTable.Entry<>(0, 3), new WeightedTable.Entry<>(1, 1))),
                 "basegame sets are selected at three-to-one relative weight");
-        check(defaultConfig.freeGame.setSelectionWeights.equals(
-                        defaultConfig.baseGame.setSelectionWeights),
+        check(config.freeGame.setSelectionWeights.equals(config.baseGame.setSelectionWeights),
                 "freegame sets use the same three-to-one relative selection weight");
     }
 
@@ -122,6 +120,35 @@ public final class ExpandingWildGameTests {
             rejectedZeroWeight = true;
         }
         check(rejectedZeroWeight, "weighted table rejects zero weights");
+    }
+
+    private static void testSymbolInsertionRespectsWeightsAndRestrictions() {
+        List<List<Long>> heatMap = List.of(
+                List.of(1L, 1L), List.of(1L, 1L), List.of(0L, 0L));
+        SymbolInsertion.Rule rule = new SymbolInsertion.Rule(ExpandingWildConfig.BANNER,
+                List.of(new WeightedTable.Entry<>(2, 1)), heatMap, 1,
+                java.util.Set.of(ExpandingWildConfig.SCATTER, ExpandingWildConfig.BANNER));
+        ReelGrid original = new ReelGrid(List.of(
+                List.of(ExpandingWildConfig.SCATTER, ExpandingWildConfig.T1),
+                List.of(ExpandingWildConfig.T1, ExpandingWildConfig.T1),
+                List.of(ExpandingWildConfig.T1, ExpandingWildConfig.T1)));
+
+        SymbolInsertion.Result inserted = SymbolInsertion.apply(original, List.of(rule),
+                new FixedRandom(0));
+        check(inserted.placements().size() == 2,
+                "insertion draws its configured number of symbols");
+        check(inserted.grid().getSymbol(0, 0).equals(ExpandingWildConfig.SCATTER),
+                "insertion never overwrites a forbidden scatter");
+        check(inserted.grid().getSymbol(2, 0).equals(ExpandingWildConfig.T1),
+                "zero heat map weights exclude positions");
+        check(inserted.placements().stream().map(SymbolInsertion.Placement::reel).distinct()
+                        .count() == 2,
+                "maximum-per-reel restriction places symbols on different reels");
+        SymbolInsertion.Result replayed = SymbolInsertion.applyRecorded(
+                original, List.of(rule), inserted.placements());
+        check(replayed.grid().getSymbol(0, 1).equals(inserted.grid().getSymbol(0, 1))
+                        && replayed.placements().equals(inserted.placements()),
+                "recorded insertions reproduce their transformed grid");
     }
 
     private static void testScatterTrigger() {
@@ -295,22 +322,22 @@ public final class ExpandingWildGameTests {
                 new WeightedTable.Entry<>(9, 1),
                 new WeightedTable.Entry<>(10, 1));
         config.freeGame.sets.get(1).reelStrips = List.of(
-                List.of(10, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0));
+                List.of(0, 0, 0, 0, 0), List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0), List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0));
+        config.freeGame.sets.get(1).symbolInsertions = List.of(
+                fixedInsertion(ExpandingWildConfig.BANNER, 3, List.of(0, 1, 2), 0));
 
         ExpandingWildSpinResult result = new ExpandingWildFreeGame(
                 config, new FixedRandom(0)).spin();
 
-        check(result.getBannerMultipliersByReel().size() == 5,
-                "each expanded banner reel receives one multiplier");
+        check(result.getBannerMultipliersByReel().size() == 3,
+                "each inserted banner reel receives one multiplier");
         check(result.getBannerMultipliersByReel().values().stream().allMatch(value -> value == 2),
                 "seeded random draws produce configured inclusive multiplier bounds");
-        check(result.getLineWins().get(0).multiplier() == 10.0,
-                "five banner multipliers add together on one line");
-        check(result.getLineWins().get(0).totalWin() == 300.0,
+        check(result.getLineWins().get(0).multiplier() == 6.0,
+                "banner multipliers add together on one line");
+        check(result.getLineWins().get(0).totalWin() == 180.0,
                 "combined banner multiplier applies to the line payout");
 
         ExpandingWildSpinResult maximumResult = new ExpandingWildFreeGame(
@@ -318,12 +345,14 @@ public final class ExpandingWildGameTests {
         check(maximumResult.getBannerMultipliersByReel().values().stream()
                         .allMatch(value -> value == 10),
                 "random banner multiplier includes the configured upper bound");
-        check(maximumResult.getLineWins().get(0).multiplier() == 50.0,
-                "five maximum banner multipliers add to fifty times");
+        check(maximumResult.getLineWins().get(0).multiplier() == 30.0,
+                "three maximum banner multipliers add together");
 
         config.freeGame.sets.get(1).bannerMultiplierWeights = List.of(
                 new WeightedTable.Entry<>(2, 1),
                 new WeightedTable.Entry<>(10, 3));
+        config.freeGame.sets.get(1).symbolInsertions = List.of(
+                fixedInsertion(ExpandingWildConfig.BANNER, 3, List.of(0, 1, 2), 0));
         ExpandingWildSpinResult lowWeightedResult = new ExpandingWildFreeGame(
                 config, new FixedRandom(0)).spin();
         ExpandingWildSpinResult highWeightedResult = new ExpandingWildFreeGame(
@@ -397,16 +426,13 @@ public final class ExpandingWildGameTests {
         }
         check(symbolCount == 10, "default paytable defines ten regular symbols");
         ExpandingWildConfig defaultConfig = new ExpandingWildConfig();
-        for (int reelIndex : defaultConfig.scatterReels) {
-            ReelStrip strip = ExpandingWildConfigAdapter.toReelStrips(defaultConfig.baseGame.sets.get(0))
-                    .get(reelIndex);
-            for (int stop = 0; stop < strip.getSymbols().size(); stop++) {
-                List<Symbol> window = strip.spinWindow(new FixedRandom(stop), 5);
-                check(!(window.contains(ExpandingWildConfig.BANNER)
-                                && window.contains(ExpandingWildConfig.SCATTER)),
-                        "default strips keep scatters visible when banners do not cover them");
-            }
-        }
+        var scatterRule = defaultConfig.baseGame.sets.get(0).symbolInsertions.get(0);
+        check(scatterRule.positionWeights().get(0).stream().allMatch(weight -> weight > 0)
+                        && scatterRule.positionWeights().get(2).stream().allMatch(weight -> weight > 0)
+                        && scatterRule.positionWeights().get(4).stream().allMatch(weight -> weight > 0)
+                        && scatterRule.positionWeights().get(1).stream().allMatch(weight -> weight == 0)
+                        && scatterRule.positionWeights().get(3).stream().allMatch(weight -> weight == 0),
+                "scatter heat map allows only reels one, three, and five");
         System.out.printf("Seeded expanding-wild run: %d rounds, %d freegame triggers, "
                         + "%d free spins, base win %.2f, freegame win %.2f, "
                         + "total win %.2f, RTP %.2f%%%n",
@@ -423,11 +449,13 @@ public final class ExpandingWildGameTests {
         ExpandingWildConfig config = new ExpandingWildConfig();
         config.freeGamesAwarded = 2;
         config.baseGame.sets.get(0).reelStrips = List.of(
-                List.of(12, 0, 0, 0, 0),
                 List.of(0, 0, 0, 0, 0),
-                List.of(12, 0, 0, 0, 0),
                 List.of(0, 0, 0, 0, 0),
-                List.of(12, 0, 0, 0, 0));
+                List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0));
+        config.baseGame.sets.get(0).symbolInsertions = List.of(
+                fixedInsertion(ExpandingWildConfig.SCATTER, 3, List.of(0, 2, 4), 0));
         config.freeGame.sets.get(0).reelStrips = List.of(
                 List.of(0, 0, 0, 0, 0),
                 List.of(0, 0, 0, 0, 0),
@@ -438,6 +466,22 @@ public final class ExpandingWildGameTests {
         config.paytable = new Paytable(
                 Map.of(ExpandingWildConfig.fromId(0), Map.of(3, 10.0, 4, 20.0, 5, 30.0)));
         return config;
+    }
+
+    private static SymbolInsertion.Rule fixedInsertion(Symbol symbol, int count,
+            List<Integer> eligibleReels, int row) {
+        List<List<Long>> heatMap = new ArrayList<>();
+        for (int reel = 0; reel < 5; reel++) {
+            List<Long> reelWeights = new ArrayList<>();
+            for (int visibleRow = 0; visibleRow < 5; visibleRow++) {
+                reelWeights.add(eligibleReels.contains(reel) && visibleRow == row ? 1L : 0L);
+            }
+            heatMap.add(List.copyOf(reelWeights));
+        }
+        return new SymbolInsertion.Rule(symbol,
+                List.of(new WeightedTable.Entry<>(count, 1)), heatMap, 1,
+                java.util.Set.of(ExpandingWildConfig.SCATTER,
+                        ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD));
     }
 
     private static ReelGrid rowGrid(List<Symbol> row, int height, Symbol filler) {

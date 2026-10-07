@@ -5,6 +5,7 @@ import GameModuleFramework.reels.ReelStrip;
 import GameModuleFramework.reels.WildExpansion;
 import GameModuleFramework.probability.WeightedTable;
 import GameModuleFramework.features.ScatterTrigger;
+import GameModuleFramework.features.SymbolInsertion;
 import game.expandingwild.ExpandingWildWinCalculator;
 import game.expandingwild.config.ExpandingWildConfig;
 import game.expandingwild.config.ExpandingWildConfigAdapter;
@@ -25,6 +26,7 @@ public final class ExpandingWildBaseGame {
     private final WeightedTable<Integer> setSelectionTable;
     private final ScatterTrigger scatterTrigger;
     private final List<ExpandingWildWinCalculator> winCalculators;
+    private final List<List<SymbolInsertion.Rule>> insertionRules;
 
     public ExpandingWildBaseGame(ExpandingWildConfig config, Random random) {
         this.config = config;
@@ -44,6 +46,9 @@ public final class ExpandingWildBaseGame {
                 .map(ignored -> new ExpandingWildWinCalculator(
                         config.paytable, config.paylines, ExpandingWildConfig.WILD))
                 .toList();
+        this.insertionRules = config.baseGame.sets.stream()
+                .map(set -> set.symbolInsertions)
+                .toList();
     }
 
     public ExpandingWildSpinResult spin() {
@@ -59,23 +64,27 @@ public final class ExpandingWildBaseGame {
         if (captureReplay) {
             ReelGrid.SpinOutcome outcome = ReelGrid.spinWithStops(
                     reelSets.get(setIndex), config.visibleRows, random);
-            return evaluate(setIndex, outcome.grid(), outcome.stops(), totalRoundStake, null, true);
+            return evaluate(setIndex, outcome.grid(), outcome.stops(), totalRoundStake,
+                    null, null, true);
         }
         ReelGrid stoppedGrid = ReelGrid.spin(reelSets.get(setIndex), config.visibleRows, random);
-        return evaluate(setIndex, stoppedGrid, null, totalRoundStake, null, false);
+        return evaluate(setIndex, stoppedGrid, null, totalRoundStake, null, null, false);
     }
 
-    /** Evaluates one exact set of reel stops without consuming the random stream. */
+    /** Evaluates exact reel stops for featureless reelset math; random features are skipped. */
     public ExpandingWildSpinResult spinAtStops(int[] reelStops, double totalRoundStake) {
         return spinAtStops(0, reelStops, totalRoundStake);
     }
 
-    /** Evaluates one exact stop combination for a selected configured set. */
+    /** Evaluates one exact stop combination using reel symbols and the paytable only. */
     public ExpandingWildSpinResult spinAtStops(int setIndex, int[] reelStops,
             double totalRoundStake) {
         ReelGrid stoppedGrid = ReelGrid.atStops(
                 reelSets.get(setIndex), config.visibleRows, reelStops);
-        return evaluate(setIndex, stoppedGrid, reelStops, totalRoundStake, null, false);
+        var lineWins = winCalculators.get(setIndex).calculate(
+                stoppedGrid, Map.of(), totalRoundStake);
+        return new ExpandingWildSpinResult(stoppedGrid, stoppedGrid, java.util.Set.of(),
+                0, lineWins, Map.of(), false, false, setIndex);
     }
 
     public ExpandingWildSpinResult replay(ReplayEvent event, double totalRoundStake) {
@@ -90,15 +99,21 @@ public final class ExpandingWildBaseGame {
             ExpandingWildReplayPayload payload, double totalRoundStake) {
         return evaluate(payload.setIndex(), ReelGrid.atStops(
                 reelSets.get(payload.setIndex()), config.visibleRows, payload.reelStops()),
-                payload.reelStops(), totalRoundStake, payload.bannerMultipliers(), true);
+                payload.reelStops(), totalRoundStake, payload.bannerMultipliers(),
+                payload.insertions(), true);
     }
 
     private ExpandingWildSpinResult evaluate(int setIndex, ReelGrid stoppedGrid, int[] reelStops,
             double totalRoundStake, Map<Integer, Integer> recordedMultipliers,
-            boolean captureReplay) {
-        ScatterTrigger.Result scatterResult = scatterTrigger.evaluate(stoppedGrid);
+            List<SymbolInsertion.Placement> recordedInsertions, boolean captureReplay) {
+        SymbolInsertion.Result insertionResult = recordedInsertions == null
+                ? SymbolInsertion.apply(stoppedGrid, insertionRules.get(setIndex), random)
+                : SymbolInsertion.applyRecorded(
+                        stoppedGrid, insertionRules.get(setIndex), recordedInsertions);
+        ReelGrid insertedGrid = insertionResult.grid();
+        ScatterTrigger.Result scatterResult = scatterTrigger.evaluate(insertedGrid);
         WildExpansion.Result expansion = WildExpansion.expandColumns(
-                stoppedGrid, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);
+                insertedGrid, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);
         WeightedTable<Integer> bannerMultiplierTable = multiplierTables.get(setIndex);
         Map<Integer, Integer> multipliers;
         if (recordedMultipliers != null) {
@@ -114,7 +129,7 @@ public final class ExpandingWildBaseGame {
                 expansion.grid(), multipliers, totalRoundStake);
 
         return new ExpandingWildSpinResult(
-                stoppedGrid,
+                insertedGrid,
                 expansion.grid(),
                 expansion.expandedReels(),
                 scatterResult.scatterCount(),
@@ -125,7 +140,8 @@ public final class ExpandingWildBaseGame {
                 setIndex,
                 captureReplay ? "basegame" : null,
                 captureReplay
-                        ? new ExpandingWildReplayPayload(setIndex, reelStops, multipliers).toJson()
+                        ? new ExpandingWildReplayPayload(setIndex, reelStops, multipliers,
+                                insertionResult.placements()).toJson()
                         : null);
     }
 

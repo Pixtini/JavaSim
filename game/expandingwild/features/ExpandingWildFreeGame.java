@@ -4,6 +4,7 @@ import GameModuleFramework.reels.ReelGrid;
 import GameModuleFramework.reels.ReelStrip;
 import GameModuleFramework.reels.WildExpansion;
 import GameModuleFramework.probability.WeightedTable;
+import GameModuleFramework.features.SymbolInsertion;
 import game.expandingwild.ExpandingWildWinCalculator;
 import game.expandingwild.ExpandingWildReplayPayload;
 import game.expandingwild.config.ExpandingWildConfig;
@@ -22,6 +23,7 @@ public final class ExpandingWildFreeGame {
     private final List<WeightedTable<Integer>> bannerMultiplierTables;
     private final List<ExpandingWildWinCalculator> winCalculators;
     private final WeightedTable<Integer> setSelectionTable;
+    private final List<List<SymbolInsertion.Rule>> insertionRules;
 
     public ExpandingWildFreeGame(ExpandingWildConfig config, Random random) {
         this.config = config;
@@ -37,6 +39,9 @@ public final class ExpandingWildFreeGame {
                         config.paytable, config.paylines, ExpandingWildConfig.WILD))
                 .toList();
         this.setSelectionTable = new WeightedTable<>(config.freeGame.setSelectionWeights);
+        this.insertionRules = config.freeGame.sets.stream()
+                .map(set -> set.symbolInsertions)
+                .toList();
     }
 
     public ExpandingWildSpinResult spin() {
@@ -53,11 +58,11 @@ public final class ExpandingWildFreeGame {
             ReelGrid.SpinOutcome outcome = ReelGrid.spinWithStops(
                     freeGameReelSets.get(setIndex), config.visibleRows, random);
             return evaluate(setIndex, outcome.grid(), outcome.stops(), totalRoundStake,
-                    null, true);
+                    null, null, true);
         }
         ReelGrid stoppedGrid = ReelGrid.spin(
                 freeGameReelSets.get(setIndex), config.visibleRows, random);
-        return evaluate(setIndex, stoppedGrid, null, totalRoundStake, null, false);
+        return evaluate(setIndex, stoppedGrid, null, totalRoundStake, null, null, false);
     }
 
     public ExpandingWildSpinResult replay(ReplayEvent event, double totalRoundStake) {
@@ -68,14 +73,20 @@ public final class ExpandingWildFreeGame {
         ReelGrid stoppedGrid = ReelGrid.atStops(
                 freeGameReelSets.get(payload.setIndex()), config.visibleRows, payload.reelStops());
         return evaluate(payload.setIndex(), stoppedGrid, payload.reelStops(), totalRoundStake,
-                payload.bannerMultipliers(), true);
+                payload.bannerMultipliers(), payload.insertions(), true);
     }
 
     private ExpandingWildSpinResult evaluate(int setIndex, ReelGrid stoppedGrid,
             int[] reelStops, double totalRoundStake,
-            Map<Integer, Integer> recordedMultipliers, boolean captureReplay) {
+            Map<Integer, Integer> recordedMultipliers,
+            List<SymbolInsertion.Placement> recordedInsertions, boolean captureReplay) {
+        SymbolInsertion.Result insertionResult = recordedInsertions == null
+                ? SymbolInsertion.apply(stoppedGrid, insertionRules.get(setIndex), random)
+                : SymbolInsertion.applyRecorded(
+                        stoppedGrid, insertionRules.get(setIndex), recordedInsertions);
+        ReelGrid insertedGrid = insertionResult.grid();
         WildExpansion.Result expansion = WildExpansion.expandColumns(
-                stoppedGrid, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);
+                insertedGrid, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);
         WeightedTable<Integer> bannerMultiplierTable = bannerMultiplierTables.get(setIndex);
         Map<Integer, Integer> multipliers;
         if (recordedMultipliers != null) {
@@ -90,7 +101,7 @@ public final class ExpandingWildFreeGame {
                 expansion.grid(), multipliers, totalRoundStake);
 
         return new ExpandingWildSpinResult(
-                stoppedGrid,
+                insertedGrid,
                 expansion.grid(),
                 expansion.expandedReels(),
                 0,
@@ -101,7 +112,8 @@ public final class ExpandingWildFreeGame {
                 setIndex,
                 captureReplay ? "freegame" : null,
                 captureReplay
-                        ? new ExpandingWildReplayPayload(setIndex, reelStops, multipliers).toJson()
+                        ? new ExpandingWildReplayPayload(setIndex, reelStops, multipliers,
+                                insertionResult.placements()).toJson()
                         : null);
     }
 

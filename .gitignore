@@ -3,6 +3,8 @@
 
 *.xlsx
 
+*.html
+
 
 
 # Common build output directories

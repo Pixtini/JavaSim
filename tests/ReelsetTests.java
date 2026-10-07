@@ -72,20 +72,22 @@ public final class ReelsetTests {
                 "full reelset count includes both equally sized basegame spin sets");
         check(FullReelsetSimulator.countWeightedCombinations(game) == 3_110_400_000L,
                 "weighted combination count applies the 3:1 set selector");
+        SpinResult featureless = game.createStopEvaluator(0)
+                .evaluate(new int[] {0, 0, 0, 0, 0}, 1.0);
+        check(!featureless.hasFreeSpin() && featureless.getWin() >= 0.0,
+                "full reelset evaluation pays the reel symbols without triggering features");
 
         ExpandingWildConfig smallConfig = new ExpandingWildConfig();
         smallConfig.baseGame.sets.get(0).reelStrips = List.of(
-                List.of(12, 0, 0, 0, 0, 0),
                 List.of(0, 0, 0, 0, 0, 0),
-                List.of(12, 0, 0, 0, 0, 0),
                 List.of(0, 0, 0, 0, 0, 0),
-                List.of(12, 0, 0, 0, 0, 0));
+                List.of(0, 0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0, 0));
         smallConfig.baseGame.sets.get(1).reelStrips = List.of(
-                List.of(10, 0, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0, 0),
-                List.of(10, 0, 0, 0, 0, 0));
+                List.of(0, 0, 0, 0, 0, 0), List.of(0, 0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0, 0), List.of(0, 0, 0, 0, 0, 0),
+                List.of(0, 0, 0, 0, 0, 0));
         smallConfig.paylines = List.of(new Payline(2, 2, 2, 2, 2));
         ReelsetSimulationResult smallRun = new FullReelsetSimulator().simulate(
                 new ExpandingWildGame(smallConfig), 1.0, 2);
@@ -93,8 +95,8 @@ public final class ReelsetTests {
                 "Expanding Wild evaluates every stop combination in both small sets");
         check(smallRun.weightedCombinations() == 31_104,
                 "Expanding Wild applies the selector weights to exhaustive outcomes");
-        check(smallRun.featureTriggers() == 13_500,
-                "Expanding Wild weights base set scatter triggers without playing freegames");
+        check(smallRun.featureTriggers() == 0,
+                "full reelset mode ignores scatter-trigger mechanics");
     }
 
     private static void testLargeRunProgressDisplay() {

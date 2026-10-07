@@ -1,5 +1,9 @@
 import game.expandingwild.ExpandingWildGameSession;
 import game.expandingwild.config.ExpandingWildConfig;
+import GameModuleFramework.features.SymbolInsertion;
+import GameModuleFramework.symbols.Symbol;
+import GameModuleFramework.paylines.Payline;
+import GameModuleFramework.paylines.Paytable;
 import game.model.GameRoundResult;
 import simulation.replay.SavedGameplay;
 import simulation.replay.SavedGameplayCsv;
@@ -9,6 +13,7 @@ import game.GameFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /** Focused tests for replay payloads, capped events, and CSV round trips. */
@@ -20,6 +25,7 @@ public final class ReplayTests {
     public static void main(String[] args) throws Exception {
         testExpandingWildReplayAndCsvRoundTrip();
         testRecordedMultiplierChoicesIgnoreCurrentWeights();
+        testRecordedInsertionLocationsIgnoreCurrentHeatMap();
         testConfiguredCaptureLimit();
         System.out.println("Passed " + assertions + " replay assertions.");
     }
@@ -51,7 +57,9 @@ public final class ReplayTests {
         originalConfig.freeGame.setSelectionWeights = List.of(
                 new GameModuleFramework.probability.WeightedTable.Entry<>(1, 1));
         originalConfig.freeGame.sets.get(1).reelStrips = List.of(
-                List.of(10), List.of(10), List.of(10), List.of(10), List.of(10));
+                List.of(0), List.of(0), List.of(0), List.of(0), List.of(0));
+        originalConfig.freeGame.sets.get(1).symbolInsertions = List.of(
+                fixedInsertion(ExpandingWildConfig.BANNER, 1, List.of(0), 0));
         originalConfig.freeGame.sets.get(1).bannerMultiplierWeights = List.of(
                 new GameModuleFramework.probability.WeightedTable.Entry<>(2, 1));
         GameRoundResult original = new ExpandingWildGameSession(
@@ -64,7 +72,9 @@ public final class ReplayTests {
         ExpandingWildConfig changedWeights = deterministicConfig();
         changedWeights.freeGamesAwarded = 1;
         changedWeights.freeGame.sets.get(1).reelStrips = List.of(
-                List.of(10), List.of(10), List.of(10), List.of(10), List.of(10));
+                List.of(0), List.of(0), List.of(0), List.of(0), List.of(0));
+        changedWeights.freeGame.sets.get(1).symbolInsertions = List.of(
+                fixedInsertion(ExpandingWildConfig.BANNER, 1, List.of(0), 0));
         changedWeights.freeGame.sets.get(1).bannerMultiplierWeights = List.of(
                 new GameModuleFramework.probability.WeightedTable.Entry<>(10, 1));
         GameRoundResult replayed = new ExpandingWildGameSession(
@@ -75,18 +85,44 @@ public final class ReplayTests {
                 "replay injects recorded multipliers instead of redrawing current weights");
     }
 
+    private static void testRecordedInsertionLocationsIgnoreCurrentHeatMap() {
+        ExpandingWildConfig originalConfig = deterministicConfig();
+        GameRoundResult original = new ExpandingWildGameSession(
+                originalConfig, new Random(91)).playRound(1.0, 1_000.0, true);
+        ExpandingWildConfig changedHeatMap = deterministicConfig();
+        changedHeatMap.baseGame.sets.get(0).symbolInsertions = List.of(
+                fixedInsertion(ExpandingWildConfig.SCATTER, 3, List.of(0, 2, 4), 4));
+
+        GameRoundResult replayed = new ExpandingWildGameSession(
+                changedHeatMap, new Random(92)).replayRound(
+                        1.0, 1_000.0, original.getReplayEvents());
+
+        var originalInsertions = game.expandingwild.ExpandingWildReplayPayload
+                .fromJson(original.getReplayEvents().get(0).payload()).insertions();
+        var replayedInsertions = game.expandingwild.ExpandingWildReplayPayload
+                .fromJson(replayed.getReplayEvents().get(0).payload()).insertions();
+        check(replayedInsertions.equals(originalInsertions)
+                        && originalInsertions.stream().allMatch(placement -> placement.row() == 0),
+                "replay restores recorded insertion positions after a heat-map change");
+        checkClose(replayed.getBaseGameResult().getWin(),
+                original.getBaseGameResult().getWin(),
+                "replayed insertion produces the original recalculated basegame win");
+    }
+
     private static void testExpandingWildReplayAndCsvRoundTrip() throws Exception {
         ExpandingWildConfig config = deterministicConfig();
         ExpandingWildGameSession originalSession = new ExpandingWildGameSession(
                 config, new Random(1));
         GameRoundResult original = originalSession.playRound(
                 1.0, config.maxWinMultiplier, true);
-        check(original.getReplayEvents().size() == 2,
-                "capture stores the basegame and cap-reaching freegame event");
+        check(original.getReplayEvents().size() == 4,
+                "capture stores the basegame and all configured freegame events");
         check(original.getReplayEvents().get(0).type().equals("basegame"),
                 "basegame replay event is first");
         check(original.getReplayEvents().get(1).type().equals("freegame"),
                 "freegame replay event is identified independently");
+        check(original.getReplayEvents().get(0).payload().contains("\"insertions\""),
+                "replay event records inserted symbol locations");
 
         double featureWin = original.getFreeGameResults().stream()
                 .mapToDouble(result -> result.getWin()).sum();
@@ -127,10 +163,31 @@ public final class ReplayTests {
         config.freeGame.setSelectionWeights = List.of(
                 new GameModuleFramework.probability.WeightedTable.Entry<>(0, 1));
         config.baseGame.sets.get(0).reelStrips = List.of(
-                List.of(12), List.of(0), List.of(12), List.of(0), List.of(12));
+                List.of(0), List.of(0), List.of(0), List.of(0), List.of(0));
+        config.baseGame.sets.get(0).symbolInsertions = List.of(
+                fixedInsertion(ExpandingWildConfig.SCATTER, 3, List.of(0, 2, 4), 0));
         config.freeGame.sets.get(0).reelStrips = List.of(
                 List.of(0), List.of(0), List.of(0), List.of(0), List.of(0));
+        config.paylines = List.of(new Payline(1, 1, 1, 1, 1));
+        config.paytable = new Paytable(Map.of(
+                ExpandingWildConfig.T1, Map.of(3, 10.0, 4, 20.0, 5, 30.0)));
         return config;
+    }
+
+    private static SymbolInsertion.Rule fixedInsertion(Symbol symbol, int count,
+            List<Integer> eligibleReels, int row) {
+        List<List<Long>> heatMap = new java.util.ArrayList<>();
+        for (int reel = 0; reel < 5; reel++) {
+            List<Long> weights = new java.util.ArrayList<>();
+            for (int visibleRow = 0; visibleRow < 5; visibleRow++) {
+                weights.add(eligibleReels.contains(reel) && visibleRow == row ? 1L : 0L);
+            }
+            heatMap.add(List.copyOf(weights));
+        }
+        return new SymbolInsertion.Rule(symbol,
+                List.of(new GameModuleFramework.probability.WeightedTable.Entry<>(count, 1)),
+                heatMap, 1, java.util.Set.of(ExpandingWildConfig.SCATTER,
+                        ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD));
     }
 
     private static void check(boolean condition, String message) {

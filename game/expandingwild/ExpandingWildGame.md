@@ -6,22 +6,19 @@ This is the first reel-based game module and a test of the `GameModuleFramework`
 
 The implementation uses a 5-reel by 5-row window, ten regular symbols (`T1`–`T5` and `L1`–`L5`), 15 left-to-right paylines, an expanding banner wild, and a basegame scatter trigger. `ExpandingWildConfig` separates shared game rules from `baseGame` and `freeGame` modes. Each mode has two independent spin sets and a weighted selector; the default selector is 3:1 for set 0 to set 1. Reel strips use integer IDs for spreadsheet editing: 0–4 map to `T1`–`T5`, 5–9 map to `L1`–`L5`, 10 is `BANNER`, 11 is `WILD`, and 12 is `SCATTER`. `ExpandingWildConfigAdapter` translates each set's strips into GMF reel strips. The configuration is intentionally small and is not balanced.
 
-Basegame set 0 uses five 60-stop reels with a scatter only on reels 1, 3, and 5, and has no banners. Basegame set 1 has one banner per reel and no scatters. Freegame set 0 has no wilds; set 1 has one banner per reel. The no-scatter freegame strips explicitly retain 60 stops per reel, with the removed scatter stop represented by an additional T1. No static `WILD` symbol is used because banners expand after the reels stop.
+Every set uses five 60-stop reels containing only regular paying symbols (six copies of each symbol on every reel). Special symbols are inserted into the visible grid after reel stops: basegame set 0 inserts scatters, basegame set 1 inserts banners, freegame set 0 inserts none, and freegame set 1 inserts banners. Each insertion rule has a 0–3 count table, a reel/row heat map, a one-per-reel limit, and forbidden replacement symbols. The default count weights are 90:6:3:1 for 0, 1, 2, and 3 inserted symbols. No static `WILD` symbol is used because banners expand after the reels stop.
 
-| Symbol | Reels 1, 3, 5 | Reels 2, 4 |
-| --- | ---: | ---: |
-| T1 | 6 | 5 |
-| T2–T5 | 6 each | 6 each |
-| L1 | 5 | 6 |
-| L2–L5 | 6 each | 6 each |
-| BANNER | 0 (set 0), 1 (set 1) | 0 (set 0), 1 (set 1) |
-| SCATTER | 1 (set 0), 0 (set 1) | 0 |
-| **Stops** | **60** | **60** |
+| Strip symbols | Count per reel |
+| --- | ---: |
+| T1–T5 | 6 each |
+| L1–L5 | 6 each |
+| **Stops** | **60** |
 
 ## Rules implemented
 
 - A spin independently stops one configured circular strip for each of the five reels. The five symbols beginning at each stop form the visible reel.
-- A banner anywhere in a stopped reel expands that reel to five wilds after all reels stop. Each reel in set 1 has one banner; set 0 has none.
+- After a normal reel stop, the selected set's symbol insertion rules draw a count and place symbols on eligible visible cells using the configured heat map. Zero-weight positions are excluded, forbidden replacement symbols are preserved, and per-reel limits are enforced. Scatter insertion is limited to reels 1, 3, and 5; banner insertion can use any reel. The inserted grid then continues through feature checks and win evaluation.
+- A banner anywhere in the inserted grid expands that reel to five wilds. Expansion occurs after the reel stop and insertion stages.
 - Paylines are read left to right. A win must start on reel one and continue without a mismatch. Only configured match lengths pay. GMF's `PaylineWinCalculator` applies total-round stake and candidate multipliers, then its configured selection policy awards the highest final payout once per line, including wild substitutions. The game adapts selected GMF wins into `ExpandingWildLineWin` values.
 - The 15 line paths below are zero-based visible row indexes, one row per reel:
 
@@ -33,8 +30,8 @@ Basegame set 0 uses five 60-stop reels with a scatter only on reels 1, 3, and 5,
   4-4-3-2-1   1-2-3-2-1   3-2-1-2-3
   ```
 
-- Scatters are present only on reels 1, 3, and 5. GMF's `ScatterTrigger` counts the configured symbol on those reels; meeting the configured threshold awards the configured number of free spins (five by default). Scatter count is evaluated on the stopped grid before expansion. The scatter and banner stops are far enough apart on the circular reel that a visible banner cannot cover a visible scatter.
-- Every basegame and freegame spin independently draws a set index from that mode's weighted selector (default set 0:set 1 is 3:1), then selects stops from that set's strips. Basegame set 0 can trigger freegames; set 1 cannot. Freegame sets contain no scatters and cannot retrigger. Each visible banner in freegame set 1 independently draws a multiplier from that set's `bannerMultiplierWeights` using GMF's `WeightedTable`. Each row defines a multiplier and its relative weight; the current config gives 2x and 3x a weight of 1000 each and 4x–10x a weight of 1 each. Basegame set multipliers are stored separately.
+- Scatters are inserted only on reels 1, 3, and 5 in basegame set 0, at most one per reel. GMF's `ScatterTrigger` counts them after insertion; three visible scatters award five free spins by default. Freegame sets have no scatter insertion rule and cannot retrigger.
+- Every basegame and freegame spin independently draws a set index from that mode's weighted selector (default set 0:set 1 is 3:1), then selects stops from that set's strips. Each visible banner in set 1 independently draws a multiplier from that set's `bannerMultiplierWeights`; each row defines a multiplier and its relative weight. Basegame and freegame multiplier tables are configured separately.
 - Multipliers on a winning line add together. For example, 2x and 3x produce a 5x line multiplier. A banner only contributes when it is part of that line's consecutive winning prefix. Basegame banner wilds use 1x.
 - A complete basegame round is capped at `maxWinMultiplier` times total round stake (currently 100x). Basegame win consumes the cap first; each free spin can win only the amount remaining. The spin that reaches the cap is clipped to the remaining amount, and later free spins are not generated. TotalGame statistics report how many rounds reached the cap.
 
@@ -67,19 +64,19 @@ Each spin result carries one named award label per winning payline, such as `T1 
 
 The game tests cover reel-window wrapping, unbroken paylines, paytable lengths, banner expansion, additive multipliers, scatter eligibility, no freegame retriggers, configured free-spin count, game-factory selection, and seeded agreement across worker-thread counts.
 
-For replay, each expanding-wild spin records its mode, selected set, zero-based reel stops, and resolved banner multiplier assignments in a versioned JSON payload. Replaying injects these decisions and recalculates the result; multiplier weights are not redrawn. The replay tool compares basegame, each freegame spin, and total wins with the values saved in the CSV.
+For replay, each expanding-wild spin records its mode, selected set, zero-based reel stops, inserted symbol locations, and resolved banner multiplier assignments in a versioned JSON payload. Replaying injects these decisions and recalculates the result; insertion heat-map and multiplier weights are not redrawn. The replay tool compares basegame, each freegame spin, and total wins with the values saved in the CSV.
 
-The full reelset tool can enumerate every basegame stop combination with `java toolkit.reelset.FullReelsetMain expanding-wild 1.0 8`. The two five-reel sets have 60 stops on every reel, so the tool evaluates 1,555,200,000 unique set-and-stop outcomes. Its weighted totals apply the 3:1 selector; it evaluates banner expansion and basegame line wins and counts scatter triggers without playing freegames. Weighted full-reelset evaluation requires selectable sets to have the same total number of stop combinations. Award hits print as a table with symbols down the rows and matching lengths across the columns.
+The full reelset tool evaluates every configured basegame reel-stop combination using the visible regular symbols and paytable only. It deliberately skips symbol insertions, scatter triggers, banner expansion, and multipliers so it measures the underlying reel/paytable cycle without random feature mechanics. It still reports stop-combination counts and symbol award hits; its results are not the full game's feature-inclusive RTP.
 
 A seeded 1,000,000-round simulation used seed `4042026`, 32 partitions, and four threads. A separate one-thread run with the same seed and partition count produced matching total and freegame distributions:
 
-- Basegame scatter triggers: 30,046 (3.0046%).
-- Free spins: 240,368 (eight per trigger).
-- Basegame winnings: 38,430,848.50.
-- Freegame winnings: 195,640,722.00.
-- Total winnings: 234,071,570.50; reported overall RTP against a stake of 1 per base round is 23,407.16%.
+- Basegame scatter triggers: 7,375 (0.7375%).
+- Free spins played: 36,679 (some rounds stop early at the win cap).
+- Basegame winnings: 267,277.80.
+- Freegame winnings: 20,259.10.
+- Total winnings: 287,536.90; reported overall RTP against a stake of 1 per base round is 28.75%.
 
-The very high RTP is expected from the deliberately unbalanced example: each winning line applies its paytable multiplier to the full round stake, without splitting the stake across the 15 paylines, and freegame banner multipliers can add to as much as 50x on a line with five banners. It is a math/configuration result, not a simulator crash or aggregation mismatch.
+The measured RTP reflects the intentionally simple example configuration. Each winning line applies its paytable multiplier to the full round stake rather than splitting stake across the 15 paylines; up to three inserted banners can contribute additive multipliers on a line. These defaults are for exercising the framework, not for balance.
 
 The run exposed reporting issues in existing generic simulation code:
 

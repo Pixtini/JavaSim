@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Random;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -13,7 +15,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
@@ -22,19 +26,36 @@ import javax.swing.Timer;
 public final class PrototypePlayerFrame extends JFrame {
     private final PlayerGameAdapter game = new ExpandingWildPlayerAdapter(new Random());
     private final JTextField stakeField = new JTextField("1.00", 8);
+    private final JSpinner autoRoundCount = new JSpinner(
+            new SpinnerNumberModel(10, 1, 1_000_000, 1));
     private final JButton spinButton = new JButton("SPIN");
+    private final JButton replayButton = new JButton("REPLAY LAST PLAY");
+    private final JButton autoPlayButton = new JButton("AUTO PLAY");
+    private final JButton stopAutoPlayButton = new JButton("STOP");
     private final JLabel gameLabel = new JLabel(game.gameName());
     private final JLabel modeLabel = new JLabel("Ready to play", SwingConstants.CENTER);
     private final JLabel detailsLabel = new JLabel(" ", SwingConstants.CENTER);
     private final JLabel awardLabel = new JLabel(" ", SwingConstants.CENTER);
     private final JLabel trackerLabel = new JLabel("Press Spin to play", SwingConstants.CENTER);
     private final JLabel totalLabel = new JLabel("Round win: £0.00", SwingConstants.CENTER);
-    private final JLabel returnLabel = new JLabel("Session return: £0.00", SwingConstants.CENTER);
+    private final JLabel balanceLabel = new JLabel("Balance: £1,000.00", SwingConstants.CENTER);
     private final ReelViewport viewport = new ReelViewport();
 
-    private double sessionReturn;
+    private double balance = 1_000.00;
+    private double roundStake;
+    private int autoRoundsRemaining;
+    private boolean autoPlayActive;
+    private boolean stopAutoAfterRound;
+    private boolean previewingFoundPlay;
+    private Timer nextAutoRoundTimer;
+    private PlayerDisplayData.Round lastRound;
+    private double lastRoundStake = 1.0;
 
     public PrototypePlayerFrame() {
+        this(null, 1.0);
+    }
+
+    private PrototypePlayerFrame(PlayerDisplayData.Round foundRound, double foundStake) {
         super("JavaSim Prototype Player");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(700, 620));
@@ -45,6 +66,16 @@ public final class PrototypePlayerFrame extends JFrame {
         add(createPlayArea(), BorderLayout.CENTER);
         add(createWinTracker(), BorderLayout.SOUTH);
         spinButton.addActionListener(event -> startRound());
+        replayButton.addActionListener(event -> replayLastRound());
+        autoPlayButton.addActionListener(event -> startAutoPlay());
+        stopAutoPlayButton.addActionListener(event -> requestAutoPlayStop());
+        stopAutoPlayButton.setEnabled(false);
+        if (foundRound != null) {
+            lastRound = foundRound;
+            lastRoundStake = foundStake;
+            stakeField.setText(String.format(java.util.Locale.ROOT, "%.2f", foundStake));
+            replayButton.setEnabled(true);
+        }
         pack();
         setSize(Math.max(getWidth(), 850), Math.max(getHeight(), 720));
         setLocationRelativeTo(null);
@@ -62,6 +93,13 @@ public final class PrototypePlayerFrame extends JFrame {
         spinButton.setFocusPainted(false);
         spinButton.setBorder(BorderFactory.createEmptyBorder(9, 26, 9, 26));
         controls.add(spinButton);
+        replayButton.setEnabled(false);
+        controls.add(replayButton);
+        controls.add(new JLabel("Auto rounds"));
+        autoRoundCount.setPreferredSize(new Dimension(78, autoRoundCount.getPreferredSize().height));
+        controls.add(autoRoundCount);
+        controls.add(autoPlayButton);
+        controls.add(stopAutoPlayButton);
         return controls;
     }
 
@@ -94,43 +132,106 @@ public final class PrototypePlayerFrame extends JFrame {
                 BorderFactory.createEmptyBorder(4, 8, 8, 8)));
         trackerLabel.setFont(trackerLabel.getFont().deriveFont(Font.BOLD, 17f));
         totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD, 15f));
+        balanceLabel.setFont(balanceLabel.getFont().deriveFont(Font.BOLD, 15f));
         tracker.add(trackerLabel);
         tracker.add(totalLabel);
-        tracker.add(returnLabel);
+        tracker.add(balanceLabel);
         return tracker;
     }
 
     private void startRound() {
-        double stake;
+        if (autoPlayActive) {
+            return;
+        }
+        Double stake = readStake();
+        if (stake != null) {
+            beginRound(stake);
+        }
+    }
+
+    private void replayLastRound() {
+        if (lastRound == null || !roundIsIdle() || autoPlayActive) {
+            return;
+        }
+        if (balance < lastRoundStake) {
+            showInsufficientBalance();
+            return;
+        }
+        stakeField.setText(String.format(java.util.Locale.ROOT, "%.2f", lastRoundStake));
+        beginRound(lastRoundStake, lastRound);
+    }
+
+    private void startAutoPlay() {
+        if (autoPlayActive || !roundIsIdle()) {
+            return;
+        }
+        Double stake = readStake();
+        if (stake == null) {
+            return;
+        }
+        if (balance < stake) {
+            showInsufficientBalance();
+            return;
+        }
+        autoRoundsRemaining = ((Number) autoRoundCount.getValue()).intValue();
+        autoPlayActive = true;
+        stopAutoAfterRound = false;
+        setAutoControlsRunning(true);
+        beginRound(stake);
+    }
+
+    private Double readStake() {
         try {
-            stake = Double.parseDouble(stakeField.getText().trim());
+            double stake = Double.parseDouble(stakeField.getText().trim());
             if (!Double.isFinite(stake) || stake <= 0.0) {
                 throw new NumberFormatException();
             }
+            if (balance < stake) {
+                showInsufficientBalance();
+                return null;
+            }
+            return stake;
         } catch (NumberFormatException exception) {
             JOptionPane.showMessageDialog(this, "Stake must be a positive number.",
                     "Invalid stake", JOptionPane.ERROR_MESSAGE);
-            return;
+            return null;
         }
+    }
 
+    private void beginRound(double stake) {
+        beginRound(stake, null);
+    }
+
+    private void beginRound(double stake, PlayerDisplayData.Round replayRound) {
+        roundStake = stake;
+        balance = currency(balance - stake);
+        updateBalanceLabel();
         spinButton.setEnabled(false);
+        autoPlayButton.setEnabled(false);
+        stopAutoPlayButton.setEnabled(autoPlayActive);
         stakeField.setEnabled(false);
+        autoRoundCount.setEnabled(false);
+        replayButton.setEnabled(false);
         awardLabel.setVisible(false);
         modeLabel.setText("Calculating round…");
         trackerLabel.setText("Waiting for spin result");
         new SwingWorker<PlayerDisplayData.Round, Void>() {
             @Override
             protected PlayerDisplayData.Round doInBackground() {
-                return game.spin(stake);
+                return replayRound == null ? game.spin(stake) : replayRound;
             }
 
             @Override
             protected void done() {
                 try {
                     PlayerDisplayData.Round round = get();
+                    lastRound = round;
+                    lastRoundStake = stake;
                     presentBaseGame(round);
                 } catch (Exception exception) {
-                    finishRound();
+                    balance = currency(balance + roundStake);
+                    updateBalanceLabel();
+                    roundIsComplete();
                     JOptionPane.showMessageDialog(PrototypePlayerFrame.this,
                             "Could not play this round: " + rootMessage(exception),
                             "Player error", JOptionPane.ERROR_MESSAGE);
@@ -182,9 +283,12 @@ public final class PrototypePlayerFrame extends JFrame {
 
     private void playSpin(PlayerDisplayData.Spin spin, Runnable finished) {
         modeLabel.setText(spin.mode());
-        detailsLabel.setText(spin.details());
-        viewport.animateSpin(spin, game.symbolPalette(),
-                () -> showWins(spin, 0, finished));
+        detailsLabel.setText(" ");
+        viewport.animateSpin(spin, game.symbolPalette(), () ->
+                viewport.animateExpansions(() -> {
+                    detailsLabel.setText(spin.details());
+                    showWins(spin, 0, finished);
+                }));
     }
 
     private void showWins(PlayerDisplayData.Spin spin, int winIndex, Runnable finished) {
@@ -211,10 +315,12 @@ public final class PrototypePlayerFrame extends JFrame {
     }
 
     private void completeRound(PlayerDisplayData.Round round) {
-        sessionReturn += round.totalWin();
+        if (!previewingFoundPlay) {
+            balance = currency(balance + round.totalWin());
+            updateBalanceLabel();
+        }
         viewport.clearActiveWin();
         totalLabel.setText("Round win: " + money(round.totalWin()));
-        returnLabel.setText("Session return: " + money(sessionReturn));
         if (round.featureTriggered() && round.featureSpins().isEmpty()) {
             detailsLabel.setText("The configured win cap prevented feature spins");
         }
@@ -223,17 +329,96 @@ public final class PrototypePlayerFrame extends JFrame {
         if (!anyWin) {
             trackerLabel.setText("No wins this round — spin to play again");
         }
-        modeLabel.setText("Round complete");
-        finishRound();
+        modeLabel.setText(previewingFoundPlay
+                ? "Win viewer play loaded — press Replay Last Play to play it"
+                : "Round complete");
+        previewingFoundPlay = false;
+        roundIsComplete();
     }
 
-    private void finishRound() {
+    private void roundIsComplete() {
+        if (autoPlayActive) {
+            autoRoundsRemaining--;
+            if (stopAutoAfterRound) {
+                endAutoPlay("Auto play stopped after this round");
+            } else if (autoRoundsRemaining <= 0) {
+                endAutoPlay("Auto play complete");
+            } else if (balance < roundStake) {
+                endAutoPlay("Auto play stopped: balance is below the stake");
+            } else {
+                modeLabel.setText("Auto play — " + autoRoundsRemaining + " rounds remaining");
+                nextAutoRoundTimer = new Timer(400, event -> beginRound(roundStake));
+                nextAutoRoundTimer.setRepeats(false);
+                nextAutoRoundTimer.start();
+                return;
+            }
+        }
+        setControlsIdle();
+    }
+
+    private void requestAutoPlayStop() {
+        if (!autoPlayActive) {
+            return;
+        }
+        stopAutoAfterRound = true;
+        stopAutoPlayButton.setEnabled(false);
+        if (nextAutoRoundTimer != null && nextAutoRoundTimer.isRunning()) {
+            nextAutoRoundTimer.stop();
+            endAutoPlay("Auto play stopped");
+            setControlsIdle();
+        } else if (roundIsIdle()) {
+            endAutoPlay("Auto play stopped");
+            setControlsIdle();
+        } else {
+            modeLabel.setText("Will stop after this round, including its freegames");
+        }
+    }
+
+    private boolean roundIsIdle() {
+        return spinButton.isEnabled() && autoPlayButton.isEnabled();
+    }
+
+    private void setAutoControlsRunning(boolean running) {
+        autoPlayButton.setEnabled(!running);
+        autoRoundCount.setEnabled(!running);
+        stopAutoPlayButton.setEnabled(running);
+    }
+
+    private void endAutoPlay(String message) {
+        autoPlayActive = false;
+        stopAutoAfterRound = false;
+        if (nextAutoRoundTimer != null) {
+            nextAutoRoundTimer.stop();
+            nextAutoRoundTimer = null;
+        }
+        modeLabel.setText(message);
+    }
+
+    private void setControlsIdle() {
         spinButton.setEnabled(true);
+        autoPlayButton.setEnabled(true);
+        stopAutoPlayButton.setEnabled(false);
         stakeField.setEnabled(true);
+        autoRoundCount.setEnabled(true);
+        replayButton.setEnabled(lastRound != null);
+    }
+
+    private void showInsufficientBalance() {
+        JOptionPane.showMessageDialog(this,
+                "Your balance is less than the selected stake.",
+                "Insufficient balance", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void updateBalanceLabel() {
+        balanceLabel.setText("Balance: " + money(balance));
     }
 
     private String money(double amount) {
         return String.format(java.util.Locale.ROOT, "£%.2f", amount);
+    }
+
+    private double currency(double amount) {
+        return BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
     private static String rootMessage(Exception exception) {
@@ -247,5 +432,22 @@ public final class PrototypePlayerFrame extends JFrame {
     public static void open() {
         PrototypePlayerFrame frame = new PrototypePlayerFrame();
         frame.setVisible(true);
+    }
+
+    /** Opens the player with a win viewer result displayed and ready for replay. */
+    public static void openFoundPlay(PlayerDisplayData.Round round, double stake) {
+        PrototypePlayerFrame frame = new PrototypePlayerFrame(round, stake);
+        frame.setVisible(true);
+        frame.previewFoundPlay(round);
+    }
+
+    private void previewFoundPlay(PlayerDisplayData.Round round) {
+        previewingFoundPlay = true;
+        spinButton.setEnabled(false);
+        replayButton.setEnabled(false);
+        autoPlayButton.setEnabled(false);
+        stakeField.setEnabled(false);
+        autoRoundCount.setEnabled(false);
+        presentBaseGame(round);
     }
 }

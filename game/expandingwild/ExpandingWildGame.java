@@ -6,8 +6,8 @@ import game.expandingwild.basegame.ExpandingWildBaseGame;
 import GameModuleFramework.probability.WeightedTable;
 import game.expandingwild.config.ExpandingWildConfig;
 import game.expandingwild.config.ExpandingWildConfigAdapter;
-import java.util.Random;
 import java.util.List;
+import java.util.Random;
 
 /** Five-reel expanding wild game module. */
 public final class ExpandingWildGame implements ExhaustiveReelGame {
@@ -134,6 +134,12 @@ public final class ExpandingWildGame implements ExhaustiveReelGame {
                 throw new IllegalArgumentException("Every spin set must be selectable and define every reel");
             }
             ExpandingWildConfigAdapter.toReelStrips(set);
+            for (List<Integer> reel : set.reelStrips) {
+                if (reel.stream().anyMatch(id -> id < 0 || id > 9)) {
+                    throw new IllegalArgumentException(
+                            "Reel strips may contain only the ten regular paying symbols");
+                }
+            }
             if (!set.bannerMultiplierWeights.isEmpty()) {
                 new WeightedTable<>(set.bannerMultiplierWeights);
             } else if (!baseGame && setIndex == 1) {
@@ -144,43 +150,64 @@ public final class ExpandingWildGame implements ExhaustiveReelGame {
                     throw new IllegalArgumentException("Banner multiplier values must be positive");
                 }
             }
-            boolean hasBanner = containsSymbol(set, ExpandingWildConfig.BANNER);
-            boolean hasScatter = containsSymbol(set, ExpandingWildConfig.SCATTER);
-            boolean hasStaticWild = containsSymbol(set, ExpandingWildConfig.WILD);
-            if (setIndex == 0 && (hasBanner || hasStaticWild || (!baseGame && hasScatter))) {
-                throw new IllegalArgumentException("Set 0 must contain no wilds and no freegame scatters");
-            }
-            if (setIndex == 1 && (!hasBanner || hasScatter || hasStaticWild)) {
-                throw new IllegalArgumentException("Set 1 must contain wild banners and no scatters");
-            }
-            if (baseGame && setIndex == 0 && !hasScatter) {
-                throw new IllegalArgumentException("Basegame set 0 must contain scatters");
-            }
-            for (int reelIndex = 0; reelIndex < set.reelStrips.size(); reelIndex++) {
-                List<Integer> reel = set.reelStrips.get(reelIndex);
-                boolean reelHasBanner = reel.contains(10);
-                if ((setIndex == 1) != reelHasBanner) {
-                    throw new IllegalArgumentException(
-                            "Only wild-reel sets may contain banners, and each of their reels must have one");
-                }
-                boolean reelHasScatter = reel.contains(12);
-                boolean scatterEligible = false;
-                if (baseGame && setIndex == 0) {
-                    for (int configuredReel : config.scatterReels) {
-                        scatterEligible |= configuredReel == reelIndex;
-                    }
-                }
-                if (reelHasScatter != scatterEligible) {
-                    throw new IllegalArgumentException(
-                            "Scatters must appear only in eligible reels of basegame set zero");
-                }
-            }
+            validateInsertions(set, baseGame, setIndex);
         }
     }
 
-    private boolean containsSymbol(ExpandingWildConfig.SpinSetConfig set,
-            GameModuleFramework.symbols.Symbol symbol) {
-        return set.reelStrips.stream().flatMap(List::stream)
-                .map(ExpandingWildConfig::fromId).anyMatch(symbol::equals);
+    private void validateInsertions(ExpandingWildConfig.SpinSetConfig set,
+            boolean baseGame, int setIndex) {
+        int scatterRules = 0;
+        int bannerRules = 0;
+        for (var rule : set.symbolInsertions) {
+            boolean scatterRule = rule.symbol().equals(ExpandingWildConfig.SCATTER);
+            boolean bannerRule = rule.symbol().equals(ExpandingWildConfig.BANNER);
+            if (!scatterRule && !bannerRule) {
+                throw new IllegalArgumentException("Expanding Wild supports scatter and banner insertions only");
+            }
+            if (scatterRule) {
+                scatterRules++;
+                if (!baseGame || setIndex != 0) {
+                    throw new IllegalArgumentException("Scatters can be inserted only in basegame set zero");
+                }
+            }
+            if (bannerRule) {
+                bannerRules++;
+                if (setIndex != 1) {
+                    throw new IllegalArgumentException("Banners can be inserted only in set one");
+                }
+            }
+            if (rule.maxPerReel() != 1
+                    || rule.positionWeights().size() != config.reelCount
+                    || rule.positionWeights().stream().anyMatch(
+                            reel -> reel.size() != config.visibleRows)
+                    || rule.countWeights().stream().anyMatch(entry -> entry.value() > 3)) {
+                throw new IllegalArgumentException(
+                        "Scatter and banner insertion uses at most three symbols and one per reel");
+            }
+            new WeightedTable<>(rule.countWeights());
+            for (int reel = 0; reel < config.reelCount; reel++) {
+                boolean eligible = bannerRule;
+                for (int scatterReel : config.scatterReels) {
+                    eligible |= scatterReel == reel;
+                }
+                if (!eligible && rule.positionWeights().get(reel).stream().anyMatch(weight -> weight != 0)) {
+                    throw new IllegalArgumentException("Insertion heat map enables an ineligible reel");
+                }
+            }
+        }
+        if (baseGame && setIndex == 0 && scatterRules != 1) {
+            throw new IllegalArgumentException("Basegame set zero must configure one scatter insertion rule");
+        }
+        if (setIndex == 1 && bannerRules != 1) {
+            throw new IllegalArgumentException("Set one must configure one banner insertion rule");
+        }
+        if (!baseGame && setIndex == 0 && !set.symbolInsertions.isEmpty()) {
+            throw new IllegalArgumentException("Freegame set zero does not insert special symbols");
+        }
+        if ((setIndex == 0 && bannerRules != 0)
+                || (baseGame && setIndex == 1 && scatterRules != 0)) {
+            throw new IllegalArgumentException("Insertion symbols do not match the spin set");
+        }
     }
+
 }

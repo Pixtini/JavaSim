@@ -19,6 +19,10 @@ import javax.swing.Timer;
 public final class ReelViewport extends JPanel {
     private static final int REEL_GAP = 8;
     private static final int CELL_GAP = 5;
+    private static final int ANIMATION_TICK_MILLIS = 95;
+    private static final int REEL_STOP_STAGGER_TICKS = 5;
+    private static final int REEL_ROLL_TICKS = 11;
+    private static final int EXPANSION_TICK_MILLIS = 125;
     private static final Map<String, Color> STYLE_COLORS = Map.ofEntries(
             Map.entry("T1", new Color(177, 72, 74)),
             Map.entry("T2", new Color(198, 105, 48)),
@@ -38,8 +42,12 @@ public final class ReelViewport extends JPanel {
     private PlayerDisplayData.Spin spin;
     private List<PlayerDisplayData.SymbolCell> palette = List.of();
     private int activeWin = -1;
-    private int stoppedReels;
+    private int animationTick;
+    private int expandedReelCount;
+    private double activeExpansionProgress;
+    private boolean expansionsStarted;
     private Timer dropTimer;
+    private Timer expansionTimer;
 
     public ReelViewport() {
         setOpaque(true);
@@ -53,21 +61,59 @@ public final class ReelViewport extends JPanel {
         if (dropTimer != null) {
             dropTimer.stop();
         }
+        if (expansionTimer != null) {
+            expansionTimer.stop();
+            expansionTimer = null;
+        }
         spin = nextSpin;
         palette = List.copyOf(availableSymbols);
         activeWin = -1;
-        stoppedReels = 0;
+        animationTick = 0;
+        expandedReelCount = 0;
+        activeExpansionProgress = 0.0;
+        expansionsStarted = false;
         repaint();
-        dropTimer = new Timer(115, event -> {
-            stoppedReels++;
+        int finalStopTick = (spin.reelCount() - 1) * REEL_STOP_STAGGER_TICKS
+                + REEL_ROLL_TICKS;
+        dropTimer = new Timer(ANIMATION_TICK_MILLIS, event -> {
+            animationTick++;
             repaint();
-            if (stoppedReels >= spin.reelCount()) {
+            if (animationTick >= finalStopTick) {
                 dropTimer.stop();
                 dropTimer = null;
                 finished.run();
             }
         });
         dropTimer.start();
+    }
+
+    /** Reveals post-stop reel transformations only after every reel has settled. */
+    public void animateExpansions(Runnable finished) {
+        if (spin.expandingReels().isEmpty()) {
+            finished.run();
+            return;
+        }
+        expandedReelCount = 0;
+        activeExpansionProgress = 0.0;
+        Timer pause = new Timer(420, event -> {
+            expansionsStarted = true;
+            expansionTimer = new Timer(EXPANSION_TICK_MILLIS, tick -> {
+                activeExpansionProgress = Math.min(1.0, activeExpansionProgress + 0.2);
+                if (activeExpansionProgress >= 1.0) {
+                    expandedReelCount++;
+                    activeExpansionProgress = 0.0;
+                }
+                repaint();
+                if (expandedReelCount >= spin.expandingReels().size()) {
+                    expansionTimer.stop();
+                    expansionTimer = null;
+                    finished.run();
+                }
+            });
+            expansionTimer.start();
+        });
+        pause.setRepeats(false);
+        pause.start();
     }
 
     public void setActiveWin(int index) {
@@ -116,19 +162,63 @@ public final class ReelViewport extends JPanel {
         PlayerDisplayData.Win highlighted = activeWin >= 0 && activeWin < spin.wins().size()
                 ? spin.wins().get(activeWin) : null;
         for (int reel = 0; reel < reelCount; reel++) {
-            boolean reelStopped = reel < stoppedReels;
-            for (int row = 0; row < rowCount; row++) {
-                PlayerDisplayData.SymbolCell symbol = reelStopped
-                        ? spin.reels().get(reel).get(row) : randomSymbol(reel, row);
-                int x = startX + reel * (cellWidth + REEL_GAP);
-                int y = startY + row * (cellHeight + CELL_GAP);
-                paintCell(g, symbol, x, y, cellWidth, cellHeight,
-                        highlighted != null && contains(highlighted.positions(), reel, row));
+            int reelProgress = animationTick - reel * REEL_STOP_STAGGER_TICKS;
+            if (reelProgress >= REEL_ROLL_TICKS) {
+                paintStoppedReel(g, reel, highlighted, startX, startY, cellWidth, cellHeight);
+            } else {
+                paintRollingReel(g, reel, animationTick, startX, startY,
+                        cellWidth, cellHeight, rowCount);
             }
         }
         if (highlighted != null) {
             paintWinLine(g, highlighted, startX, startY, cellWidth, cellHeight);
         }
+    }
+
+    private void paintStoppedReel(Graphics2D g, int reel, PlayerDisplayData.Win highlighted,
+            int startX, int startY, int cellWidth, int cellHeight) {
+        int sourceBannerRow = bannerRow(reel);
+        int expansionIndex = spin.expandingReels().indexOf(reel);
+        boolean fullyExpanded = expansionIndex >= 0 && expansionIndex < expandedReelCount;
+        boolean animatingExpansion = expansionsStarted && expansionIndex == expandedReelCount
+                && expansionIndex >= 0;
+        int maxDistance = sourceBannerRow < 0 ? 0
+                : Math.max(sourceBannerRow, spin.rowCount() - 1 - sourceBannerRow);
+        for (int row = 0; row < spin.rowCount(); row++) {
+            boolean revealWild = fullyExpanded || (animatingExpansion
+                    && (sourceBannerRow == row || Math.abs(row - sourceBannerRow)
+                            <= Math.ceil(activeExpansionProgress * maxDistance)));
+            PlayerDisplayData.SymbolCell symbol = revealWild
+                    ? spin.reels().get(reel).get(row)
+                    : spin.stoppedReels().get(reel).get(row);
+            int x = startX + reel * (cellWidth + REEL_GAP);
+            int y = startY + row * (cellHeight + CELL_GAP);
+            paintCell(g, symbol, x, y, cellWidth, cellHeight,
+                    highlighted != null && contains(highlighted.positions(), reel, row));
+        }
+    }
+
+    private int bannerRow(int reel) {
+        for (int row = 0; row < spin.rowCount(); row++) {
+            if (spin.stoppedReels().get(reel).get(row).label().equals("B")) {
+                return row;
+            }
+        }
+        return -1;
+    }
+
+    private void paintRollingReel(Graphics2D g, int reel, int reelProgress,
+            int startX, int startY, int cellWidth, int cellHeight, int rowCount) {
+        int x = startX + reel * (cellWidth + REEL_GAP);
+        int pitch = cellHeight + CELL_GAP;
+        int offset = reelProgress * 22 % pitch;
+        var originalClip = g.getClip();
+        g.clipRect(x, startY, cellWidth, rowCount * cellHeight + (rowCount - 1) * CELL_GAP);
+        for (int row = -1; row <= rowCount; row++) {
+            int y = startY + row * pitch + offset;
+            paintCell(g, randomSymbol(reel, row), x, y, cellWidth, cellHeight, false);
+        }
+        g.setClip(originalClip);
     }
 
     private void paintCell(Graphics2D g, PlayerDisplayData.SymbolCell symbol,
@@ -188,8 +278,8 @@ public final class ReelViewport extends JPanel {
         if (palette.isEmpty()) {
             return new PlayerDisplayData.SymbolCell("?", "L5");
         }
-        int offset = (reel * spin.rowCount() + row + animationRandom.nextInt(palette.size()))
-                % palette.size();
+        int offset = Math.floorMod(reel * spin.rowCount() + row
+                + animationRandom.nextInt(palette.size()), palette.size());
         return palette.get(offset);
     }
 

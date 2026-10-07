@@ -41,6 +41,11 @@ public final class ExpandingWildPlayerAdapter implements PlayerGameAdapter {
     public PlayerDisplayData.Round spin(double stake) {
         GameRoundResult result = session.playRound(
                 stake, config.maxWinMultiplier * stake, false);
+        return adaptRound(result);
+    }
+
+    /** Converts a previously calculated game round for presentation or playback. */
+    public PlayerDisplayData.Round adaptRound(GameRoundResult result) {
         PlayerDisplayData.Spin base = adapt(result.getBaseGameResult(), "Basegame");
         List<PlayerDisplayData.Spin> freeSpins = result.getFreeGameResults().stream()
                 .map(spin -> adapt(spin, "Freegame"))
@@ -60,15 +65,13 @@ public final class ExpandingWildPlayerAdapter implements PlayerGameAdapter {
             throw new IllegalStateException("Expanding Wild returned an unsupported spin result");
         }
         ReelGrid grid = expandingResult.getExpandedGrid();
-        List<List<PlayerDisplayData.SymbolCell>> reels = new ArrayList<>();
-        for (int reel = 0; reel < grid.getReelCount(); reel++) {
-            List<PlayerDisplayData.SymbolCell> rows = new ArrayList<>();
-            for (int row = 0; row < grid.getHeight(); row++) {
-                rows.add(adaptSymbol(grid.getSymbol(reel, row)));
-            }
-            reels.add(rows);
-        }
-
+        List<List<PlayerDisplayData.SymbolCell>> finalReels = adaptGrid(grid);
+        List<List<PlayerDisplayData.SymbolCell>> stoppedReels = adaptGrid(
+                expandingResult.getStoppedGrid());
+        List<Integer> expansionReels = expandingResult.getExpandedBannerReels().stream()
+                .map(reel -> reel - 1)
+                .sorted()
+                .toList();
         List<PlayerDisplayData.Win> wins = expandingResult.getLineWins().stream()
                 .map(this::adaptWin)
                 .toList();
@@ -80,7 +83,20 @@ public final class ExpandingWildPlayerAdapter implements PlayerGameAdapter {
                 "Set %d  •  scatters %d  •  expanded reels %s  •  banner multipliers %s",
                 result.getSetIndex(), expandingResult.getScatterCount(),
                 bannerDetails, multiplierDetails);
-        return new PlayerDisplayData.Spin(mode, reels, result.getWin(), wins, details);
+        return new PlayerDisplayData.Spin(mode, finalReels, stoppedReels, expansionReels,
+                result.getWin(), wins, details);
+    }
+
+    private List<List<PlayerDisplayData.SymbolCell>> adaptGrid(ReelGrid grid) {
+        List<List<PlayerDisplayData.SymbolCell>> reels = new ArrayList<>();
+        for (int reel = 0; reel < grid.getReelCount(); reel++) {
+            List<PlayerDisplayData.SymbolCell> rows = new ArrayList<>();
+            for (int row = 0; row < grid.getHeight(); row++) {
+                rows.add(adaptSymbol(grid.getSymbol(reel, row)));
+            }
+            reels.add(rows);
+        }
+        return List.copyOf(reels);
     }
 
     private PlayerDisplayData.Win adaptWin(ExpandingWildLineWin lineWin) {
