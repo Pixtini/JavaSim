@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expanding Wild Config Tables</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #172033;
+      background: #f3f6fb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { padding: 30px clamp(20px, 5vw, 64px); color: white; background: #172554; }
+    header h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3vw, 2.4rem); }
+    header p { margin: 0; color: #dbeafe; max-width: 850px; line-height: 1.5; }
+    main { max-width: 1500px; margin: auto; padding: 24px clamp(16px, 4vw, 48px) 56px; }
+    section { margin: 22px 0; padding: 22px; background: white; border: 1px solid #dbe3ef; border-radius: 14px; box-shadow: 0 3px 14px #0f172a0a; }
+    h2 { margin: 0 0 7px; font-size: 1.25rem; }
+    h3 { margin: 22px 0 8px; font-size: 1rem; }
+    p.note { margin: 0 0 14px; color: #53627a; line-height: 1.5; }
+    .table-wrap { width: 100%; overflow: auto; border: 1px solid #dbe3ef; border-radius: 9px; }
+    table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .88rem; }
+    caption { padding: 9px 12px; text-align: left; font-weight: 700; color: #334155; background: #f8fafc; }
+    th, td { padding: 8px 10px; text-align: center; white-space: nowrap; border-right: 1px solid #e4eaf2; border-top: 1px solid #e4eaf2; }
+    thead th { position: sticky; top: 0; z-index: 1; color: #1e3a8a; background: #eff6ff; }
+    tbody th { position: sticky; left: 0; z-index: 1; text-align: left; color: #334155; background: #f8fafc; }
+    td.zero { color: #94a3b8; background: #f8fafc; }
+    td.active { color: #14532d; background: #dcfce7; font-weight: 700; }
+    td.symbol { min-width: 44px; font-weight: 650; }
+    .grid-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); gap: 18px; }
+    .badge { display: inline-block; padding: 3px 8px; margin: 0 5px 5px 0; border-radius: 999px; color: #1e3a8a; background: #dbeafe; font-size: .8rem; }
+    footer { color: #64748b; font-size: .85rem; padding: 12px 0; }
+    @media (max-width: 600px) { section { padding: 15px; } th, td { padding: 7px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Expanding Wild Config Tables</h1>
+    <p>A visual view of the current defaults in <code>ExpandingWildConfig</code>. Scroll wide tables horizontally. Reel strips are shown as symbol IDs; the ID-to-name key is below.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Game-wide settings</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Shared configuration values</caption>
+          <thead><tr><th>Reels</th><th>Visible rows</th><th>Maximum win</th><th>Freegames awarded</th><th>Scatter trigger</th><th>Eligible scatter reels</th></tr></thead>
+          <tbody><tr><td>5</td><td>5</td><td>100× round stake</td><td>5</td><td>3 scatters</td><td>1, 3, 5</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Symbol ID lookup</h2>
+      <p class="note">The strips store integer IDs. Both game modes use the same default strip: six repetitions of IDs 0 through 9 on each reel.</p>
+      <div id="symbols" class="table-wrap"></div>
+    </section>
+
+    <section>
+      <h2>Basegame set selection</h2>
+      <p class="note">Weights are relative selection weights; total weight is 4.</p>
+      <div class="table-wrap">
+        <table><caption>Basegame selector</caption><thead><tr><th>Set ID</th><th>Selection weight</th><th>Share of selector weight</th><th>Special insertion</th></tr></thead>
+          <tbody><tr><th>0</th><td>3</td><td>75%</td><td>Scatter</td></tr><tr><th>1</th><td>1</td><td>25%</td><td>Banner</td></tr></tbody>
+        </table>
+      </div>
+      <h3>Basegame reel strips — set 0</h3><div id="base-reels-0" class="table-wrap"></div>
+      <h3>Basegame reel strips — set 1</h3><div id="base-reels-1" class="table-wrap"></div>
+      <div class="grid-two">
+        <div><h3>Scatter insertion count weights</h3><div id="scatter-counts" class="table-wrap"></div></div>
+        <div><h3>Scatter insertion position weights</h3><div id="scatter-heat" class="table-wrap"></div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Freegame set selection</h2>
+      <p class="note">Weights are relative selection weights; total weight is 4.</p>
+      <div class="table-wrap">
+        <table><caption>Freegame selector</caption><thead><tr><th>Set ID</th><th>Selection weight</th><th>Share of selector weight</th><th>Special insertion</th><th>Banner multiplier table</th></tr></thead>
+          <tbody><tr><th>0</th><td>3</td><td>75%</td><td>None</td><td>None</td></tr><tr><th>1</th><td>1</td><td>25%</td><td>Banner</td><td>Configured</td></tr></tbody>
+        </table>
+      </div>
+      <h3>Freegame reel strips — set 0</h3><div id="free-reels-0" class="table-wrap"></div>
+      <h3>Freegame reel strips — set 1</h3><div id="free-reels-1" class="table-wrap"></div>
+      <div class="grid-two">
+        <div><h3>Banner insertion count weights</h3><div id="banner-counts" class="table-wrap"></div></div>
+        <div><h3>Banner insertion position weights</h3><div id="banner-heat" class="table-wrap"></div></div>
+      </div>
+      <h3>Freegame set 1 banner multiplier weights</h3>
+      <div id="multipliers" class="table-wrap"></div>
+    </section>
+
+    <section>
+      <h2>Paylines</h2>
+      <p class="note">Each row is one payline. Values are zero-based visible-row indexes for reels 1 through 5.</p>
+      <div id="paylines" class="table-wrap"></div>
+    </section>
+
+    <section>
+      <h2>Paytable</h2>
+      <p class="note">Payouts are multiples of total round stake, applied per winning line.</p>
+      <div id="paytable" class="table-wrap"></div>
+    </section>
+    <footer>Rendered from the current default values in ExpandingWildConfig.java. Config changes should be reflected here.</footer>
+  </main>
+  <script>
+    const symbols = ["T1", "T2", "T3", "T4", "T5", "L1", "L2", "L3", "L4", "L5"];
+    const makeTable = (caption, headers, rows) => {
+      const table = document.createElement("table");
+      const cap = document.createElement("caption"); cap.textContent = caption; table.append(cap);
+      const thead = document.createElement("thead");
+      const hr = document.createElement("tr");
+      headers.forEach(value => { const th = document.createElement("th"); th.textContent = value; hr.append(th); });
+      thead.append(hr); table.append(thead);
+      const tbody = document.createElement("tbody");
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach((value, index) => {
+          const cell = document.createElement(index === 0 ? "th" : "td");
+          cell.textContent = value;
+          if (cell.tagName === "TD" && value === "0") cell.className = "zero";
+          if (cell.tagName === "TD" && value === "1") cell.className = "active";
+          tr.append(cell);
+        });
+        tbody.append(tr);
+      });
+      table.append(tbody); return table;
+    };
+    const mount = (id, table) => document.getElementById(id).append(table);
+    mount("symbols", makeTable("Integer symbol IDs", ["ID", "Symbol", "Type"], [
+      ...symbols.map((name, id) => [id, name, "Regular paying"]),
+      [10, "BANNER", "Inserted feature symbol"], [11, "WILD", "Wild symbol"], [12, "SCATTER", "Inserted trigger symbol"]
+    ]));
+    const reelRows = () => Array.from({length: 5}, (_, reel) => [
+      `Reel ${reel + 1}`, ...Array.from({length: 60}, (_, stop) => String(stop % 10))
+    ]);
+    const reelHeaders = ["Reel", ...Array.from({length: 60}, (_, stop) => `Stop ${stop + 1}`)];
+    ["base-reels-0", "base-reels-1", "free-reels-0", "free-reels-1"].forEach(id =>
+      mount(id, makeTable("5 reels × 60 stops (symbol IDs)", reelHeaders, reelRows())));
+    const counts = [["0", "90"], ["1", "6"], ["2", "3"], ["3", "1"]];
+    mount("scatter-counts", makeTable("Weighted insertion count", ["Inserted scatters", "Weight"], counts));
+    mount("banner-counts", makeTable("Weighted insertion count", ["Inserted banners", "Weight"], counts));
+    const heatRows = eligible => Array.from({length: 5}, (_, reel) => [
+      `Reel ${reel + 1}`,
+      ...Array.from({length: 5}, () => String(eligible.includes(reel) ? 1 : 0))
+    ]);
+    const heatHeaders = ["Reel / row", "Row 1", "Row 2", "Row 3", "Row 4", "Row 5"];
+    mount("scatter-heat", makeTable("Scatter position weight (eligible reels 1, 3, 5)", heatHeaders, heatRows([0, 2, 4])));
+    mount("banner-heat", makeTable("Banner position weight (all reels eligible)", heatHeaders, heatRows([0, 1, 2, 3, 4])));
+    mount("multipliers", makeTable("Weighted banner multiplier", ["Multiplier", "Weight"], [
+      [2, 1000], [3, 1000], ...Array.from({length: 7}, (_, i) => [i + 4, 1])
+    ]));
+    const lines = [
+      [2,2,2,2,2], [0,0,0,0,0], [4,4,4,4,4], [1,1,1,1,1], [3,3,3,3,3],
+      [0,1,2,3,4], [4,3,2,1,0], [1,0,1,2,1], [3,4,3,2,3], [2,1,0,1,2],
+      [2,3,4,3,2], [0,0,1,2,3], [4,4,3,2,1], [1,2,3,2,1], [3,2,1,2,3]
+    ];
+    mount("paylines", makeTable("15 configured paylines", ["Line", "Reel 1", "Reel 2", "Reel 3", "Reel 4", "Reel 5"],
+      lines.map((line, index) => [`Line ${index + 1}`, ...line])));
+    const payouts = [
+      ["T1", 5, 10, 20], ["T2", 2, 3, 5], ["T3", 1, 2, 3], ["T4", 0.5, 1, 2], ["T5", 0.2, 0.5, 1],
+      ["L1", 0.1, 0.2, 0.5], ["L2", 0.1, 0.2, 0.5], ["L3", 0.1, 0.2, 0.5], ["L4", 0.1, 0.2, 0.5], ["L5", 0.1, 0.2, 0.5]
+    ];
+    mount("paytable", makeTable("Payout per winning line (× round stake)", ["Symbol", "3 matching symbols", "4 matching symbols", "5 matching symbols"], payouts));
+  </script>
+</body>
+</html>

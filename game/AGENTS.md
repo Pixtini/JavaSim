@@ -231,6 +231,33 @@ for game mathematics.
 Random events must be generated through the simulator's controlled RNG.
 
 ---
+## Parser
+
+Game-Wide-Config : Defines the overall rules for the game , such as starting screen size, maxWin and other features that may be included within the config.
+
+PAYTABLE: Includes Symbol-ID , the Name of the symbol, payouts, and it description of its type.
+
+PAYLINES: Defines the lines to be used for a lines game.
+
+Then we have the different tables. 
+
+CHANCETABLE - Defines a weight table where we have on value and weight. Value being how much of something happens and weight being the weight for that. Its naming convention is the following CHANCETABLE:[Mode]-[SET]-[FEATURE]-[DESCRIPTION]. 
+
+    For example CHANCETABLE:BG-0-wildExpand-insertQuantity would refer to , Basegame, set 0, wild expansion feature, and its discribing how many of the symbols we are inserting. One of these naming blocks may be missing if relevant , for example selection of the set will omit the set and description. 
+
+MAP - Defines a maping from a quantity of symbols to something else made up of sym and f(sym). Its naming convention is MAP:[Symbol]-[RANGE].
+
+    For example MAP:SCATTER-FREEGAMES, would map an amount of scatters to an amount of freegames (3->5)
+
+HEATMAP - Defines the weight of where something can be placed on the grid. Its naming convention is HEATMAP:[Mode]-[SET]-[FEATURE]-[DESCRIPTION]{LIMITS}.
+
+    For example HEATMAP:BG-0-wildExpand-location{reelMax = 1}, would be Basegame, set 0, wild expansion feature, its location and max one per reel.
+
+When finding the tables, they can be anywhere on the "Config" Sheet of the PAR excel file. The headers will be directly below the type of table, any header prefixed with MATH: is to be ignored. All entries will be consectutive in the sheet, the first white space below a row marks the end of that table.
+
+Reels are featured on the "Reels" Sheet. Feature the title on row 1, [Mode]-[Set] for example BG-0, that marks the reels of the Basegame set 0. Row 2 , will feature the reel number. Indexed by 1 rather that 0. 0 Index should still be used within the config. And then the columns will feature the reels per the ID which will be consecutive, any white space is the end of that reel.
+
+
 
 ## Configuration
 

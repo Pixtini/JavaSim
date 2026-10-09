@@ -4,6 +4,8 @@
 *.xlsx
 
 *.html
+!docs/expanding-wild-config-tables.html
+!docs/expanding-wild-game-info.html
 
 
 

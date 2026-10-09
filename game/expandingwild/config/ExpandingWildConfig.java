@@ -32,13 +32,13 @@ public final class ExpandingWildConfig {
             Map.entry(9, L5), Map.entry(10, BANNER), Map.entry(11, WILD),
             Map.entry(12, SCATTER));
 
-    public final int reelCount = 5;
-    public final int visibleRows = 5;
+    public int reelCount = 5;
+    public int visibleRows = 5;
     /** Maximum round payout as a multiple of total round stake. */
     public double maxWinMultiplier = 100.0;
     public int freeGamesAwarded = 5;
-    public final int freeGameTriggerScatterCount = 3;
-    public final int[] scatterReels = {0, 2, 4};
+    public int freeGameTriggerScatterCount = 3;
+    public int[] scatterReels = {0, 2, 4};
 
     /** Basegame sets: scatters insert on set 0, banners insert on set 1. */
     public SpinModeConfig baseGame = new SpinModeConfig(

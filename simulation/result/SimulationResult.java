@@ -14,11 +14,12 @@ public final class SimulationResult {
     private final Map<Integer, StandardStats> freeGameSetStats;
     private final List<SavedGameplay> savedGameplays;
     private final long elapsedNanos;
+    private final double maxWinMultiplier;
 
     public SimulationResult(StandardStats totalGameStats,
             StandardStats baseGameStats, StandardStats freeGameStats, long elapsedNanos) {
         this(totalGameStats, baseGameStats, freeGameStats, Map.of(), Map.of(),
-                List.of(), elapsedNanos);
+                List.of(), elapsedNanos, Double.POSITIVE_INFINITY);
     }
 
     public SimulationResult(StandardStats totalGameStats,
@@ -27,7 +28,7 @@ public final class SimulationResult {
             Map<Integer, StandardStats> freeGameSetStats,
             long elapsedNanos) {
         this(totalGameStats, baseGameStats, freeGameStats, baseGameSetStats,
-                freeGameSetStats, List.of(), elapsedNanos);
+                freeGameSetStats, List.of(), elapsedNanos, Double.POSITIVE_INFINITY);
     }
 
     public SimulationResult(StandardStats totalGameStats,
@@ -36,6 +37,16 @@ public final class SimulationResult {
             Map<Integer, StandardStats> freeGameSetStats,
             List<SavedGameplay> savedGameplays,
             long elapsedNanos) {
+        this(totalGameStats, baseGameStats, freeGameStats, baseGameSetStats,
+                freeGameSetStats, savedGameplays, elapsedNanos, Double.POSITIVE_INFINITY);
+    }
+
+    public SimulationResult(StandardStats totalGameStats,
+            StandardStats baseGameStats, StandardStats freeGameStats,
+            Map<Integer, StandardStats> baseGameSetStats,
+            Map<Integer, StandardStats> freeGameSetStats,
+            List<SavedGameplay> savedGameplays,
+            long elapsedNanos, double maxWinMultiplier) {
         this.totalGameStats = totalGameStats;
         this.baseGameStats = baseGameStats;
         this.freeGameStats = freeGameStats;
@@ -43,6 +54,7 @@ public final class SimulationResult {
         this.freeGameSetStats = Map.copyOf(freeGameSetStats);
         this.savedGameplays = List.copyOf(savedGameplays);
         this.elapsedNanos = elapsedNanos;
+        this.maxWinMultiplier = maxWinMultiplier;
     }
 
     public StandardStats getTotalGameStats() {
@@ -71,5 +83,9 @@ public final class SimulationResult {
 
     public long getElapsedNanos() {
         return elapsedNanos;
+    }
+
+    public double getMaxWinMultiplier() {
+        return maxWinMultiplier;
     }
 }

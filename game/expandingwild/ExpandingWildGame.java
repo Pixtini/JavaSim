@@ -142,71 +142,42 @@ public final class ExpandingWildGame implements ExhaustiveReelGame {
             }
             if (!set.bannerMultiplierWeights.isEmpty()) {
                 new WeightedTable<>(set.bannerMultiplierWeights);
-            } else if (!baseGame && setIndex == 1) {
-                throw new IllegalArgumentException("Freegame set 1 must define banner multipliers");
             }
             for (var entry : set.bannerMultiplierWeights) {
                 if (entry.value() < 1) {
                     throw new IllegalArgumentException("Banner multiplier values must be positive");
                 }
             }
-            validateInsertions(set, baseGame, setIndex);
+            validateInsertions(set);
         }
     }
 
-    private void validateInsertions(ExpandingWildConfig.SpinSetConfig set,
-            boolean baseGame, int setIndex) {
-        int scatterRules = 0;
-        int bannerRules = 0;
+    private void validateInsertions(ExpandingWildConfig.SpinSetConfig set) {
         for (var rule : set.symbolInsertions) {
             boolean scatterRule = rule.symbol().equals(ExpandingWildConfig.SCATTER);
             boolean bannerRule = rule.symbol().equals(ExpandingWildConfig.BANNER);
             if (!scatterRule && !bannerRule) {
                 throw new IllegalArgumentException("Expanding Wild supports scatter and banner insertions only");
             }
-            if (scatterRule) {
-                scatterRules++;
-                if (!baseGame || setIndex != 0) {
-                    throw new IllegalArgumentException("Scatters can be inserted only in basegame set zero");
-                }
-            }
-            if (bannerRule) {
-                bannerRules++;
-                if (setIndex != 1) {
-                    throw new IllegalArgumentException("Banners can be inserted only in set one");
-                }
-            }
-            if (rule.maxPerReel() != 1
+            if (rule.maxPerReel() <= 0
                     || rule.positionWeights().size() != config.reelCount
                     || rule.positionWeights().stream().anyMatch(
-                            reel -> reel.size() != config.visibleRows)
-                    || rule.countWeights().stream().anyMatch(entry -> entry.value() > 3)) {
+                        reel -> reel.size() != config.visibleRows)) {
                 throw new IllegalArgumentException(
-                        "Scatter and banner insertion uses at most three symbols and one per reel");
+                        "Insertion count exceeds the configured grid or per-reel maximum");
             }
             new WeightedTable<>(rule.countWeights());
-            for (int reel = 0; reel < config.reelCount; reel++) {
-                boolean eligible = bannerRule;
-                for (int scatterReel : config.scatterReels) {
-                    eligible |= scatterReel == reel;
-                }
-                if (!eligible && rule.positionWeights().get(reel).stream().anyMatch(weight -> weight != 0)) {
-                    throw new IllegalArgumentException("Insertion heat map enables an ineligible reel");
-                }
+            if (rule.positionWeights().stream().flatMap(List::stream).noneMatch(weight -> weight > 0)) {
+                throw new IllegalArgumentException("Insertion heat map must enable at least one position");
             }
-        }
-        if (baseGame && setIndex == 0 && scatterRules != 1) {
-            throw new IllegalArgumentException("Basegame set zero must configure one scatter insertion rule");
-        }
-        if (setIndex == 1 && bannerRules != 1) {
-            throw new IllegalArgumentException("Set one must configure one banner insertion rule");
-        }
-        if (!baseGame && setIndex == 0 && !set.symbolInsertions.isEmpty()) {
-            throw new IllegalArgumentException("Freegame set zero does not insert special symbols");
-        }
-        if ((setIndex == 0 && bannerRules != 0)
-                || (baseGame && setIndex == 1 && scatterRules != 0)) {
-            throw new IllegalArgumentException("Insertion symbols do not match the spin set");
+            int maximumPlacementCount = rule.positionWeights().stream()
+                    .mapToInt(reel -> Math.min(rule.maxPerReel(),
+                            (int) reel.stream().filter(weight -> weight > 0).count()))
+                    .sum();
+            if (rule.countWeights().stream().anyMatch(entry -> entry.value() > maximumPlacementCount)) {
+                throw new IllegalArgumentException("Insertion count table requests more symbols than its heat map "
+                        + "and per-reel limit allow");
+            }
         }
     }
 

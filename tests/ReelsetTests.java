@@ -68,9 +68,13 @@ public final class ReelsetTests {
     private static void testExpandingWildCombinationCount() {
         ExhaustiveReelGame game = (ExhaustiveReelGame) GameFactory.create("expanding-wild");
         check(game.getReelCount() == 5, "expanding wild exposes five reels to the tool");
-        check(FullReelsetSimulator.countCombinations(game) == 1_555_200_000L,
-                "full reelset count includes both equally sized basegame spin sets");
-        check(FullReelsetSimulator.countWeightedCombinations(game) == 3_110_400_000L,
+        long perSetCombinations = 1;
+        for (int reel = 0; reel < game.getReelCount(); reel++) {
+            perSetCombinations = Math.multiplyExact(perSetCombinations, game.getStopCount(0, reel));
+        }
+        check(FullReelsetSimulator.countCombinations(game) == 2 * perSetCombinations,
+                "full reelset count includes both PAR-defined basegame spin sets");
+        check(FullReelsetSimulator.countWeightedCombinations(game) == 4 * perSetCombinations,
                 "weighted combination count applies the 3:1 set selector");
         SpinResult featureless = game.createStopEvaluator(0)
                 .evaluate(new int[] {0, 0, 0, 0, 0}, 1.0);

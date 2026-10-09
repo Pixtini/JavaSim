@@ -1,5 +1,5 @@
 # Next steps
 
-## Add a reusable game contract test harness
+## Compare PAR results with the intended RTP target
 
-Create shared deterministic test helpers for checking `Game` / `GameSession` behavior, round accounting, feature results, cap handling, and seed repeatability. Use them for each registered game so contract regressions are caught without duplicating the same integration checks in every game test suite.
+The shared stats report now includes RTP by mode, hit and feature frequencies, max-win frequency, and standard deviation by observation unit. Compare the seeded result and per-mode/set RTP contributions with the intended target, then tune PAR inputs while keeping the confirmed total-bet payout convention fixed.

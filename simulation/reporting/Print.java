@@ -18,6 +18,8 @@ import simulation.config.SimConfig;
 import simulation.result.SimulationResult;
 import simulation.replay.SavedGameplayCsv;
 import simulation.stats.StandardStats;
+import toolkit.par.ParWorkbookHtmlReport;
+import toolkit.par.ParWorkbookSheetExporter;
 
 public class Print {
     private static final DateTimeFormatter REPORT_FOLDER_TIME =
@@ -49,12 +51,29 @@ public class Print {
         output.println("--------");
         output.println("Rounds: " + rounds);
         output.println("Spins: " + totalSpins);
-        output.println("FG Triggers: " + freeGameStats.getFreegameTriggers());
-        output.println("Wincaps: " + totalGameStats.getWinCaps());
         output.println("Total staked: £" + (rounds * stake));
         output.println("Total winnings: £" + formatWin(totalWinnings, stake));
-        output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", (totalWinnings / (rounds * stake)) * 100);
-        output.printf(Locale.ROOT, "Standard Deviation: %.2f%n", totalGameStats.getStandardDeviation());
+        output.println();
+        output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n",
+                totalWinnings / (rounds * stake) * 100);
+        output.printf(Locale.ROOT, "Basegame RTP: %.4f%%%n", baseGameStats.getRtp() * 100);
+        output.printf(Locale.ROOT, "Freegame RTP: %.4f%%%n", freeGameStats.getRtp() * 100);
+        output.println();
+        output.println("Hit Rate (1 in): " + frequency(rounds, baseGameStats.getHits()));
+        output.println();
+        long freegameTriggers = freeGameStats.getFreegameTriggers();
+        output.println("FG Triggers: " + freegameTriggers);
+        output.println("Freegame Freq (1 in): " + frequency(rounds, freegameTriggers));
+        output.println("Freegame Avg Win: " + (freegameTriggers == 0 ? "N/A"
+                : String.format(Locale.ROOT, "£%.2f",
+                        freeGameStats.getTotalWinnings() / freegameTriggers)));
+        output.println();
+        output.println("Max Win: " + formatMaxWin(simulationResult.getMaxWinMultiplier(), stake));
+        output.println("Wincaps: " + totalGameStats.getWinCaps());
+        output.println("Max Win Freq (1 in): " + frequency(rounds, totalGameStats.getWinCaps()));
+        output.println("Standard Deviation: " + formatDeviation(totalGameStats.getStandardDeviation()));
+        output.println("Base SD: " + formatDeviation(baseGameStats.getStandardDeviation()));
+        output.println("Free SD: " + formatDeviation(freeGameStats.getStandardDeviation()));
         output.println();
     }
 
@@ -65,13 +84,30 @@ public class Print {
         output.println("Rounds: " + stats.getRounds());
         output.println("Total winnings: £" + formatWin(stats.getTotalWinnings(), stake));
         output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", stats.getRtp() * 100);
+        output.println("Hits: " + stats.getHits());
+        output.println("Standard Deviation: " + formatDeviation(stats.getStandardDeviation()));
         if (showAwards) {
             output.println("Awards: " + (stats.getAwardCounts().isEmpty()
                     ? java.util.Arrays.toString(stats.getPaytable())
                     : stats.getAwardCounts()));
         }
-        output.println("Hits: " + stats.getHits());
         output.println();
+    }
+
+    private static String frequency(long rounds, long occurrences) {
+        if (occurrences == 0) return "N/A";
+        return String.format(Locale.ROOT, "%.2f", (double) rounds / occurrences);
+    }
+
+    private static String formatDeviation(double deviation) {
+        return Double.isFinite(deviation)
+                ? String.format(Locale.ROOT, "%.2f", deviation) : "N/A";
+    }
+
+    private static String formatMaxWin(double multiplier, double stake) {
+        if (!Double.isFinite(multiplier)) return "Unlimited";
+        return String.format(Locale.ROOT, "%.2f× round stake (£%s)",
+                multiplier, formatWin(multiplier * stake, stake));
     }
 
     private void printRegularStats(PrintWriter output, SimConfig simConfig) {
@@ -106,6 +142,9 @@ public class Print {
 
     private void printRunSettings(PrintWriter output, SimConfig simConfig) {
         output.println("Game: " + simConfig.gameId);
+        if (simConfig.parWorkbookPath != null) {
+            output.println("PAR workbook: " + simConfig.parWorkbookPath.toAbsolutePath().normalize());
+        }
         output.println("Logical partitions: " + simConfig.partitions);
         output.println("Seed: " + simConfig.seed);
         output.printf(Locale.ROOT, "Time Taken: %.3f seconds%n",
@@ -141,6 +180,19 @@ public class Print {
             suffix++;
         }
         Files.createDirectory(reportFolder);
+
+        if (simConfig.parWorkbookPath != null) {
+            Path selectedWorkbook = simConfig.parWorkbookPath.toAbsolutePath().normalize();
+            if (!Files.isRegularFile(selectedWorkbook)) {
+                throw new IOException("Selected PAR workbook does not exist: " + selectedWorkbook);
+            }
+            String workbookName = selectedWorkbook.getFileName().toString();
+            Path reportWorkbook = reportFolder.resolve(workbookName);
+            ParWorkbookSheetExporter.export(selectedWorkbook, reportWorkbook,
+                    java.util.Set.of("Config", "Reels"));
+            ParWorkbookHtmlReport.write(reportWorkbook,
+                    reportFolder.resolve("config.html"));
+        }
 
         try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
             reportFolder.resolve("simulation_stats.txt"), StandardCharsets.UTF_8))) {

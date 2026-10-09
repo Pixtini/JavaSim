@@ -85,6 +85,19 @@ public final class ToolkitGUI extends JFrame {
     private JPanel createSimulationTab() {
         JPanel panel = formPanel();
         JComboBox<String> game = gameSelector();
+        JTextField parWorkbook = new JTextField(
+                Path.of("game", "expandingwild", "expandingWildPAR.xlsx").toString(), 30);
+        JButton choosePar = new JButton("Choose PAR…");
+        JPanel parRow = new JPanel(new BorderLayout(6, 0));
+        parRow.add(parWorkbook, BorderLayout.CENTER);
+        parRow.add(choosePar, BorderLayout.EAST);
+        choosePar.addActionListener(event -> {
+            JFileChooser chooser = new JFileChooser(Path.of("game", "expandingwild").toFile());
+            chooser.setFileFilter(new FileNameExtensionFilter("Excel PAR workbook", "xlsx"));
+            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                parWorkbook.setText(chooser.getSelectedFile().getAbsolutePath());
+            }
+        });
         JSpinner rounds = spinner(1_000_000L, 1L, Long.MAX_VALUE, 100_000L);
         JTextField stake = new JTextField("1.0", 14);
         JCheckBox useSeed = new JCheckBox("Use this seed");
@@ -97,27 +110,33 @@ public final class ToolkitGUI extends JFrame {
         JSpinner saved = spinner(1_000, 0, Integer.MAX_VALUE, 100);
 
         addRow(panel, 0, "Game", game);
-        addRow(panel, 1, "Rounds", rounds);
-        addRow(panel, 2, "Stake per round", stake);
+        addRow(panel, 1, "PAR workbook", parRow);
+        addRow(panel, 2, "Rounds", rounds);
+        addRow(panel, 3, "Stake per round", stake);
         JPanel seedRow = new JPanel(new BorderLayout(8, 0));
         seedRow.add(useSeed, BorderLayout.WEST);
         seedRow.add(seed, BorderLayout.CENTER);
         useSeed.addActionListener(event -> seed.setEnabled(useSeed.isSelected()));
         seed.setEnabled(false);
-        addRow(panel, 3, "Seed", seedRow);
-        addRow(panel, 4, "Worker threads", threads);
-        addRow(panel, 5, "Logical partitions", partitions);
-        addRow(panel, 6, "Replay records to keep", saved);
+        addRow(panel, 4, "Seed", seedRow);
+        addRow(panel, 5, "Worker threads", threads);
+        addRow(panel, 6, "Logical partitions", partitions);
+        addRow(panel, 7, "Replay records to keep", saved);
         JPanel options = new JPanel();
         options.add(exportReport);
         options.add(showAwards);
-        addRow(panel, 7, "Options", options);
+        addRow(panel, 8, "Options", options);
 
         JButton run = runButton("Run simulation", panel);
         run.addActionListener(event -> {
             try {
                 SimConfig config = new SimConfig();
                 config.gameId = (String) game.getSelectedItem();
+                String selectedPar = parWorkbook.getText().trim();
+                if (selectedPar.isEmpty()) {
+                    throw new IllegalArgumentException("Select a PAR workbook before starting a simulation.");
+                }
+                config.parWorkbookPath = Path.of(selectedPar).toAbsolutePath().normalize();
                 config.rounds = ((Number) rounds.getValue()).longValue();
                 config.stake = parsePositive(stake.getText(), "Stake");
                 config.usePreviousSeed = useSeed.isSelected();
@@ -133,7 +152,7 @@ public final class ToolkitGUI extends JFrame {
                     PrintStream previousError = System.err;
                     try {
                         System.setErr(output);
-                        Game selectedGame = GameFactory.create(config.gameId);
+                        Game selectedGame = GameFactory.create(config.gameId, config.parWorkbookPath);
                         SimulationResult result = new SimulationRunner(config, selectedGame).run();
                         new Print(result).printToConsole(config,
                                 new PrintWriter(output, true, StandardCharsets.UTF_8));

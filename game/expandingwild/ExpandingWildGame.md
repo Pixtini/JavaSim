@@ -4,9 +4,9 @@
 
 This is the first reel-based game module and a test of the `GameModuleFramework` (GMF) foundation. The module is registered as `expanding-wild` and is now the default selected game; set `simulation.config.SimConfig.gameId` to `"basic-proxy"` to run the probability proxy.
 
-The implementation uses a 5-reel by 5-row window, ten regular symbols (`T1`–`T5` and `L1`–`L5`), 15 left-to-right paylines, an expanding banner wild, and a basegame scatter trigger. `ExpandingWildConfig` separates shared game rules from `baseGame` and `freeGame` modes. Each mode has two independent spin sets and a weighted selector; the default selector is 3:1 for set 0 to set 1. Reel strips use integer IDs for spreadsheet editing: 0–4 map to `T1`–`T5`, 5–9 map to `L1`–`L5`, 10 is `BANNER`, 11 is `WILD`, and 12 is `SCATTER`. `ExpandingWildConfigAdapter` translates each set's strips into GMF reel strips. The configuration is intentionally small and is not balanced.
+The implementation uses a 5-reel by 5-row window, ten regular symbols (`T1`–`T5` and `L1`–`L5`), configurable left-to-right paylines, expanding banner wilds, and a scatter freegame trigger. `ExpandingWildConfig` separates shared game rules from `baseGame` and `freeGame` modes. The selected PAR workbook is parsed by `ExpandingWildParParser`; the `Reels` and `Config` worksheets supply reel strips, game-wide values, paylines, paytable, set selectors, insertion count tables, placement heat maps, multiplier tables, and the scatter award map. `ExcelWorkbookReader` handles the workbook's Open XML data without a third-party dependency. Reel strips use symbol IDs: 0–9 are the regular symbols, 10 is `BANNER`, 11 is `WILD`, and 12 is `SCATTER`. `ExpandingWildConfigAdapter` translates the parsed strips into GMF reel strips.
 
-Every set uses five 60-stop reels containing only regular paying symbols (six copies of each symbol on every reel). Special symbols are inserted into the visible grid after reel stops: basegame set 0 inserts scatters, basegame set 1 inserts banners, freegame set 0 inserts none, and freegame set 1 inserts banners. Each insertion rule has a 0–3 count table, a reel/row heat map, a one-per-reel limit, and forbidden replacement symbols. The default count weights are 90:6:3:1 for 0, 1, 2, and 3 inserted symbols. No static `WILD` symbol is used because banners expand after the reels stop.
+The selected workbook currently defines four 206/166/172/134/124-stop reel sets (the stop count may differ by reel). Special symbols are inserted after reel stops according to separate per-mode, per-set count tables and heat maps. `wildExpand` tables configure banner insertion; `scatter` tables configure scatter insertion. The heat map's `reelMax` is enforced per column, and protected symbols are not replaced. The current freegame scatter tables give positive weight only to zero inserted scatters; the game does not support freegame retriggers, and the parser rejects a PAR that enables them. No static `WILD` symbol is used because banners expand after the reels stop.
 
 | Strip symbols | Count per reel |
 | --- | ---: |
@@ -30,29 +30,25 @@ Every set uses five 60-stop reels containing only regular paying symbols (six co
   4-4-3-2-1   1-2-3-2-1   3-2-1-2-3
   ```
 
-- Scatters are inserted only on reels 1, 3, and 5 in basegame set 0, at most one per reel. GMF's `ScatterTrigger` counts them after insertion; three visible scatters award five free spins by default. Freegame sets have no scatter insertion rule and cannot retrigger.
-- Every basegame and freegame spin independently draws a set index from that mode's weighted selector (default set 0:set 1 is 3:1), then selects stops from that set's strips. Each visible banner in set 1 independently draws a multiplier from that set's `bannerMultiplierWeights`; each row defines a multiplier and its relative weight. Basegame and freegame multiplier tables are configured separately.
+- Scatters can be configured independently in each set. The basegame trigger counts scatters on any reel enabled by its placement heat maps. The current PAR maps three scatters to five free spins. Freegame scatter insertion is currently weighted to zero; freegame retriggers are unsupported.
+- Every basegame and freegame spin independently draws a set index from that mode's weighted selector (currently set 0:set 1 is 3:1), then selects stops from that set's strips. Each visible banner draws from the selected set's `bannerMultiplierWeights` when configured; basegame banners without a multiplier table use 1×.
 - Multipliers on a winning line add together. For example, 2x and 3x produce a 5x line multiplier. A banner only contributes when it is part of that line's consecutive winning prefix. Basegame banner wilds use 1x.
 - A complete basegame round is capped at `maxWinMultiplier` times total round stake (currently 100x). Basegame win consumes the cap first; each free spin can win only the amount remaining. The spin that reaches the cap is clipped to the remaining amount, and later free spins are not generated. TotalGame statistics report how many rounds reached the cap.
 
 The chosen free-spin award and line paths are example values because the request did not specify them. Both live in `ExpandingWildConfig` and can be changed there.
 
-## Example paytable
+## Current PAR paytable
 
-Each value is a multiplier of the total basegame round stake, paid for each winning line before any freegame banner multiplier. For example, T1 paying 2.0 for three of a kind awards `2.0 × total round stake` on that line. The values are deliberately simple and are not balanced.
+Payouts are multipliers of the total round stake, applied per winning line before banner multipliers. The workbook is the source of truth for the values used in simulation.
 
 | Symbol | 3 of a kind | 4 of a kind | 5 of a kind |
 | --- | ---: | ---: | ---: |
-| T1 | 2 | 5 | 12 |
-| T2 | 2 | 6 | 15 |
-| T3 | 2.5 | 7 | 18 |
-| T4 | 3 | 8 | 20 |
-| T5 | 3 | 9 | 24 |
-| L1 | 3.5 | 10 | 28 |
-| L2 | 4 | 12 | 32 |
-| L3 | 4 | 14 | 36 |
-| L4 | 5 | 16 | 40 |
-| L5 | 5 | 18 | 45 |
+| T1 | 5 | 10 | 20 |
+| T2 | 2 | 3 | 5 |
+| T3 | 1 | 2 | 3 |
+| T4 | 0.5 | 1 | 2 |
+| T5 | 0.2 | 0.5 | 1 |
+| L1–L5 | 0.1 | 0.2 | 0.5 |
 
 ## Results
 
@@ -68,15 +64,15 @@ For replay, each expanding-wild spin records its mode, selected set, zero-based 
 
 The full reelset tool evaluates every configured basegame reel-stop combination using the visible regular symbols and paytable only. It deliberately skips symbol insertions, scatter triggers, banner expansion, and multipliers so it measures the underlying reel/paytable cycle without random feature mechanics. It still reports stop-combination counts and symbol award hits; its results are not the full game's feature-inclusive RTP.
 
-A seeded 1,000,000-round simulation used seed `4042026`, 32 partitions, and four threads. A separate one-thread run with the same seed and partition count produced matching total and freegame distributions:
+A seeded 1,000,000-round simulation using `expandingWildPAR.xlsx` used seed `4042026`, 32 partitions, and four threads. A separate one-thread run with the same seed and partition count produced matching total and freegame distributions:
 
-- Basegame scatter triggers: 7,375 (0.7375%).
-- Free spins played: 36,679 (some rounds stop early at the win cap).
-- Basegame winnings: 267,277.80.
-- Freegame winnings: 20,259.10.
-- Total winnings: 287,536.90; reported overall RTP against a stake of 1 per base round is 28.75%.
+- Basegame scatter triggers: 119,926 (11.9926%).
+- Free spins played: 519,790 (some rounds stop early at the win cap).
+- Basegame winnings: 3,823,369.70.
+- Freegame winnings: 5,474,676.00.
+- Total winnings: 9,298,045.70; reported overall RTP against a stake of 1 per base round is 929.80%.
 
-The measured RTP reflects the intentionally simple example configuration. Each winning line applies its paytable multiplier to the full round stake rather than splitting stake across the 15 paylines; up to three inserted banners can contribute additive multipliers on a line. These defaults are for exercising the framework, not for balance.
+This run is a parser and execution check, not a target PAR validation. The observed RTP is 929.80%; each winning line applies the workbook payout multiplier to the total round stake, which is the intended pay-per-line convention. The round win is capped at 100×. Compare the result with the target RTP before treating the current workbook as a validated production PAR.
 
 The run exposed reporting issues in existing generic simulation code:
 

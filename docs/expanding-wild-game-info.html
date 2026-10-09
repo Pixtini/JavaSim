@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Game, feature, balancing and handover reference for the Expanding Wild slot simulation.">
+  <title>Expanding Wild | Game Information &amp; Handover</title>
+  <style>
+    :root { color-scheme: light; font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #182235; background: #f2f5fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: #2456c4; }
+    header { color: #fff; background: linear-gradient(120deg, #14213d, #263f79); padding: 42px max(22px, calc((100vw - 1180px) / 2)); }
+    header .eyebrow { color: #bcd0ff; text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; font-weight: 750; }
+    h1 { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.08; margin: 10px 0 12px; }
+    header p { max-width: 760px; color: #e2eaff; margin: 0; font-size: 1.08rem; }
+    nav { background: #fff; border-bottom: 1px solid #dce3ee; padding: 12px max(22px, calc((100vw - 1180px) / 2)); display: flex; flex-wrap: wrap; gap: 8px 20px; }
+    nav a { text-decoration: none; font-size: .9rem; font-weight: 650; }
+    main { max-width: 1180px; margin: auto; padding: 24px 22px 60px; }
+    section { background: #fff; border: 1px solid #dce3ee; border-radius: 14px; padding: 24px; margin: 18px 0; box-shadow: 0 4px 18px #14213d08; }
+    h2 { margin: 0 0 12px; font-size: 1.45rem; color: #172554; }
+    h3 { margin: 20px 0 8px; font-size: 1.03rem; color: #243b6b; }
+    p { margin: 8px 0 12px; }
+    .muted { color: #5e6b80; }
+    .callout { border-left: 4px solid #e5a629; background: #fff8e8; padding: 13px 16px; border-radius: 5px 10px 10px 5px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .card { border: 1px solid #e1e7f0; border-radius: 10px; padding: 15px; background: #fbfcfe; }
+    .card strong { display: block; color: #172554; font-size: 1.1rem; }
+    .card span { color: #5e6b80; font-size: .9rem; }
+    .table-wrap { overflow-x: auto; border: 1px solid #e1e7f0; border-radius: 9px; margin: 10px 0 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th, td { padding: 9px 11px; border-bottom: 1px solid #e7ecf3; text-align: left; }
+    thead th { background: #eef3fb; color: #243b6b; }
+    tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+    code { background: #f0f3f8; padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+    .steps { counter-reset: handover; list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .steps li { counter-increment: handover; border: 1px solid #e1e7f0; border-radius: 10px; padding: 14px 14px 14px 48px; position: relative; }
+    .steps li::before { content: counter(handover); position: absolute; left: 14px; top: 13px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #dbeafe; color: #1e40af; font-weight: 750; }
+    footer { color: #68758a; font-size: .88rem; padding: 10px 4px; }
+    @media (max-width: 600px) { section { padding: 18px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Game information · Balancing · Handover</div>
+    <h1>Expanding Wild</h1>
+    <p>A practical reference for the current five-reel prototype: what the game does, where its math lives, and how a balance package can move from Excel into the simulator.</p>
+  </header>
+  <nav aria-label="Page sections">
+    <a href="#overview">Overview</a><a href="#features">Features</a><a href="#balance">Balancing</a><a href="#workflow">Config workflow</a><a href="#handover">Handover</a><a href="#status">Status &amp; limits</a>
+  </nav>
+  <main>
+    <section id="overview">
+      <h2>Game overview</h2>
+      <div class="grid">
+        <div class="card"><strong>5 × 5</strong><span>Five reels, five visible rows</span></div>
+        <div class="card"><strong>15 lines</strong><span>Left-to-right paylines</span></div>
+        <div class="card"><strong>10 symbols</strong><span>T1–T5 and L1–L5 regular pays</span></div>
+        <div class="card"><strong>5 free games</strong><span>Awarded on three or more scatters</span></div>
+        <div class="card"><strong>100× cap</strong><span>Maximum win per basegame round</span></div>
+      </div>
+      <p>Each reel stops on a circular strip. After the stop, the selected set may insert special symbols into eligible visible cells. A banner makes its reel wild for win evaluation. Wins start on reel one and continue left to right; configured payline wins are resolved once per line using the highest final payout.</p>
+      <p class="muted">The values shown on this page describe the current Java defaults. They are example math and should not be treated as a production balance.</p>
+    </section>
+
+    <section id="features">
+      <h2>Features and spin flow</h2>
+      <h3>Basegame</h3>
+      <p>Each base spin draws one of two sets using a 3:1 relative weight (set 0:set 1). Set 0 can insert scatters on reels 1, 3 and 5. Set 1 can insert banners across all reels. Insertions are applied after the reel stops.</p>
+      <h3>Scatter freegame trigger</h3>
+      <p>Three visible scatters trigger five free spins. Scatter insertion is limited to at most one per eligible reel. Freegame sets have no scatter insertion rule, so freegames do not retrigger under the current configuration.</p>
+      <h3>Expanding banner wilds</h3>
+      <p>A banner expands to fill its reel with wilds after the stop and insertion stages. In freegame set 1, each visible banner receives a multiplier from that set’s weighted multiplier table. Multipliers on a winning line add together; a banner contributes only when it is part of that line’s winning prefix. Basegame banners use 1×.</p>
+      <h3>Round win cap</h3>
+      <p>The basegame win and subsequent freegame wins share a round cap of 100 times the round stake. A spin that reaches the cap is clipped to the remaining amount, and later free spins are skipped.</p>
+    </section>
+
+    <section id="balance">
+      <h2>Current balancing inputs</h2>
+      <div class="callout"><strong>Important:</strong> These are starter defaults, not a validated target PAR. Each line award is multiplied by the total round bet, as intended. Feature and reel economics still need to be assessed against a target RTP.</div>
+      <h3>Shared values</h3>
+      <div class="table-wrap"><table><thead><tr><th>Parameter</th><th>Current default</th></tr></thead><tbody>
+        <tr><td>Visible window</td><td>5 reels × 5 rows</td></tr><tr><td>Maximum round win</td><td>100× total round stake</td></tr><tr><td>Free spins awarded</td><td>5</td></tr><tr><td>Scatter trigger</td><td>3 scatters, inserted on reels 1, 3, 5 in base set 0</td></tr><tr><td>Set selector</td><td>Set 0 weight 3; set 1 weight 1 (each mode)</td></tr>
+      </tbody></table></div>
+      <h3>Reels and insertion weights</h3>
+      <p>Each of the four mode/set combinations currently has five 60-stop strips. Every strip contains six repetitions of symbol IDs 0–9 (the ten regular symbols). Special symbols are inserted separately.</p>
+      <div class="table-wrap"><table><thead><tr><th>Table</th><th>Outcome</th><th>Weight</th><th>Eligibility</th></tr></thead><tbody>
+        <tr><td>Insertion count</td><td>0 / 1 / 2 / 3 symbols</td><td>90 / 6 / 3 / 1</td><td>One per reel maximum</td></tr><tr><td>Scatter position</td><td>Visible reel/row cell</td><td>1 for eligible cells, 0 otherwise</td><td>Base set 0, reels 1, 3, 5</td></tr><tr><td>Banner position</td><td>Visible reel/row cell</td><td>1 for eligible cells, 0 otherwise</td><td>Base set 1 and free set 1, all reels</td></tr><tr><td>Freegame banner multiplier</td><td>2×, 3×</td><td>1000 each</td><td>Free set 1</td></tr><tr><td>Freegame banner multiplier</td><td>4×–10×</td><td>1 each</td><td>Free set 1</td></tr>
+      </tbody></table></div>
+      <h3>Paytable (payout × total round stake per winning line)</h3>
+      <div class="table-wrap"><table><thead><tr><th>Symbol</th><th>3 of a kind</th><th>4 of a kind</th><th>5 of a kind</th></tr></thead><tbody>
+        <tr><th>T1</th><td>5</td><td>10</td><td>20</td></tr><tr><th>T2</th><td>2</td><td>3</td><td>5</td></tr><tr><th>T3</th><td>1</td><td>2</td><td>3</td></tr><tr><th>T4</th><td>0.5</td><td>1</td><td>2</td></tr><tr><th>T5</th><td>0.2</td><td>0.5</td><td>1</td></tr>
+        <tr><th>L1–L5</th><td>0.1 each</td><td>0.2 each</td><td>0.5 each</td></tr>
+      </tbody></table></div>
+      <p>The 15 paylines and the symbol-ID key are available in the <a href="expanding-wild-config-tables.html">visual config tables</a>. The authoritative current defaults are in <code>ExpandingWildConfig.java</code>.</p>
+    </section>
+
+    <section id="workflow">
+      <h2>Recommended Excel-to-simulator workflow</h2>
+      <ol class="steps">
+        <li><strong>Balance in the workbook.</strong><br>Use named sheets and stable IDs for symbols, modes, sets, reels, stops, paytable, paylines, feature weights and shared values.</li>
+        <li><strong>Export a versioned JSON config.</strong><br>A small exporter reads workbook tables and writes a portable data file. Java should load the exported config, not depend on Excel at runtime.</li>
+        <li><strong>Validate before simulation.</strong><br>Check required fields, duplicate IDs, strip lengths, valid symbols, nonnegative weights, valid references, and that each weighted table has positive total weight.</li>
+        <li><strong>Run and record the balance.</strong><br>Save the config version or hash, simulator revision, seed, rounds and key RTP/feature statistics beside every result.</li>
+      </ol>
+      <p class="muted">This keeps the workbook useful as the authoring UI while JSON remains an open handoff format that can be generated by another tool or employer’s pipeline later.</p>
+    </section>
+
+    <section id="handover">
+      <h2>Balancing handover package</h2>
+      <p>A reviewable delivery should include the math inputs, the exact simulator build used, and evidence that the target values were checked.</p>
+      <div class="grid">
+        <div class="card"><strong>1. Balance workbook</strong><span>Versioned sheets, units, IDs, source notes and change log.</span></div>
+        <div class="card"><strong>2. Exported config</strong><span>JSON plus schema/version and workbook revision reference.</span></div>
+        <div class="card"><strong>3. Validation report</strong><span>Input checks, warnings and any unresolved assumptions.</span></div>
+        <div class="card"><strong>4. Simulation report</strong><span>RTP split, hit rate, volatility, feature trigger/return, win cap and seed.</span></div>
+        <div class="card"><strong>5. Reproducibility details</strong><span>Simulator commit/version, configuration hash, rounds, stake, seed and thread/partition settings.</span></div>
+        <div class="card"><strong>6. Known limitations</strong><span>Payline/stake interpretation, simplified mechanics, omitted features and confidence limitations.</span></div>
+      </div>
+      <p>For a new team, keep the workbook format documented and the JSON schema stable. The receiving team can replace the exporter or workbook tooling without rewriting game math, provided it produces the same validated config contract.</p>
+    </section>
+
+    <section id="status">
+      <h2>Implementation status and limits</h2>
+      <ul>
+        <li>Implemented: reel strips, weighted Basegame/Freegame set selection, weighted symbol insertion, scatter trigger, expanding banner wilds, additive line multipliers, payline evaluation and round win cap.</li>
+        <li>Replay records include selected sets, reel stops, inserted locations and resolved banner multiplier choices.</li>
+        <li>The current full reelset evaluator covers the regular reel/paytable cycle only. It skips random insertions, scatters, banner expansion and multipliers, so it is not a full feature-inclusive PAR result.</li>
+        <li>The existing defaults are intentionally simple. No claim of target RTP, volatility, hit frequency or production readiness is made by this page.</li>
+      </ul>
+      <p>Source reference: <a href="../game/expandingwild/ExpandingWildGame.md">Expanding Wild technical notes</a>. This page summarizes the current configuration and recommended handover workflow.</p>
+    </section>
+    <footer>Expanding Wild · JavaSim game reference · Keep balance inputs and reported simulator version together for reproducible review.</footer>
+  </main>
+</body>
+</html>

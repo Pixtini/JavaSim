@@ -232,6 +232,18 @@ public final class SimulationTests {
             check(statsText.contains("Seed: " + config.seed), "stats file reports the seed");
             check(statsText.contains("Game: basic-proxy"), "stats file reports the selected game ID");
             check(statsText.contains("Time Taken: "), "stats file reports elapsed time");
+            check(statsText.contains("Basegame RTP: ") && statsText.contains("Freegame RTP: "),
+                    "stats file splits simulated RTP by mode");
+            check(statsText.contains("Hit Rate (1 in): ")
+                            && statsText.contains("Freegame Freq (1 in): "),
+                    "stats file reports hit and freegame frequencies");
+            check(statsText.contains("Max Win: Unlimited")
+                            && statsText.contains("Max Win Freq (1 in): "),
+                    "stats file reports configured max win and cap frequency");
+            check(statsText.contains("Base SD: ") && statsText.contains("Free SD: "),
+                    "stats file reports total and per-mode standard deviations");
+            check(statsText.indexOf("Basegame\n") < statsText.indexOf("Freegame\n"),
+                    "stats summary groups basegame before freegame");
             check(!statsText.contains("Awards:"),
                     "showAwards also controls the saved simulation stats file");
             check(statsText.indexOf("Seed: ") < statsText.indexOf("Time Taken: "), "file timing follows seed");

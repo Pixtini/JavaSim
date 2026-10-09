@@ -94,7 +94,8 @@ public final class SimulationRunner {
                 baseGameSetStats,
                 freeGameSetStats,
                 savedGameplays,
-                System.nanoTime() - startNanos);
+                System.nanoTime() - startNanos,
+                game.getMaxWinMultiplier());
     }
 
     private PartitionStats runPartition(int partitionId, long firstRoundId,
