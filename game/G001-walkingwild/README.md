@@ -2,9 +2,11 @@
 
 **Game code:** `G001-walkingwild`
 **Workspace folder:** `G001-walkingwild/`  
-**Suggested Java package:** `game.walkingwild`
+**Java package:** `game.walkingwild` (`src/main/java/game/walkingwild/`)
 
-This wizard creates an intake workspace only. It does not create or register game code.
+This is the complete G001 game workspace. It keeps source material and PAR under `source/`, Java implementation under `src/main/java/`, and game-specific tests under `src/test/java/`. The package is `game.walkingwild`; the `G001-walkingwild` folder is the human-facing game ID, while the Java package uses a valid Java identifier.
+
+From the repository root, launch the toolkit with `./run.sh`. It compiles all game workspaces into the shared `build/classes` output before starting the GUI, so nested G001 classes are available at runtime.
 
 ## Step 0: prepare and review the source material
 
@@ -16,9 +18,9 @@ This wizard creates an intake workspace only. It does not create or register gam
 
 ## After the review is agreed
 
-Implement game-specific config and logic in this workspace, reuse `GameModuleFramework` where its behavior matches the rules, and keep Basegame and randomly triggered Feature Game logic separate. Add deterministic rule tests, register `G001-walkingwild` in `game/GameFactory.java`, and run a seeded simulation through the existing engine.
+The implementation reads its config from the selected mode in `source/G001-walkingWildsPAR.xlsx`; do not substitute hard-coded defaults for PAR values. Select `G001-walkingwild`, its workbook, and Normal or BB1 in the Simulation screen, Game launcher, or Win viewer. The lower-level factory API also accepts `(gameId, parWorkbookPath, mode)` for scripted runs.
 
-Check RTP by mode and set, triggers, hit rate, distributions, caps, and report assets. Document assumptions and validation evidence in the game handover. Update `docs/architecture.md` and `nextsteps.md` when the implementation changes the framework or completes a task.
+The Game launcher opens a G001 player with animated 6×4 screens, line highlights, the scatter/Freegame sequence, auto play, mode-cost balance accounting, and last-round playback. The Win viewer prints the grid and line awards and can open the found round in the player. Reports save G001 reel stops, scatter insertions, and Freegame wild destinations; Replay reconstructs the screens and validates the recalculated wins. The Full reelset tool evaluates Basegame reel stops and paylines; it omits random scatter insertions and triggered Freegames. The implemented rules and integrations have deterministic coverage in `src/test/java/game/walkingwild/tests/WalkingWildGameTests.java`. Both modes were simulated with seeded runs; reports are under `reports/G001-walkingwild/`. Check RTP by mode and set, triggers, hit rate, distributions, caps, and report assets before balance approval. Framework architecture and G002 workflow lessons are summarized in root `G001-LESSONS-LEARNED.md`.
 
 ## Workspace files
 
@@ -28,3 +30,5 @@ Check RTP by mode and set, triggers, hit rate, distributions, caps, and report a
 - `source/G001-walkingWildsPAR.xlsx`: mode-specific PAR input with Normal and BB1 Config/Reels sheets.
 - `source/game-creation-form.md`: implementation intake checklist.
 - `AGENT-REVIEW.md`: agent-authored questions, gaps, and proposals.
+- `src/main/java/game/walkingwild/`: G001 implementation and config parser.
+- `src/test/java/game/walkingwild/tests/`: deterministic G001 tests.

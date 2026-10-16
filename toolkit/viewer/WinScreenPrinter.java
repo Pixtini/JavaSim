@@ -6,6 +6,8 @@ import game.expandingwild.model.ExpandingWildLineWin;
 import game.expandingwild.model.ExpandingWildSpinResult;
 import game.model.SpinResult;
 import game.model.GameRoundResult;
+import game.walkingwild.model.WalkingWildLineWin;
+import game.walkingwild.model.WalkingWildSpin;
 import simulation.replay.SavedGameplay;
 import java.io.PrintStream;
 import java.util.Locale;
@@ -26,6 +28,8 @@ public final class WinScreenPrinter {
             for (ExpandingWildLineWin lineWin : expandingWildResult.getLineWins()) {
                 printLineWin(lineWin, stake, output);
             }
+        } else if (winningSpin instanceof WalkingWildSpin walkingWildResult) {
+            printWalkingWild(walkingWildResult, stake, output);
         } else if (!winningSpin.getAwards().isEmpty()) {
             output.println("Awards: " + winningSpin.getAwards());
         }
@@ -61,8 +65,23 @@ public final class WinScreenPrinter {
             for (ExpandingWildLineWin lineWin : expanding.getLineWins()) {
                 printLineWin(lineWin, stake, output);
             }
+        } else if (spin instanceof WalkingWildSpin walkingWild) {
+            printWalkingWild(walkingWild, stake, output);
         } else if (!spin.getAwards().isEmpty()) {
             output.println("Awards: " + spin.getAwards());
+        }
+    }
+
+    private static void printWalkingWild(WalkingWildSpin spin, double stake, PrintStream output) {
+        output.printf("Set %d; scatters %d; active wilds %d%n", spin.getSetIndex(),
+                spin.scatterCount(), spin.wildPositions().size());
+        printGrid(spin.grid(), output);
+        for (WalkingWildLineWin lineWin : spin.lineWins()) {
+            String symbol = lineWin.symbol().id();
+            output.printf(Locale.ROOT,
+                    "Line %d: %d oak %s = %.2f (%.2fx stake)%n",
+                    lineWin.paylineNumber(), lineWin.matchingReels(), symbol,
+                    lineWin.totalWin(), lineWin.totalWin() / stake);
         }
     }
 

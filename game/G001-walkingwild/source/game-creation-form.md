@@ -10,7 +10,8 @@ For the workflow and code reference points, see [game-creation-flow.md](../../do
 - **Stable game ID** (lowercase, used by `GameFactory`): [ ]
 - **Owner / source of rules:** [ ]
 - **Rules or math specification link/file/version:** [ ]
-- **Target package:** `game/[game-name]/`
+- **Game workspace:** `game/G001-walkingwild/` (source, PAR, implementation, and tests)
+- **Target Java package:** `game.walkingwild` under `src/main/java/`
 - **Reference game reviewed:** [ ]
 - **Open questions requiring math approval:**
   - [ ]

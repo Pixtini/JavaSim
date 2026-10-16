@@ -44,7 +44,8 @@ public class Print {
         this.reportsRoot = reportsRoot;
     }
 
-    private void printSimulationStats(PrintWriter output, long rounds, double stake) {
+    private void printSimulationStats(PrintWriter output, long rounds, double stake,
+            double costMultiplier) {
         double totalWinnings = baseGameStats.getTotalWinnings() + freeGameStats.getTotalWinnings();
         long totalSpins = baseGameStats.getRounds() + freeGameStats.getRounds();
 
@@ -52,11 +53,12 @@ public class Print {
         output.println("--------");
         output.println("Rounds: " + rounds);
         output.println("Spins: " + totalSpins);
-        output.println("Total staked: £" + (rounds * stake));
+        double totalStake = rounds * stake * costMultiplier;
+        output.println("Total staked: £" + String.format(Locale.ROOT, "%.1f", totalStake));
         output.println("Total winnings: £" + formatWin(totalWinnings, stake));
         output.println();
         output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n",
-                totalWinnings / (rounds * stake) * 100);
+                totalWinnings / totalStake * 100);
         output.printf(Locale.ROOT, "Basegame RTP: %.4f%%%n", baseGameStats.getRtp() * 100);
         output.printf(Locale.ROOT, "Freegame RTP: %.4f%%%n", freeGameStats.getRtp() * 100);
         output.println();
@@ -112,13 +114,15 @@ public class Print {
     }
 
     private void printRegularStats(PrintWriter output, SimConfig simConfig) {
-        printSimulationStats(output, simConfig.rounds, simConfig.stake);
+        double totalStake = simConfig.rounds * simConfig.stake * simConfig.modeCostMultiplier;
+        printSimulationStats(output, simConfig.rounds, simConfig.stake,
+                simConfig.modeCostMultiplier);
         printStats(output, baseGameStats, "Basegame", simConfig.showAwards, simConfig.stake);
         printSetBreakdown(output, simulationResult.getBaseGameSetStats(),
-                "Basegame Set ", false, simConfig.rounds * simConfig.stake, simConfig.stake);
+                "Basegame Set ", false, totalStake, simConfig.stake);
         printStats(output, freeGameStats, "Freegame", simConfig.showAwards, simConfig.stake);
         printSetBreakdown(output, simulationResult.getFreeGameSetStats(),
-                "Freegame Set ", true, simConfig.rounds * simConfig.stake, simConfig.stake);
+                "Freegame Set ", true, totalStake, simConfig.stake);
         output.flush();
     }
 
@@ -135,7 +139,8 @@ public class Print {
                     output.println("--------");
                     output.println("Rounds: " + stats.getRounds());
                     output.println("Total winnings: £" + formatWin(stats.getTotalWinnings(), stake));
-                    output.printf(Locale.ROOT, "Simulated RTP: %.4f%%%n", rtp * 100);
+                    output.println("Simulated RTP: " + (Double.isFinite(rtp)
+                            ? String.format(Locale.ROOT, "%.4f%%", rtp * 100) : "N/A"));
                     output.println("Hits: " + stats.getHits());
                     output.println();
                 });
@@ -144,6 +149,7 @@ public class Print {
     private void printRunSettings(PrintWriter output, SimConfig simConfig) {
         output.println("Game: " + simConfig.gameId);
         output.println("Mode: " + simConfig.gameMode);
+        output.println("Mode cost multiplier: " + simConfig.modeCostMultiplier + "× base stake");
         if (simConfig.parWorkbookPath != null) {
             output.println("PAR workbook: " + simConfig.parWorkbookPath.toAbsolutePath().normalize());
         }
@@ -214,7 +220,7 @@ public class Print {
         try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
                 reportFolder.resolve("win_distribution_aggregated.csv"), StandardCharsets.UTF_8))) {
             output.println("Distribution,Range Min (>=),Range Max (<),Hits,Hit Rate,HR Freq,RTP");
-            double totalStaked = simConfig.rounds * simConfig.stake;
+            double totalStaked = simConfig.rounds * simConfig.stake * simConfig.modeCostMultiplier;
             writeAggregatedWinDistributionRows(output, "Total Game", totalGameStats, totalStaked);
             output.println();
             writeAggregatedWinDistributionRows(output, "Basegame", baseGameStats, totalStaked);

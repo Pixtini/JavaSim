@@ -31,6 +31,7 @@ public final class SimulationRunner {
 
     public SimulationResult run() {
         long startNanos = System.nanoTime();
+        simConfig.modeCostMultiplier = game.getCostMultiplier();
         validateConfig();
         if (!simConfig.usePreviousSeed) {
             simConfig.seed = ThreadLocalRandom.current().nextLong();
@@ -38,9 +39,10 @@ public final class SimulationRunner {
 
         int[] paytable = game.getPaytable();
         List<String> awardLabels = game.getAwardLabels();
-        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
-        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
-        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
+        double stakeExposure = effectiveStake();
+        StandardStats totalGameStats = new StandardStats(stakeExposure, paytable, awardLabels);
+        StandardStats baseGameStats = new StandardStats(stakeExposure, paytable, awardLabels);
+        StandardStats freeGameStats = new StandardStats(stakeExposure, paytable, awardLabels);
         Map<Integer, StandardStats> baseGameSetStats = createSetStats(
                 game.getBaseGameSetCount(), paytable, awardLabels);
         Map<Integer, StandardStats> freeGameSetStats = createSetStats(
@@ -105,16 +107,17 @@ public final class SimulationRunner {
 
         int[] paytable = game.getPaytable();
         List<String> awardLabels = game.getAwardLabels();
-        StandardStats totalGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
-        StandardStats baseGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
-        StandardStats freeGameStats = new StandardStats(simConfig.stake, paytable, awardLabels);
+        double stakeExposure = effectiveStake();
+        StandardStats totalGameStats = new StandardStats(stakeExposure, paytable, awardLabels);
+        StandardStats baseGameStats = new StandardStats(stakeExposure, paytable, awardLabels);
+        StandardStats freeGameStats = new StandardStats(stakeExposure, paytable, awardLabels);
         Map<Integer, StandardStats> baseGameSetStats = createSetStats(
                 game.getBaseGameSetCount(), paytable, awardLabels);
         Map<Integer, StandardStats> freeGameSetStats = createSetStats(
                 game.getFreeGameSetCount(), paytable, awardLabels);
-        freeGameStats.recordStakeBasis(rounds * simConfig.stake);
+        freeGameStats.recordStakeBasis(rounds * stakeExposure);
         freeGameSetStats.values().forEach(stats ->
-                stats.recordStakeBasis(rounds * simConfig.stake));
+                stats.recordStakeBasis(rounds * stakeExposure));
         List<SavedGameplay> savedGameplays = new ArrayList<>();
 
         long pendingProgress = 0;
@@ -147,6 +150,8 @@ public final class SimulationRunner {
 
                 freeGameStats.recordWinInDistribution(freeGameWin);
             }
+            totalGameStats.addResult(new SpinResult(totalWin, totalWin > 0.0 ? 1 : 0, false),
+                    effectiveStake());
             totalGameStats.recordWinInDistribution(totalWin);
 
             if (captureReplay && hasCompleteReplayEvents(roundResult)) {
@@ -181,13 +186,13 @@ public final class SimulationRunner {
             int[] paytable, List<String> awardLabels) {
         Map<Integer, StandardStats> statsBySet = new LinkedHashMap<>();
         for (int setIndex = 0; setIndex < setCount; setIndex++) {
-            statsBySet.put(setIndex, new StandardStats(simConfig.stake, paytable, awardLabels));
+            statsBySet.put(setIndex, new StandardStats(effectiveStake(), paytable, awardLabels));
         }
         return statsBySet;
     }
 
     private void addToSetStats(Map<Integer, StandardStats> statsBySet, SpinResult result) {
-        addToSetStats(statsBySet, result, simConfig.stake);
+        addToSetStats(statsBySet, result, effectiveStake());
     }
 
     private void addToSetStats(Map<Integer, StandardStats> statsBySet,
@@ -224,6 +229,10 @@ public final class SimulationRunner {
         if (!Double.isFinite(simConfig.stake) || simConfig.stake <= 0.0) {
             throw new IllegalArgumentException("Simulation stake must be finite and greater than zero");
         }
+        if (!Double.isFinite(simConfig.modeCostMultiplier) || simConfig.modeCostMultiplier <= 0.0
+                || !Double.isFinite(effectiveStake())) {
+            throw new IllegalArgumentException("Game mode cost multiplier must be finite and greater than zero");
+        }
         if (simConfig.threads <= 0) {
             throw new IllegalArgumentException("Simulation thread count must be greater than zero");
         }
@@ -233,6 +242,10 @@ public final class SimulationRunner {
         if (simConfig.maxSavedGameplays < 0) {
             throw new IllegalArgumentException("Maximum saved gameplays must not be negative");
         }
+    }
+
+    private double effectiveStake() {
+        return simConfig.stake * simConfig.modeCostMultiplier;
     }
 
     private static long seedForPartition(long seed, int partitionId) {

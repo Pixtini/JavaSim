@@ -54,23 +54,19 @@ public final class GameRoundResult {
             throw new IllegalArgumentException("Maximum win must be positive and finite");
         }
 
-        double remaining = maximumWin;
-        SpinResult cappedBase = baseGameResult.cappedAt(remaining);
+        SpinResult cappedBase = baseGameResult.cappedAt(maximumWin);
         double totalWin = cappedBase.getWin();
-        remaining = maximumWin - totalWin;
         boolean reached = baseGameResult.getWin() >= maximumWin;
         java.util.ArrayList<SpinResult> cappedFreeGames = new java.util.ArrayList<>();
         if (!reached) {
             for (SpinResult freeGameResult : freeGameResults) {
-                SpinResult cappedFree = freeGameResult.cappedAt(remaining);
-                while (totalWin + cappedFree.getWin() > maximumWin) {
-                    cappedFree = freeGameResult.cappedAt(Math.nextDown(cappedFree.getWin()));
-                }
+                double availableBeforeSpin = Math.max(0.0, maximumWin - totalWin);
+                SpinResult cappedFree = capToRemainingWin(
+                        freeGameResult, totalWin, maximumWin, availableBeforeSpin);
                 cappedFreeGames.add(cappedFree);
-                double availableBeforeSpin = remaining;
-                totalWin += cappedFree.getWin();
-                remaining = maximumWin - totalWin;
-                if (freeGameResult.getWin() >= availableBeforeSpin) {
+                totalWin = Math.min(maximumWin, totalWin + cappedFree.getWin());
+                double remaining = Math.max(0.0, maximumWin - totalWin);
+                if (freeGameResult.getWin() >= availableBeforeSpin || remaining == 0.0) {
                     reached = true;
                     break;
                 }
@@ -79,6 +75,21 @@ public final class GameRoundResult {
         List<ReplayEvent> cappedEvents = updateEventWins(
                 replayEvents, cappedBase, cappedFreeGames);
         return new GameRoundResult(cappedBase, cappedFreeGames, reached, cappedEvents);
+    }
+
+    private static SpinResult capToRemainingWin(SpinResult result, double accumulatedWin,
+            double maximumWin, double remainingWin) {
+        if (remainingWin == 0.0) {
+            return result.cappedAt(0.0);
+        }
+        SpinResult capped = result.cappedAt(remainingWin);
+        if (accumulatedWin + capped.getWin() > maximumWin) {
+            capped = result.cappedAt(Math.nextDown(remainingWin));
+            if (accumulatedWin + capped.getWin() > maximumWin) {
+                capped = result.cappedAt(0.0);
+            }
+        }
+        return capped;
     }
 
     private static List<ReplayEvent> replayEventsFrom(SpinResult base,

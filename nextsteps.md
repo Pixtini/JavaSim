@@ -1,5 +1,5 @@
 # Next steps
 
-## Implement the G001 parser and game engine
+## Add a cap-boundary regression case
 
-The G001 docs now specify wild relocation through a temporary copy of the Freegame location weights, zeroing occupied cells while preserving source PAR values, with a five-wild cap. Implement the G001-specific parser and game using the selected mode's Config/Reels pair, then validate these rules with deterministic cases and a seeded simulation. Complete the remaining game-creation intake and source metadata as part of handover.
+Add deterministic cases where a feature win reaches the remaining cap and where floating-point subtraction leaves no positive remainder. Verify both game sessions stop promptly, never return a negative spin win, and preserve the configured round cap.

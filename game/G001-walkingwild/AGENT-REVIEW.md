@@ -4,7 +4,7 @@ This review reflects the current G001 sources and PAR, checked against the lates
 
 ## Review status
 
-- Status: **Core line, mode, and wild transition rules are documented; source metadata and implementation remain outstanding**
+- Status: **G001 engine and PAR parser implemented; seeded Normal and BB1 reports generated; source metadata and balance approval remain outstanding**
 - Sources reviewed: `source/GDD.md`, `source/edge-cases.md`, `source/flowchart.md`, `source/flowchart.pdf`, `source/game-creation-form.md`, `README.md`, `game/broadGDDs/lines.md`, and `source/G001-walkingWildsPAR.xlsx`
 - PAR sheets: `Normal-Config`, `Normal-Reels`, `BB1-Config`, and `BB1-Reels`
 - Review date: 2026-10-16
@@ -17,7 +17,7 @@ The revised `lines.md` now resolves the general line evaluation rules, including
 
 The PDF and the owner's answers now define the Freegame wild sequence: use the 2D chance table to determine new wild count; new wilds land with the reels; persisted wilds stay in limbo while reels spin; after reel 6 stops, move persisted wilds using the same location distribution. For this placement sequence, occupied cells—including new wilds and persisted wilds already placed—have their weights set to zero in a temporary copy of the location table; source PAR weights remain unchanged. The configuration caps the total at 5 active wilds, preventing the quantity table from requesting more wilds than can be placed. Both prior wild placement questions are resolved.
 
-The mode-prefixed parser and run-level mode behavior are implemented as generic infrastructure for Expanding Wild. G001 still needs its own game-specific parser and engine before its workbook can be simulated.
+The mode-prefixed parser and run-level mode behavior are shared infrastructure. G001's parser and engine are in this workspace under `src/main/java/game/walkingwild/`, with tests under `src/test/java/game/walkingwild/tests/`. G001 is registered in `GameFactory` and can be simulated through the GUI and CLI. Its parser loads only the selected mode's Config/Reels pair.
 
 The Normal PAR gives BG-0 a set-selection weight of 3 and BG-1 a weight of 1, while scatter insertion has positive weights only for BG-1. This means scatter triggers are possible only when BG-1 is selected. The shared rules explicitly allow features to be enabled/disabled by set weights, so this is a valid configuration pattern; it is a balance choice to verify, not a conflict with the general rules.
 
@@ -32,9 +32,9 @@ The Normal PAR gives BG-0 a set-selection weight of 3 and BG-1 a weight of 1, wh
 
 | ID | Item | Finding | Follow-up | Status |
 |---|---|---|---|---|
-| I-001 | Mode-specific workbook sheets and simulation selection | Owner specifies matching `<Mode>-Config`/`<Mode>-Reels` pairs, no cross-mode merging, one selected mode for the whole simulation, and unprefixed sheets defaulting to Normal. | Generic pair discovery, mode selection, pair validation, and report/replay mode metadata are implemented for the current Expanding Wild parser. G001 still requires its own parser and game integration. | Generic infrastructure implemented; G001 integration pending |
+| I-001 | Mode-specific workbook sheets and simulation selection | Owner specifies matching `<Mode>-Config`/`<Mode>-Reels` pairs, no cross-mode merging, one selected mode for the whole simulation, and unprefixed sheets defaulting to Normal. | Generic mode selection and selected-pair reporting are implemented; G001 has its own validated parser and engine. Both modes have seeded 1,000,000-round report artifacts under `reports/G001-walkingwild/`. | Implemented and simulated; balance review pending |
 | I-002 | Scatter/set balance | Normal mode can trigger scatters only from BG-1; BB1's set selector gives BG-0 weight zero and selects BG-1. Scatter awards are 4→5, 5→8, and 6→12 freegames; the scatter has zero paytable awards. | Preserve this mapping and confirm it in the eventual seeded balance review. No rule clarification is needed unless the owner intended scatters in BG-0. | Config observation |
-| I-003 | Flowchart and edge-case source material | The PDF supplies the freegame wild sequence; owner has clarified destination exclusions and the maximum wild count. Edge-case and game-creation forms are still being completed. | Converted the PDF into `source/flowchart.md`; added confirmed wild rules to the GDD and wild-specific cases to `source/edge-cases.md`. Complete remaining general edge cases and game creation form during implementation intake. | Wild rules recorded; intake documents incomplete |
+| I-003 | Flowchart and edge-case source material | The PDF supplies the freegame wild sequence; owner has clarified destination exclusions and the maximum wild count. | Converted the PDF into `source/flowchart.md`; added confirmed wild rules to the GDD and wild-specific cases to `source/edge-cases.md`. Remaining general edge cases and game creation form content should be completed as source metadata is approved. | Core game rules implemented; intake documents incomplete |
 | I-004 | README PAR instructions | Updated to describe the populated Normal/BB1 sheet pairs and mode isolation. | Keep the README aligned if the workbook mode layout changes. | Resolved |
 | I-005 | GDD source metadata | Owner, status/version/date, authoritative source, and source reference remain blank. | Fill these fields before treating the GDD as the approved handover source. | Documentation incomplete |
 
@@ -67,6 +67,15 @@ The Normal PAR gives BG-0 a set-selection weight of 3 and BG-1 a weight of 1, wh
 - Test mode selection, basegame start, cost/config association, and max-win clipping/termination.
 - Run a seeded simulation and inspect RTP and trigger frequency by mode and set.
 
+## Implementation and seeded simulation results
+
+- Deterministic/parser/report/player/viewer/replay checks: 56 assertions in `src/test/java/game/walkingwild/tests/WalkingWildGameTests.java`.
+- Normal: 1,000,000 rounds, seed `1001001`, RTP `42.3257%`, 2,474 Freegame triggers, report at `reports/G001-walkingwild/Normal/`.
+- BB1: 1,000,000 rounds, seed `1001002`, RTP `1.2157%` against its 100× purchase cost, 500,367 Freegame triggers, report at `reports/G001-walkingwild/BB1/`.
+- BB1's configured max win remains 100× base stake; the cost multiplier changes stake exposure only. Review these PAR-driven results for balance intent before treating them as approved targets.
+- Framework changes: a game-provided mode cost is now carried into stake exposure and report metadata, and total-game stats accumulate one round result per simulated round. See root `G001-LESSONS-LEARNED.md`.
+- Presentation/replay: G001 outcomes expose the grid and selected line awards to the Game launcher and Win viewer. Reports now include G001 event payloads; replay rebuilds screens from recorded stops and placements, re-evaluates wins, and passes validation for both modes.
+
 ## Decisions and change history
 
 | Date | Review update | Impact |
@@ -76,3 +85,5 @@ The Normal PAR gives BG-0 a set-selection weight of 3 and BG-1 a weight of 1, wh
 | 2026-10-16 | Converted `source/flowchart.pdf` into a full Mermaid round flow and re-reviewed it against the GDD, PAR, and shared line rules. | Confirmed the wild move sequence. At this point destination allocation and exhausted-position fallback remained open; the owner resolved these in a later update recorded above. |
 | 2026-10-16 | Re-reviewed G001 after updates to `game/broadGDDs/lines.md` and the GDD. | Closed generic wild/pay selection, mode-selection, cost, payout, six-symbol award, and cap questions. At that point persistent wild movement remained unresolved; it has since been clarified. Parser sheet mapping and source-template completion remain implementation/documentation follow-ups. |
 | 2026-10-16 | Recorded the owner's mode-prefixed sheet and simulation selection rules. | Mode sheet parsing and run-level selection are no longer open design questions; implementation must keep each mode isolated and default to Normal. |
+| 2026-10-16 | Implemented G001 from its selected mode PAR, added deterministic rule/report tests, and ran seeded million-round Normal and BB1 simulations. | Confirmed scatter insertion, scatter-triggered Freegames, persistent wild placement, mode cost accounting, report export, and the configured cap. Results are recorded above; source metadata and balance approval remain open. |
+| 2026-10-16 | Added G001 to the Game launcher and detailed Win Viewer; added recorded-stop/placement replay payloads and report replay validation. | Both modes now share the player/viewer/replay workflow used by Expanding Wild. Replay reconstructs screens from recorded reel stops and feature placements, then recalculates the payouts. |

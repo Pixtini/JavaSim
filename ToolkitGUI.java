@@ -42,8 +42,9 @@ import toolkit.reelset.FullReelsetSimulator;
 import toolkit.reelset.ReelsetReportPrinter;
 import toolkit.replay.ReplayerMain;
 import toolkit.player.PrototypePlayerFrame;
-import toolkit.player.ExpandingWildPlayerAdapter;
 import toolkit.player.PlayerDisplayData;
+import toolkit.player.PlayerAdapterFactory;
+import toolkit.player.PlayerGameAdapter;
 import toolkit.par.ParWorkbookModes;
 import toolkit.viewer.WinFinder;
 import toolkit.viewer.WinScreenPrinter;
@@ -51,7 +52,7 @@ import toolkit.wizard.GameProjectWizard;
 
 /** Small desktop launcher for the simulator and its command-line toolkit. */
 public final class ToolkitGUI extends JFrame {
-    private static final String[] GAME_IDS = {"expanding-wild", "basic-proxy"};
+    private static final String[] GAME_IDS = {"expanding-wild", "basic-proxy", "G001-walkingwild"};
 
     private final JTextArea outputArea = new JTextArea();
     private final JLabel statusLabel = new JLabel("Ready");
@@ -60,6 +61,7 @@ public final class ToolkitGUI extends JFrame {
     private final JTextField replayId = new JTextField("1", 12);
     private PlayerDisplayData.Round viewerFoundRound;
     private double viewerFoundStake;
+    private PlayerGameAdapter viewerFoundAdapter;
 
     private ToolkitGUI() {
         super("JavaSim Toolkit");
@@ -72,7 +74,7 @@ public final class ToolkitGUI extends JFrame {
         tabs.addTab("Win viewer", createViewerTab());
         tabs.addTab("Full reelset", createReelsetTab());
         tabs.addTab("Replay", createReplayTab());
-        tabs.addTab("Prototype player", createPlayerTab());
+        tabs.addTab("Game launcher", createPlayerTab());
         tabs.addTab("New game", createGameWizardTab());
         add(tabs, BorderLayout.NORTH);
 
@@ -94,6 +96,16 @@ public final class ToolkitGUI extends JFrame {
         JTextField parWorkbook = new JTextField(
                 Path.of("game", "expandingwild", "expandingWildPAR.xlsx").toString(), 30);
         JComboBox<String> mode = new JComboBox<>(new String[] {"Normal"});
+        game.addActionListener(event -> {
+            String selectedGame = String.valueOf(game.getSelectedItem());
+            if (selectedGame.equals("G001-walkingwild")) {
+                parWorkbook.setText(Path.of("game", "G001-walkingwild", "source",
+                        "G001-walkingWildsPAR.xlsx").toString());
+            } else if (selectedGame.equals("expanding-wild")) {
+                parWorkbook.setText(Path.of("game", "expandingwild", "expandingWildPAR.xlsx").toString());
+            }
+            refreshParModes(parWorkbook, mode);
+        });
         JButton choosePar = new JButton("Choose PAR…");
         JPanel parRow = new JPanel(new BorderLayout(6, 0));
         parRow.add(parWorkbook, BorderLayout.CENTER);
@@ -211,18 +223,48 @@ public final class ToolkitGUI extends JFrame {
     private JPanel createViewerTab() {
         JPanel panel = formPanel();
         JComboBox<String> game = gameSelector();
+        JTextField parWorkbook = new JTextField(
+                Path.of("game", "expandingwild", "expandingWildPAR.xlsx").toString(), 30);
+        JComboBox<String> mode = new JComboBox<>(new String[] {"Normal"});
+        game.addActionListener(event -> {
+            String selected = String.valueOf(game.getSelectedItem());
+            if (selected.equals("G001-walkingwild")) {
+                parWorkbook.setText(Path.of("game", "G001-walkingwild", "source",
+                        "G001-walkingWildsPAR.xlsx").toString());
+            } else if (selected.equals("expanding-wild")) {
+                parWorkbook.setText(Path.of("game", "expandingwild", "expandingWildPAR.xlsx").toString());
+            }
+            refreshParModes(parWorkbook, mode);
+        });
+        JButton choosePar = new JButton("Choose PAR…");
+        JPanel parRow = new JPanel(new BorderLayout(6, 0));
+        parRow.add(parWorkbook, BorderLayout.CENTER);
+        parRow.add(choosePar, BorderLayout.EAST);
+        choosePar.addActionListener(event -> {
+            JFileChooser chooser = new JFileChooser(Path.of(parWorkbook.getText()).toFile());
+            chooser.setFileFilter(new FileNameExtensionFilter("Excel PAR workbook", "xlsx"));
+            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                parWorkbook.setText(chooser.getSelectedFile().getAbsolutePath());
+                refreshParModes(parWorkbook, mode);
+            }
+        });
+        parWorkbook.addActionListener(event -> refreshParModes(parWorkbook, mode));
+        refreshParModes(parWorkbook, mode);
         JSpinner spins = spinner(100L, 1L, Long.MAX_VALUE, 100L);
         JTextField stake = new JTextField("1.0", 14);
-        JButton openFoundPlay = new JButton("Open found play in prototype player");
+        JButton openFoundPlay = new JButton("Open found play in player");
         openFoundPlay.setEnabled(false);
         addRow(panel, 0, "Game", game);
-        addRow(panel, 1, "Maximum spins", spins);
-        addRow(panel, 2, "Stake", stake);
+        addRow(panel, 1, "PAR workbook", parRow);
+        addRow(panel, 2, "Mode", mode);
+        addRow(panel, 3, "Maximum spins", spins);
+        addRow(panel, 4, "Base stake", stake);
         JButton run = new JButton("Find a winning screen");
         runButtons.add(run);
         openFoundPlay.addActionListener(event -> {
-            if (viewerFoundRound != null) {
-                PrototypePlayerFrame.openFoundPlay(viewerFoundRound, viewerFoundStake);
+            if (viewerFoundRound != null && viewerFoundAdapter != null) {
+                PrototypePlayerFrame.openFoundPlay(viewerFoundAdapter,
+                        viewerFoundRound, viewerFoundStake);
             }
         });
         JPanel actions = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 0));
@@ -230,7 +272,7 @@ public final class ToolkitGUI extends JFrame {
         actions.add(openFoundPlay);
         GridBagConstraints actionConstraints = new GridBagConstraints();
         actionConstraints.gridx = 1;
-        actionConstraints.gridy = 3;
+        actionConstraints.gridy = 5;
         actionConstraints.anchor = GridBagConstraints.LINE_START;
         actionConstraints.insets = new Insets(8, 0, 4, 5);
         actionConstraints.gridwidth = 2;
@@ -238,28 +280,31 @@ public final class ToolkitGUI extends JFrame {
         run.addActionListener(event -> {
             try {
                 String gameId = (String) game.getSelectedItem();
+                String modeValue = String.valueOf(mode.getSelectedItem());
+                Path par = Path.of(parWorkbook.getText().trim()).toAbsolutePath().normalize();
                 long maxSpins = ((Number) spins.getValue()).longValue();
                 double stakeValue = parsePositive(stake.getText(), "Stake");
                 viewerFoundRound = null;
+                viewerFoundAdapter = null;
                 openFoundPlay.setEnabled(false);
                 runTask("Win viewer", output -> {
-                    Game selectedGame = GameFactory.create(gameId);
+                    Game selectedGame = gameId.equals("basic-proxy")
+                            ? GameFactory.create(gameId)
+                            : GameFactory.create(gameId, par, modeValue);
                     WinFinder.Result result = new WinFinder(selectedGame, new Random(),
                             stakeValue, maxSpins).find();
                     if (result.foundWin()) {
                         WinScreenPrinter.print(result, stakeValue, output);
-                        if (gameId.equals("expanding-wild")) {
-                            PlayerDisplayData.Round displayRound =
-                                    new ExpandingWildPlayerAdapter(new Random())
-                                            .adaptRound(result.winningRound());
+                        if (!gameId.equals("basic-proxy")) {
+                            PlayerGameAdapter adapter = PlayerAdapterFactory.create(
+                                    gameId, par, modeValue, new Random());
+                            PlayerDisplayData.Round displayRound = adapter.adaptRound(result.winningRound());
                             SwingUtilities.invokeLater(() -> {
                                 viewerFoundRound = displayRound;
+                                viewerFoundAdapter = adapter;
                                 viewerFoundStake = stakeValue;
                                 openFoundPlay.setEnabled(true);
                             });
-                        } else {
-                            output.println("Opening this game in the prototype player is not "
-                                    + "available yet.");
                         }
                     } else {
                         output.printf("Win could not be found within %d spins.%n", maxSpins);
@@ -349,16 +394,15 @@ public final class ToolkitGUI extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(12, 12));
         panel.setBorder(BorderFactory.createEmptyBorder(18, 22, 18, 22));
         JTextArea description = new JTextArea(
-                "Open a resizable player window for hands-on balancing. "
-                + "It plays Expanding Wild through its normal game session and shows "
-                + "the reel drop, winning lines, payout tracker, and freegame award screen. "
-                + "Player display adapters keep rendering separate from game calculations.");
+                "Choose Expanding Wild or G001 Walking Wild, select its PAR workbook and mode, "
+                + "then launch the resizable player. Both players show reel outcomes, winning lines, "
+                + "freegame flow, auto play, balance, and replay of the last round.");
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         description.setEditable(false);
         description.setOpaque(false);
         panel.add(description, BorderLayout.CENTER);
-        JButton openPlayer = new JButton("Open prototype player");
+        JButton openPlayer = new JButton("Launch a game");
         openPlayer.addActionListener(event -> PrototypePlayerFrame.open());
         panel.add(openPlayer, BorderLayout.SOUTH);
         return panel;

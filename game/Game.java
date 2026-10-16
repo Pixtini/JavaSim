@@ -30,4 +30,9 @@ public interface Game {
     default double getMaxWinMultiplier() {
         return Double.POSITIVE_INFINITY;
     }
+
+    /** Actual cost charged per round as a multiple of the base stake unit. */
+    default double getCostMultiplier() {
+        return 1.0;
+    }
 }

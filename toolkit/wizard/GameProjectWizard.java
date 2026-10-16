@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Creates an intake workspace for a new game without generating game logic. */
+/** Creates a complete game workspace layout without generating game logic. */
 public final class GameProjectWizard {
     private static final Pattern CODE_IN_FOLDER = Pattern.compile("^G(\\d{3,})-");
     private static final Pattern CODE_FOLDER_NAME = Pattern.compile("^G\\d{3,}-(.+)$");
@@ -41,6 +41,17 @@ public final class GameProjectWizard {
         try {
             Files.createDirectory(staging);
             Path source = Files.createDirectory(staging.resolve("source"));
+            Path implementation = staging.resolve("src/main/java/game").resolve(packageName);
+            Path tests = staging.resolve("src/test/java/game").resolve(packageName).resolve("tests");
+            Files.createDirectories(implementation);
+            Files.createDirectories(tests);
+            Files.writeString(implementation.resolve("README.md"),
+                    "# Game implementation package\n\nAdd this game's Java classes here. Keep the package name `game."
+                            + packageName + "` and put shared framework code outside this game module.\n",
+                    StandardCharsets.UTF_8);
+            Files.writeString(tests.resolve("README.md"),
+                    "# Game tests\n\nAdd deterministic tests for this game's rules here.\n",
+                    StandardCharsets.UTF_8);
             Files.writeString(staging.resolve("README.md"),
                     readme(displayName, gameCode, packageName),
                     StandardCharsets.UTF_8);
@@ -114,7 +125,7 @@ public final class GameProjectWizard {
                 **Workspace folder:** `%s/`  
                 **Suggested Java package:** `game.%s`
 
-                This wizard creates an intake workspace only. It does not create or register game code.
+                This wizard creates a complete game workspace, but does not generate or register game code. Keep this game together in this `%s/` folder: source material, PAR, Java implementation, and game-specific tests.
 
                 ## Step 0: prepare and review the source material
 
@@ -126,7 +137,7 @@ public final class GameProjectWizard {
 
                 ## After the review is agreed
 
-                Implement game-specific config and logic in this workspace, reuse `GameModuleFramework` where its behavior matches the rules, and keep Basegame and randomly triggered Feature Game logic separate. Add deterministic rule tests, register `%s` in `game/GameFactory.java`, and run a seeded simulation through the existing engine.
+                Implement game-specific config and logic in `src/main/java/game/%s/`, with Java package `game.%s`. Add deterministic rule tests under `src/test/java/game/%s/tests/`. Reuse `GameModuleFramework` where its behavior matches the rules, and keep Basegame and randomly triggered Feature Game logic separate. Register `%s` in `game/GameFactory.java`, then use `./build.sh` to compile every game workspace into the shared runtime classpath and run a seeded simulation through the existing engine.
 
                 Check RTP by mode and set, triggers, hit rate, distributions, caps, and report assets. Document assumptions and validation evidence in the game handover. Update `docs/architecture.md` and `nextsteps.md` when the implementation changes the framework or completes a task.
 
@@ -138,7 +149,10 @@ public final class GameProjectWizard {
                 - `source/PAR.xlsx`: Config and Reels worksheet templates.
                 - `source/game-creation-form.md`: implementation intake checklist.
                 - `AGENT-REVIEW.md`: agent-authored questions, gaps, and proposals.
-                """.formatted(name, code, code, packageName, code);
+                - `src/main/java/game/%s/`: this game's Java implementation and config.
+                - `src/test/java/game/%s/tests/`: deterministic tests for this game.
+                """.formatted(name, code, code, packageName, code, packageName,
+                        packageName, packageName, code, code, packageName, packageName);
     }
 
     private static String gddTemplate(String name) {

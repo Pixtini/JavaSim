@@ -46,29 +46,40 @@ public final class ExpandingWildGameSession implements GameSession {
         var rawBaseResult = baseGame.spin(totalRoundStake, captureReplay);
         var baseResult = rawBaseResult.cappedAt(maximumWin);
         double roundWin = baseResult.getWin();
-        double freeGameWin = 0.0;
-        double remainingWin = maximumWin - roundWin;
+        double remainingWin = Math.max(0.0, maximumWin - roundWin);
         boolean capReached = rawBaseResult.getWin() >= maximumWin;
         List<SpinResult> freeResults = new ArrayList<>();
         if (baseResult.hasFreeSpin() && !capReached) {
             for (int freeGameIndex = 0; freeGameIndex < config.freeGamesAwarded; freeGameIndex++) {
                 var rawFreeResult = freeGame.spin(totalRoundStake, captureReplay);
-                var freeResult = rawFreeResult.cappedAt(remainingWin);
-                while (roundWin + freeResult.getWin() > maximumWin
-                        || freeGameWin + freeResult.getWin() > maximumWin) {
-                    freeResult = rawFreeResult.cappedAt(Math.nextDown(freeResult.getWin()));
-                }
+                double availableBeforeSpin = remainingWin;
+                SpinResult freeResult = capToRemainingWin(
+                        rawFreeResult, roundWin, maximumWin, availableBeforeSpin);
                 freeResults.add(freeResult);
-                remainingWin -= freeResult.getWin();
-                roundWin += freeResult.getWin();
-                freeGameWin += freeResult.getWin();
-                if (rawFreeResult.getWin() >= remainingWin + freeResult.getWin()) {
+                roundWin = Math.min(maximumWin, roundWin + freeResult.getWin());
+                remainingWin = Math.max(0.0, maximumWin - roundWin);
+                if (rawFreeResult.getWin() >= availableBeforeSpin || remainingWin == 0.0) {
                     capReached = true;
                     break;
                 }
             }
         }
         return new GameRoundResult(baseResult, freeResults, capReached);
+    }
+
+    private SpinResult capToRemainingWin(SpinResult result, double accumulatedWin,
+            double maximumWin, double remainingWin) {
+        if (remainingWin == 0.0) {
+            return result.cappedAt(0.0);
+        }
+        SpinResult capped = result.cappedAt(remainingWin);
+        if (accumulatedWin + capped.getWin() > maximumWin) {
+            capped = result.cappedAt(Math.nextDown(remainingWin));
+            if (accumulatedWin + capped.getWin() > maximumWin) {
+                capped = result.cappedAt(0.0);
+            }
+        }
+        return capped;
     }
 
     @Override

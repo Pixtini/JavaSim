@@ -10,7 +10,8 @@ For the workflow and code reference points, see [game-creation-flow.md](game-cre
 - **Stable game ID** (lowercase, used by `GameFactory`): [ ]
 - **Owner / source of rules:** [ ]
 - **Rules or math specification link/file/version:** [ ]
-- **Target package:** `game/[game-name]/`
+- **Game workspace:** `game/GXXX-game-name/` (source, PAR, implementation, and game-specific tests stay together here)
+- **Target Java package:** `game/[valid-package-name]/` under `src/main/java/`
 - **Reference game reviewed:** [ ]
 - **Open questions requiring math approval:**
   - [ ]
@@ -100,7 +101,8 @@ Configuration belongs to the game module. List game-wide values and mode-specifi
 
 ## 6. Integration
 
-- [ ] Create the dedicated package and game-specific config.
+- [ ] Create game config and logic under this workspace's `src/main/java/` package.
+- [ ] Keep game-specific tests under this workspace's `src/test/java/` package.
 - [ ] Keep Basegame and Feature Game logic clearly separated.
 - [ ] Implement reusable GMF calculations where they have a clear generic contract; otherwise keep unique rules in the game module.
 - [ ] Register the stable game ID and constructor in `game/GameFactory.java`.

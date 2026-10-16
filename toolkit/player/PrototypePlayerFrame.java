@@ -22,9 +22,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-/** Resizable prototype slot player that presents game results without running a simulation. */
+/** Resizable player window that presents adapted game results without running a simulation. */
 public final class PrototypePlayerFrame extends JFrame {
-    private final PlayerGameAdapter game = new ExpandingWildPlayerAdapter(new Random());
+    private final PlayerGameAdapter game;
+    private final double costMultiplier;
     private final JTextField stakeField = new JTextField("1.00", 8);
     private final JSpinner autoRoundCount = new JSpinner(
             new SpinnerNumberModel(10, 1, 1_000_000, 1));
@@ -32,7 +33,7 @@ public final class PrototypePlayerFrame extends JFrame {
     private final JButton replayButton = new JButton("REPLAY LAST PLAY");
     private final JButton autoPlayButton = new JButton("AUTO PLAY");
     private final JButton stopAutoPlayButton = new JButton("STOP");
-    private final JLabel gameLabel = new JLabel(game.gameName());
+    private final JLabel gameLabel;
     private final JLabel modeLabel = new JLabel("Ready to play", SwingConstants.CENTER);
     private final JLabel detailsLabel = new JLabel(" ", SwingConstants.CENTER);
     private final JLabel awardLabel = new JLabel(" ", SwingConstants.CENTER);
@@ -52,11 +53,17 @@ public final class PrototypePlayerFrame extends JFrame {
     private double lastRoundStake = 1.0;
 
     public PrototypePlayerFrame() {
-        this(null, 1.0);
+        this(new ExpandingWildPlayerAdapter(new Random()), null, 1.0);
     }
 
-    private PrototypePlayerFrame(PlayerDisplayData.Round foundRound, double foundStake) {
-        super("JavaSim Prototype Player");
+    private PrototypePlayerFrame(PlayerGameAdapter game,
+            PlayerDisplayData.Round foundRound, double foundStake) {
+        super("JavaSim Player · " + game.gameName() + " · " + game.modeName());
+        this.game = game;
+        this.costMultiplier = game.costMultiplier();
+        String costLabel = costMultiplier == 1.0 ? "" : String.format(
+                java.util.Locale.ROOT, " · cost %.2f×", costMultiplier);
+        this.gameLabel = new JLabel(game.gameName() + " · " + game.modeName() + costLabel);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(700, 620));
         setSize(1000, 800);
@@ -85,7 +92,7 @@ public final class PrototypePlayerFrame extends JFrame {
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 12));
         gameLabel.setFont(gameLabel.getFont().deriveFont(Font.BOLD, 20f));
         controls.add(gameLabel);
-        controls.add(new JLabel("Stake"));
+        controls.add(new JLabel("Base stake"));
         controls.add(stakeField);
         spinButton.setFont(spinButton.getFont().deriveFont(Font.BOLD, 18f));
         spinButton.setBackground(new Color(48, 139, 104));
@@ -153,7 +160,7 @@ public final class PrototypePlayerFrame extends JFrame {
         if (lastRound == null || !roundIsIdle() || autoPlayActive) {
             return;
         }
-        if (balance < lastRoundStake) {
+        if (balance < lastRoundStake * costMultiplier) {
             showInsufficientBalance();
             return;
         }
@@ -169,7 +176,7 @@ public final class PrototypePlayerFrame extends JFrame {
         if (stake == null) {
             return;
         }
-        if (balance < stake) {
+        if (balance < stake * costMultiplier) {
             showInsufficientBalance();
             return;
         }
@@ -186,7 +193,7 @@ public final class PrototypePlayerFrame extends JFrame {
             if (!Double.isFinite(stake) || stake <= 0.0) {
                 throw new NumberFormatException();
             }
-            if (balance < stake) {
+            if (balance < stake * costMultiplier) {
                 showInsufficientBalance();
                 return null;
             }
@@ -204,7 +211,7 @@ public final class PrototypePlayerFrame extends JFrame {
 
     private void beginRound(double stake, PlayerDisplayData.Round replayRound) {
         roundStake = stake;
-        balance = currency(balance - stake);
+        balance = currency(balance - stake * costMultiplier);
         updateBalanceLabel();
         spinButton.setEnabled(false);
         autoPlayButton.setEnabled(false);
@@ -229,7 +236,7 @@ public final class PrototypePlayerFrame extends JFrame {
                     lastRoundStake = stake;
                     presentBaseGame(round);
                 } catch (Exception exception) {
-                    balance = currency(balance + roundStake);
+                    balance = currency(balance + roundStake * costMultiplier);
                     updateBalanceLabel();
                     roundIsComplete();
                     JOptionPane.showMessageDialog(PrototypePlayerFrame.this,
@@ -343,7 +350,7 @@ public final class PrototypePlayerFrame extends JFrame {
                 endAutoPlay("Auto play stopped after this round");
             } else if (autoRoundsRemaining <= 0) {
                 endAutoPlay("Auto play complete");
-            } else if (balance < roundStake) {
+            } else if (balance < roundStake * costMultiplier) {
                 endAutoPlay("Auto play stopped: balance is below the stake");
             } else {
                 modeLabel.setText("Auto play — " + autoRoundsRemaining + " rounds remaining");
@@ -430,13 +437,22 @@ public final class PrototypePlayerFrame extends JFrame {
     }
 
     public static void open() {
-        PrototypePlayerFrame frame = new PrototypePlayerFrame();
+        GameLauncherFrame.open();
+    }
+
+    public static void open(PlayerGameAdapter game) {
+        PrototypePlayerFrame frame = new PrototypePlayerFrame(game, null, 1.0);
         frame.setVisible(true);
     }
 
     /** Opens the player with a win viewer result displayed and ready for replay. */
     public static void openFoundPlay(PlayerDisplayData.Round round, double stake) {
-        PrototypePlayerFrame frame = new PrototypePlayerFrame(round, stake);
+        openFoundPlay(new ExpandingWildPlayerAdapter(new Random()), round, stake);
+    }
+
+    public static void openFoundPlay(PlayerGameAdapter game,
+            PlayerDisplayData.Round round, double stake) {
+        PrototypePlayerFrame frame = new PrototypePlayerFrame(game, round, stake);
         frame.setVisible(true);
         frame.previewFoundPlay(round);
     }

@@ -7,6 +7,8 @@ public class SimConfig {
     public String gameId = "expanding-wild";
     /** Mode selected for every round in this simulation; mode-specific PAR games default to Normal. */
     public String gameMode = "Normal";
+    /** Game-provided mode cost, populated by SimulationRunner; payouts still use stake. */
+    public double modeCostMultiplier = 1.0;
     /** Selected game PAR workbook; required by the simulation UI before starting a run. */
     public Path parWorkbookPath;
     public long rounds = 1_000_000;

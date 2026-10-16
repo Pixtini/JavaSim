@@ -2,7 +2,7 @@ package toolkit.player;
 
 import javax.swing.SwingUtilities;
 
-/** Standalone launch point for the balancing prototype player. */
+/** Standalone launch point for the game launcher and balancing player. */
 public final class PlayerMain {
     private PlayerMain() {}
 

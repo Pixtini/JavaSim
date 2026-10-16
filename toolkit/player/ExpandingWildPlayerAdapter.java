@@ -18,14 +18,20 @@ public final class ExpandingWildPlayerAdapter implements PlayerGameAdapter {
     private final ExpandingWildConfig config;
     private final GameSession session;
     private final List<PlayerDisplayData.SymbolCell> symbolPalette;
+    private final String modeName;
 
     public ExpandingWildPlayerAdapter(Random random) {
         this(new ExpandingWildConfig(), random);
     }
 
     public ExpandingWildPlayerAdapter(ExpandingWildConfig config, Random random) {
+        this(config, random, "Normal");
+    }
+
+    public ExpandingWildPlayerAdapter(ExpandingWildConfig config, Random random, String modeName) {
         this.config = config;
         this.session = new ExpandingWildGame(config).createSession(random);
+        this.modeName = modeName;
         this.symbolPalette = List.of(
                 cell("T1"), cell("T2"), cell("T3"), cell("T4"), cell("T5"),
                 cell("L1"), cell("L2"), cell("L3"), cell("L4"), cell("L5"),
@@ -37,6 +43,8 @@ public final class ExpandingWildPlayerAdapter implements PlayerGameAdapter {
         return "Expanding Wild";
     }
 
+    @Override public String modeName() { return modeName; }
+
     @Override
     public PlayerDisplayData.Round spin(double stake) {
         GameRoundResult result = session.playRound(
@@ -45,6 +53,7 @@ public final class ExpandingWildPlayerAdapter implements PlayerGameAdapter {
     }
 
     /** Converts a previously calculated game round for presentation or playback. */
+    @Override
     public PlayerDisplayData.Round adaptRound(GameRoundResult result) {
         PlayerDisplayData.Spin base = adapt(result.getBaseGameResult(), "Basegame");
         List<PlayerDisplayData.Spin> freeSpins = result.getFreeGameResults().stream()

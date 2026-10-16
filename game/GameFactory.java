@@ -4,6 +4,8 @@ import game.proxy.BasicProxyConfig;
 import game.proxy.BasicProxyGame;
 import game.expandingwild.ExpandingWildGame;
 import game.expandingwild.config.ExpandingWildParParser;
+import game.walkingwild.WalkingWildGame;
+import game.walkingwild.config.WalkingWildParParser;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -20,6 +22,7 @@ public final class GameFactory {
         return switch (gameId) {
             case "basic-proxy" -> new BasicProxyGame(new BasicProxyConfig());
             case "expanding-wild" -> createDefaultExpandingWild();
+            case "G001-walkingwild" -> createDefaultWalkingWild();
             default -> throw new IllegalArgumentException("Unknown game ID: " + gameId);
         };
     }
@@ -30,6 +33,16 @@ public final class GameFactory {
                     Path.of("game", "expandingwild", "expandingWildPAR.xlsx"));
         } catch (IOException exception) {
             throw new IllegalStateException("Could not load the default Expanding Wild PAR workbook", exception);
+        }
+    }
+
+    private static Game createDefaultWalkingWild() {
+        try {
+            return create("G001-walkingwild",
+                    Path.of("game", "G001-walkingwild", "source", "G001-walkingWildsPAR.xlsx"),
+                    "Normal");
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not load the default G001 walkingWild PAR workbook", exception);
         }
     }
 
@@ -52,6 +65,8 @@ public final class GameFactory {
         return switch (gameId) {
             case "expanding-wild" -> new ExpandingWildGame(
                     new ExpandingWildParParser().parse(parWorkbookPath, gameMode));
+            case "G001-walkingwild" -> new WalkingWildGame(
+                    new WalkingWildParParser().parse(parWorkbookPath, gameMode));
             default -> throw new IllegalArgumentException(
                     "No PAR workbook parser is registered for game '" + gameId + "'");
         };
