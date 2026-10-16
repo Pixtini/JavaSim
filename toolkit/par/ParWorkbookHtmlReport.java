@@ -13,7 +13,12 @@ public final class ParWorkbookHtmlReport {
     private ParWorkbookHtmlReport() {}
 
     public static void write(Path workbookPath, Path htmlPath) throws IOException {
+        write(workbookPath, "Normal", htmlPath);
+    }
+
+    public static void write(Path workbookPath, String gameMode, Path htmlPath) throws IOException {
         var workbook = ExcelWorkbookReader.read(workbookPath);
+        var selectedSheets = ParWorkbookModes.select(workbook, gameMode);
         try (var output = Files.newBufferedWriter(htmlPath, StandardCharsets.UTF_8)) {
             output.write("<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">");
             output.write("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -21,16 +26,18 @@ public final class ParWorkbookHtmlReport {
             output.write(":root{color-scheme:light;font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#172033;background:#f3f6fb}*{box-sizing:border-box}body{margin:0}header{padding:30px clamp(20px,5vw,64px);color:#fff;background:#172554}header h1{margin:0 0 8px;font-size:clamp(1.6rem,3vw,2.4rem)}header p{margin:0;color:#dbeafe;max-width:900px}main{max-width:1500px;margin:auto;padding:24px clamp(16px,4vw,48px) 56px}section{margin:22px 0;padding:22px;background:#fff;border:1px solid #dbe3ef;border-radius:14px;box-shadow:0 3px 14px #0f172a0a}h2{margin:0 0 7px;color:#172554;font-size:1.25rem}h3{margin:18px 0 8px;color:#334155;font-size:1rem}.note,.source{color:#53627a}.table-wrap{width:100%;overflow:auto;border:1px solid #dbe3ef;border-radius:9px}table{border-collapse:separate;border-spacing:0;min-width:100%;font-size:.88rem}th,td{padding:8px 10px;text-align:left;white-space:pre;border-right:1px solid #e4eaf2;border-top:1px solid #e4eaf2}thead th{position:sticky;top:0;z-index:1;color:#1e3a8a;background:#eff6ff;font-weight:700}tbody tr:nth-child(even){background:#f8fafd}tbody th{position:sticky;left:0;background:#f8fafc;color:#334155}td:empty{background:#fbfcfe}.block{margin:16px 0}.badge{display:inline-block;padding:3px 8px;border-radius:999px;color:#1e3a8a;background:#dbeafe;font-size:.8rem}footer{padding:12px 0;color:#64748b;font-size:.85rem}@media(max-width:600px){section{padding:15px}th,td{padding:7px}");
             output.write("}</style></head><body><header><h1>Simulation PAR configuration</h1><p>Balancing inputs copied from the selected workbook for this simulation.</p><p class=\"source\">Source workbook: ");
             output.write(escape(workbookPath.getFileName().toString()));
+            output.write("</p><p>Simulation mode: ");
+            output.write(escape(selectedSheets.mode()));
             output.write("</p></header><main>");
             for (Map.Entry<String, ExcelWorkbookReader.Sheet> sheetEntry : workbook.sheets().entrySet()) {
-                if (!sheetEntry.getKey().equals("Config") && !sheetEntry.getKey().equals("Reels")) {
+                if (!selectedSheets.sheetNames().contains(sheetEntry.getKey())) {
                     continue;
                 }
                 ExcelWorkbookReader.Sheet sheet = sheetEntry.getValue();
                 output.write("<section><h2>");
                 output.write(escape(sheetEntry.getKey()));
                 output.write("</h2>");
-                if (sheetEntry.getKey().equals("Reels")) writeReelSets(output, sheet);
+                if (sheetEntry.getKey().equals(selectedSheets.reelsSheet())) writeReelSets(output, sheet);
                 else writeConfigBlocks(output, sheet);
                 output.write("</section>");
             }

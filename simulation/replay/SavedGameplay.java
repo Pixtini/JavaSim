@@ -5,8 +5,13 @@ import java.util.List;
 import java.util.Objects;
 
 /** Game-neutral saved round summary and the ordered game-owned events needed to replay it. */
-public record SavedGameplay(long id, String gameId, double stake, double totalWin,
+public record SavedGameplay(long id, String gameId, String gameMode, double stake, double totalWin,
         double baseGameWin, double featureGameWin, List<ReplayEvent> events) {
+    public SavedGameplay(long id, String gameId, double stake, double totalWin,
+            double baseGameWin, double featureGameWin, List<ReplayEvent> events) {
+        this(id, gameId, "Normal", stake, totalWin, baseGameWin, featureGameWin, events);
+    }
+
     public SavedGameplay {
         if (id <= 0 || !Double.isFinite(stake) || stake <= 0.0
                 || !Double.isFinite(totalWin) || !Double.isFinite(baseGameWin)
@@ -16,6 +21,10 @@ public record SavedGameplay(long id, String gameId, double stake, double totalWi
         Objects.requireNonNull(gameId, "gameId");
         if (gameId.isBlank()) {
             throw new IllegalArgumentException("Saved gameplay game ID must not be blank");
+        }
+        Objects.requireNonNull(gameMode, "gameMode");
+        if (gameMode.isBlank()) {
+            throw new IllegalArgumentException("Saved gameplay mode must not be blank");
         }
         events = List.copyOf(events);
         if (events.isEmpty()) {

@@ -19,6 +19,7 @@ import simulation.result.SimulationResult;
 import simulation.replay.SavedGameplayCsv;
 import simulation.stats.StandardStats;
 import toolkit.par.ParWorkbookHtmlReport;
+import toolkit.par.ParWorkbookModes;
 import toolkit.par.ParWorkbookSheetExporter;
 
 public class Print {
@@ -142,6 +143,7 @@ public class Print {
 
     private void printRunSettings(PrintWriter output, SimConfig simConfig) {
         output.println("Game: " + simConfig.gameId);
+        output.println("Mode: " + simConfig.gameMode);
         if (simConfig.parWorkbookPath != null) {
             output.println("PAR workbook: " + simConfig.parWorkbookPath.toAbsolutePath().normalize());
         }
@@ -151,22 +153,20 @@ public class Print {
                 simulationResult.getElapsedNanos() / 1_000_000_000.0);
     }
 
-    private void writeAggregatedWinBand(PrintWriter output, int index,
-            StandardStats.WinBand band, double stake) {
-        String rangeMin = index == 0
-                ? String.format(Locale.ROOT, "%.2f", band.getLowerBound())
-                : String.format(Locale.ROOT, "> %.2f", band.getLowerBound());
-
+    private void writeAggregatedWinBand(PrintWriter output, StandardStats.WinBand band) {
         output.printf(Locale.ROOT,
-                "%s,%.2f,%d,%.8f%%,%.8f%%,%.2f,%.2f%%,%s%n",
-                rangeMin,
-                band.getUpperBound(),
+                "%.2f,%s,%d,%.8f%%,%.2f,%.2f%%%n",
+                band.getLowerBound(),
+                formatBandUpperBound(band.getUpperBound()),
                 band.getHits(),
-                band.getPercentOfWinnings(),
                 band.getPercentOfHits(),
                 band.getFrequency(),
-                band.getRtp(),
-                formatWin(band.getTotalWin(), stake));
+                band.getRtp());
+    }
+
+    private static String formatBandUpperBound(double upperBound) {
+        return Double.isInfinite(upperBound)
+                ? "∞" : String.format(Locale.ROOT, "%.2f", upperBound);
     }
 
     private Path createReportFiles(SimConfig simConfig) throws IOException {
@@ -188,9 +188,10 @@ public class Print {
             }
             String workbookName = selectedWorkbook.getFileName().toString();
             Path reportWorkbook = reportFolder.resolve(workbookName);
+            var modeSheets = ParWorkbookModes.select(selectedWorkbook, simConfig.gameMode);
             ParWorkbookSheetExporter.export(selectedWorkbook, reportWorkbook,
-                    java.util.Set.of("Config", "Reels"));
-            ParWorkbookHtmlReport.write(reportWorkbook,
+                    modeSheets.sheetNames());
+            ParWorkbookHtmlReport.write(reportWorkbook, simConfig.gameMode,
                     reportFolder.resolve("config.html"));
         }
 
@@ -212,16 +213,13 @@ public class Print {
 
         try (PrintWriter output = new PrintWriter(Files.newBufferedWriter(
                 reportFolder.resolve("win_distribution_aggregated.csv"), StandardCharsets.UTF_8))) {
-            output.println("Distribution,Range Min,Range Max,Hits,% Of Winnings,% Of Hits,Frequency,RTP,Total Win");
+            output.println("Distribution,Range Min (>=),Range Max (<),Hits,Hit Rate,HR Freq,RTP");
             double totalStaked = simConfig.rounds * simConfig.stake;
-            writeAggregatedWinDistributionRows(output, "Total Game", totalGameStats, totalStaked,
-                    simConfig.stake);
+            writeAggregatedWinDistributionRows(output, "Total Game", totalGameStats, totalStaked);
             output.println();
-            writeAggregatedWinDistributionRows(output, "Basegame", baseGameStats, totalStaked,
-                    simConfig.stake);
+            writeAggregatedWinDistributionRows(output, "Basegame", baseGameStats, totalStaked);
             output.println();
-            writeAggregatedWinDistributionRows(output, "Freegame", freeGameStats, totalStaked,
-                    simConfig.stake);
+            writeAggregatedWinDistributionRows(output, "Freegame", freeGameStats, totalStaked);
         }
 
         if (!simulationResult.getSavedGameplays().isEmpty()) {
@@ -243,11 +241,11 @@ public class Print {
     }
 
     private void writeAggregatedWinDistributionRows(PrintWriter output, String distribution,
-            StandardStats stats, double totalStaked, double stake) {
+            StandardStats stats, double totalStaked) {
         List<StandardStats.WinBand> bands = stats.getAggregatedWinDistribution(totalStaked);
-        for (int i = 0; i < bands.size(); i++) {
+        for (StandardStats.WinBand band : bands) {
             output.print(distribution + ",");
-            writeAggregatedWinBand(output, i, bands.get(i), stake);
+            writeAggregatedWinBand(output, band);
         }
     }
 

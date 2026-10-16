@@ -253,9 +253,13 @@ HEATMAP - Defines the weight of where something can be placed on the grid. Its n
 
     For example HEATMAP:BG-0-wildExpand-location{reelMax = 1}, would be Basegame, set 0, wild expansion feature, its location and max one per reel.
 
-When finding the tables, they can be anywhere on the "Config" Sheet of the PAR excel file. The headers will be directly below the type of table, any header prefixed with MATH: is to be ignored. All entries will be consectutive in the sheet, the first white space below a row marks the end of that table.
+PAR workbooks may contain one or more mode-specific Config/Reels sheet pairs. A mode pair uses `<Mode>-Config` and `<Mode>-Reels`, for example `Normal-Config` and `Normal-Reels`. The matching mode prefix keeps that mode's settings and reels isolated; never combine tables across different modes. Unprefixed `Config` and `Reels` sheets each default to the `Normal` mode. Reject duplicate sheets for the same mode and incomplete mode pairs with a clear validation error.
 
-Reels are featured on the "Reels" Sheet. Feature the title on row 1, [Mode]-[Set] for example BG-0, that marks the reels of the Basegame set 0. Row 2 , will feature the reel number. Indexed by 1 rather that 0. 0 Index should still be used within the config. And then the columns will feature the reels per the ID which will be consecutive, any white space is the end of that reel.
+Within each mode's Config sheet, tables can appear anywhere. Headers are directly below the table type; headers prefixed with `MATH:` are ignored. Entries are consecutive, and the first blank row ends the table.
+
+Within each mode's Reels sheet, the title in row 1 uses `[SpinMode]-[Set]`, for example `BG-0` for Basegame set 0. Row 2 contains reel numbers indexed from 1; config uses zero-based indexes. Each reel is a column of consecutive symbol IDs, and the first blank cell ends that reel.
+
+For a PAR-backed simulation, select one mode before the run starts. Every round and spin in that simulation uses only the selected mode's matching Config/Reels pair; do not draw a mode per spin or merge values between modes. Default the selected mode to `Normal`. If the chosen mode is not present in the workbook, reject the simulation before it starts with a clear validation error.
 
 
 

@@ -9,6 +9,7 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 ## Source layout
 
 - `game/`: game contracts (`Game`, `GameSession`), selection factory, shared game result types, and implementations.
+- `game/broadGDDs/`: cross-game rule references, such as the shared reel, payline, stake-unit, mode, and set conventions in `lines.md`; individual GDDs can specify game-specific exceptions.
 - `game/model/`: spin and base-round results passed from game sessions to the simulation layer, including shared round win-cap application and cap-hit metadata.
 - `game/proxy/`: current probability-based example game and its `BasicProxyConfig`. Each future game should keep its own configuration with its implementation.
 - `game/expandingwild/`: first reel-based game, with separate basegame, freegame, config, config adapter, and detailed spin results. Its game-wide config is separated from basegame and freegame spin sets; each set contains integer-ID regular-symbol strips, insertion rules, and multiplier settings. The adapter translates each set to GMF `Symbol` values.
@@ -24,7 +25,9 @@ The source is grouped into separate game and simulation layers. `Main.java` stay
 - `toolkit/replay/`: saved-gameplay lookup, replay calculation, and validation.
 - `toolkit/progress/`: shared progress display for long-running simulation and reelset jobs.
 - `toolkit/player/`: balancing player presentation model, resizable reel viewport, and per-game adapters.
-- `toolkit/par/`: dependency-free Open XML workbook reader, selected-sheet `.xlsx` exporter, and styled HTML renderer for PAR inputs included in simulation reports. Reports keep only the `Config` and `Reels` sheets required to reproduce the Expanding Wild setup; Config blocks and each reel set are displayed as separate tables.
+- `toolkit/par/`: dependency-free Open XML workbook reader, mode-pair discovery, selected-sheet `.xlsx` exporter, and styled HTML renderer for PAR inputs included in simulation reports. A PAR-backed simulation selects one complete Config/Reels pair for its mode; unprefixed sheets map to Normal. Reports include only that selected pair.
+- `toolkit/wizard/`: new-game workspace initializer that creates source templates, a two-sheet PAR workbook, a placeholder flowchart, and an agent review log without generating game logic.
+- `game/G001-walkingwild/`: intake workspace under source review. Its multi-mode PAR workbook defines Normal and BB1 sheets, mode costs, and a 100-unit maximum win; the PDF flowchart is transcribed into `source/flowchart.md`, and the GDD specifies temporary zero-weight exclusions for occupied wild cells and a five-wild maximum. Generic mode selection is implemented in the simulation flow, but G001 still needs its own parser and game implementation and is not registered.
 - `ToolkitGUI.java`: root-level Swing launcher with tabs for simulation, win viewing, full reelset evaluation, and replay.
 - `Main.java`: root-level application entry point.
 
@@ -52,6 +55,8 @@ Holds simulation-wide values:
 - `maxSavedGameplays`: maximum replayable rounds retained for CSV export; zero disables capture.
 - `threads`: maximum worker threads used to process partitions.
 - `partitions`: fixed logical work partitions used for deterministic seeding and result merging.
+
+For PAR-backed games, `gameMode` selects one complete Config/Reels pair per simulation run and defaults to `Normal`. Every round uses only that pair; configuration values are never combined across modes. The current Expanding Wild parser supports this mode selection. G001 still needs its game-specific parser and game implementation before its workbook can be simulated.
 
 ## Simulation flow
 
@@ -154,7 +159,7 @@ These classes implement the proxy's individual spin logic. They are an example g
 
 Implements the existing game contract with a 5x5 reel game. It keeps basegame and freegame logic separate, uses GMF for weighted symbol insertion and reel/grid and payline math, expands visible banners into full-height wild reels, and draws configured banner multipliers before adding participating multipliers on paylines. Its configuration caps each basegame round at the configured stake multiple; the session clips the spin that reaches the cap and stops further free spins. The full reelset tool deliberately evaluates only regular reel symbols and paytable wins, skipping all feature mechanics. See [ExpandingWildGame.md](../game/expandingwild/ExpandingWildGame.md) for the current PAR results and known limits.
 
-`ExpandingWildParParser` maps the workbook's `Config` and `Reels` sheets into `ExpandingWildConfig`. It reads game-wide settings, the symbol paytable, paylines, the scatter award map, selectors, per-mode/per-set insertion counts and heat maps, banner multipliers, and reel strips. `GameFactory.create(gameId, parPath)` validates this game-specific PAR before creating a game. The Simulation tab selects a workbook; reports retain an `.xlsx` copy and an HTML rendering of its Config/Reels sheets. Freegame scatter retriggers are not implemented: the parser rejects PARs that give positive weight to nonzero freegame scatter counts.
+`ExpandingWildParParser` maps the selected mode's Config and Reels sheets into `ExpandingWildConfig`. It reads game-wide settings, the symbol paytable, paylines, the scatter award map, selectors, per-mode/per-set insertion counts and heat maps, banner multipliers, and reel strips. `GameFactory.create(gameId, parPath, mode)` validates the selected pair and game-specific PAR before creating a game. The Simulation tab offers the workbook's available modes; reports retain an `.xlsx` copy containing only the selected pair and an HTML rendering of those sheets. Freegame scatter retriggers are not implemented: the parser rejects PARs that give positive weight to nonzero freegame scatter counts.
 
 ### `GameModuleFramework`
 
@@ -172,7 +177,7 @@ Immutable results for an individual spin and a complete basegame round. A round 
 
 ### `ToolkitGUI`
 
-Launch the desktop toolkit from the project root with `java ToolkitGUI` after compiling the project. Its Simulation tab exposes game ID, rounds, stake, seed reuse, report export, award display, worker threads, logical partitions, and saved-gameplay count. The Win viewer takes game ID, maximum spins, and stake; Full reelset takes game ID, stake, and workers; Replay takes a saved-gameplay CSV and gameplay ID. A found Expanding Wild round can be opened in the prototype player; other games do not yet have player adapters. The GUI runs each operation on a background worker and streams its output into the window. Simulation reporting accepts a supplied writer so console output and report files stay consistent.
+Launch the desktop toolkit from the project root with `java ToolkitGUI` after compiling the project. Its Simulation tab exposes game ID, PAR workbook and available mode, rounds, stake, seed reuse, report export, award display, worker threads, logical partitions, and saved-gameplay count. The Win viewer takes game ID, maximum spins, and stake; Full reelset takes game ID, stake, and workers; Replay takes a saved-gameplay CSV and gameplay ID. The New game tab creates each intake workspace in a folder named with its sequential `GXXX-game-name` code under the selected game folder root, and recommends a valid Java package separately. A found Expanding Wild round can be opened in the prototype player; other games do not yet have player adapters. The GUI runs each operation on a background worker and streams its output into the window. Simulation reporting accepts a supplied writer so console output and report files stay consistent.
 
 The Prototype player tab opens a separate resizable play window. It can also be launched directly with `java toolkit.player.PlayerMain`. `PlayerGameAdapter` maps a normal game-session round into `PlayerDisplayData` (stopped and transformed grids, awards, highlight positions, feature spins, and display metadata); the player renders that data without using simulation statistics or report generation. The first adapter is Expanding Wild. Positional wins support line, ways, or cluster highlighting, and the viewport sizes itself from the grid dimensions. The player maintains a local balance, supports manual or counted autoplay, and animates reels before revealing post-stop wild expansion and wins. Autoplay stop takes effect after the current complete round, including its triggered freegames. The viewer can preload its found Expanding Wild round as a no-cost preview; Replay Last Play charges the original stake and repeats that saved display outcome, including its feature spins.
 
@@ -184,18 +189,16 @@ Accumulates spin counts, total winnings, generic paytable buckets, named award c
 
 `addResult` records one individual spin in regular totals, paytable buckets, and named award counts. `recordWinInDistribution` separately records the value that represents one observation in a distribution. This separation lets freegame totals count each free spin while its distribution counts one sum per triggered freegame. Freegame RTP divides its winnings by basegame stake exposure recorded by the runner.
 
-The win distributions map each win amount to a `long` frequency. Standard deviation is computed from the distribution. Aggregated win-band rows are also calculated from the distribution using the configured ranges: zero, then `(0, 1]`, `(1, 2]`, `(2, 3]`, `(3, 5]`, and successive bands through `(25,000, 10,000,000]`.
+The win distributions map each win amount to a `long` frequency. Standard deviation is computed from the distribution. Aggregated win-band rows use inclusive minimums and exclusive maximums: `[0, 1)`, `[1, 2)`, `[2, 3)`, `[3, 5)`, and successive bands through `[25,000, ∞)`. An exact threshold is assigned to the band that begins at that threshold, and all outcomes are covered.
 
 Each aggregate band reports:
 
 - **Hits:** observations in that band.
-- **% Of Winnings:** that band's total win divided by the distribution's total win.
-- **% Of Hits:** band hits divided by observations in that distribution.
-- **Frequency:** observations divided by band hits; zero when the band has no hits.
+- **Hit Rate:** band hits divided by observations in that distribution.
+- **HR Freq:** observations divided by band hits; zero when the band has no hits.
 - **RTP:** band total win divided by total simulation stake.
-- **Total Win:** sum of all wins in the band.
 
-The percentage of hits and frequency use each distribution's own observation count. RTP uses total basegame stake for all three distributions so the rows show each category's contribution to overall simulation RTP.
+Hit Rate and HR Freq use each distribution's own observation count. RTP uses total basegame stake for all three distributions so the rows show each category's contribution to overall simulation RTP. In `win_distribution_aggregated.csv`, the order is Distribution, Range Min (>=), Range Max (<), Hits, Hit Rate, HR Freq, RTP.
 
 ## Reporting
 
@@ -216,14 +219,15 @@ Both CSVs group their sections in this order, with a blank row between sections:
 
 ## Tests
 
-`tests/SimulationTests.java` covers generic statistics, deterministic merging, game selection, and reports. `game/expandingwild/tests/ExpandingWildGameTests.java` covers GMF mechanics, game rules, and a seeded simulator run. `ExpandingWildParParserTests` checks PAR mapping, a seeded PAR-backed simulation, report assets, and replay against the report workbook; `ExcelWorkbookReaderTests` checks generic workbook parsing and HTML rendering. `ViewerTests`, `ReelsetTests`, and `ReplayTests` cover the toolkit flows; `PlayerTests` checks the player adapter, found-round adaptation, variable-size display model, and separation of stopped reels from expanded wilds. Run the suites with:
+`tests/SimulationTests.java` covers generic statistics, deterministic merging, game selection, and reports. `GameProjectWizardTests` verifies starter files, sequential codes, collision handling, and the generated two-sheet workbook. `game/expandingwild/tests/ExpandingWildGameTests.java` covers GMF mechanics, game rules, and a seeded simulator run. `ExpandingWildParParserTests` checks PAR mapping, a seeded PAR-backed simulation, report assets, and replay against the report workbook; `ExcelWorkbookReaderTests` checks generic workbook parsing and HTML rendering. `ViewerTests`, `ReelsetTests`, and `ReplayTests` cover the toolkit flows; `PlayerTests` checks the player adapter, found-round adaptation, variable-size display model, and separation of stopped reels from expanded wilds. Run the suites with:
 
 ```sh
-javac *.java tests/*.java game/expandingwild/tests/*.java
+javac *.java tests/*.java game/expandingwild/tests/*.java toolkit/par/*.java toolkit/wizard/*.java
 java -cp .:tests SimulationTests
 java game.expandingwild.tests.ExpandingWildGameTests
 java game.expandingwild.tests.ExpandingWildParParserTests
 java toolkit.par.ExcelWorkbookReaderTests
+java -cp .:tests GameProjectWizardTests
 java -cp .:tests PlayerTests
 java -cp .:tests ViewerTests
 java -cp .:tests ReelsetTests

@@ -5,6 +5,8 @@ import java.nio.file.Path;
 public class SimConfig {
 
     public String gameId = "expanding-wild";
+    /** Mode selected for every round in this simulation; mode-specific PAR games default to Normal. */
+    public String gameMode = "Normal";
     /** Selected game PAR workbook; required by the simulation UI before starting a run. */
     public Path parWorkbookPath;
     public long rounds = 1_000_000;

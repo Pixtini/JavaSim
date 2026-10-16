@@ -12,9 +12,12 @@ import java.util.List;
 
 /** CSV persistence for saved gameplays, with one row per ordered replay event. */
 public final class SavedGameplayCsv {
-    private static final String HEADER = "Format Version,Gameplay ID,Game ID,Stake,Total Win,Basegame Win,"
+    private static final String HEADER_V1 = "Format Version,Gameplay ID,Game ID,Stake,Total Win,Basegame Win,"
             + "Feature Win,Event Index,Event Type,Event Win,Event Payload";
-    private static final String FORMAT_VERSION = "1";
+    private static final String HEADER = "Format Version,Gameplay ID,Game ID,Game Mode,Stake,Total Win,Basegame Win,"
+            + "Feature Win,Event Index,Event Type,Event Win,Event Payload";
+    private static final String FORMAT_VERSION_V1 = "1";
+    private static final String FORMAT_VERSION = "2";
 
     private SavedGameplayCsv() {}
 
@@ -29,6 +32,7 @@ public final class SavedGameplayCsv {
                             FORMAT_VERSION,
                             Long.toString(gameplay.id()),
                             gameplay.gameId(),
+                            gameplay.gameMode(),
                             Double.toString(gameplay.stake()),
                             Double.toString(gameplay.totalWin()),
                             Double.toString(gameplay.baseGameWin()),
@@ -47,35 +51,40 @@ public final class SavedGameplayCsv {
         List<ReplayEvent> events = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String header = reader.readLine();
-            if (!HEADER.equals(header)) {
+            boolean versionOne = HEADER_V1.equals(header);
+            if (!versionOne && !HEADER.equals(header)) {
                 throw new IOException("Unrecognized saved gameplays CSV header");
             }
+            String expectedVersion = versionOne ? FORMAT_VERSION_V1 : FORMAT_VERSION;
             String line;
             while ((line = reader.readLine()) != null) {
                 List<String> fields = parseRow(line);
-                if (fields.size() != 11 || !fields.get(0).equals(FORMAT_VERSION)) {
+                int expectedFieldCount = versionOne ? 11 : 12;
+                if (fields.size() != expectedFieldCount || !fields.get(0).equals(expectedVersion)) {
                     throw new IOException("Invalid saved gameplay CSV row");
                 }
                 long id = parseLong(fields.get(1), "gameplay ID");
                 if (id != requestedId) {
                     continue;
                 }
+                int shift = versionOne ? 0 : 1;
                 SavedGameplayHeader rowSummary = new SavedGameplayHeader(
-                        fields.get(2), parseDouble(fields.get(3), "stake"),
-                        parseDouble(fields.get(4), "total win"),
-                        parseDouble(fields.get(5), "basegame win"),
-                        parseDouble(fields.get(6), "feature win"));
+                        fields.get(2), versionOne ? "Normal" : fields.get(3),
+                        parseDouble(fields.get(3 + shift), "stake"),
+                        parseDouble(fields.get(4 + shift), "total win"),
+                        parseDouble(fields.get(5 + shift), "basegame win"),
+                        parseDouble(fields.get(6 + shift), "feature win"));
                 if (summary == null) {
                     summary = rowSummary;
                 } else if (!summary.equals(rowSummary)) {
                     throw new IOException("Gameplay summary differs between event rows");
                 }
-                int eventIndex = (int) parseLong(fields.get(7), "event index");
+                int eventIndex = (int) parseLong(fields.get(7 + shift), "event index");
                 if (eventIndex != events.size()) {
                     throw new IOException("Saved gameplay event rows are missing or out of order");
                 }
-                events.add(new ReplayEvent(fields.get(8),
-                        parseDouble(fields.get(9), "event win"), fields.get(10)));
+                events.add(new ReplayEvent(fields.get(8 + shift),
+                        parseDouble(fields.get(9 + shift), "event win"), fields.get(10 + shift)));
             }
         } catch (IllegalArgumentException exception) {
             throw new IOException("Could not parse saved gameplay " + requestedId, exception);
@@ -83,7 +92,7 @@ public final class SavedGameplayCsv {
         if (summary == null) {
             throw new IOException("Saved gameplay ID not found: " + requestedId);
         }
-        return new SavedGameplay(requestedId, summary.gameId(), summary.stake(),
+        return new SavedGameplay(requestedId, summary.gameId(), summary.gameMode(), summary.stake(),
                 summary.totalWin(), summary.baseGameWin(), summary.featureGameWin(), events);
     }
 
@@ -153,6 +162,6 @@ public final class SavedGameplayCsv {
         }
     }
 
-    private record SavedGameplayHeader(String gameId, double stake, double totalWin,
+    private record SavedGameplayHeader(String gameId, String gameMode, double stake, double totalWin,
             double baseGameWin, double featureGameWin) {}
 }

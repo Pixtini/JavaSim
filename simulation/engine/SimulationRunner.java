@@ -153,6 +153,7 @@ public final class SimulationRunner {
                 double featureWin = roundResult.getFreeGameResults().stream()
                         .mapToDouble(SpinResult::getWin).sum();
                 savedGameplays.add(new SavedGameplay(gameplayId, simConfig.gameId,
+                        simConfig.gameMode,
                         simConfig.stake, totalWin, baseResult.getWin(), featureWin,
                         roundResult.getReplayEvents()));
             }
@@ -214,6 +215,9 @@ public final class SimulationRunner {
     }
 
     private void validateConfig() {
+        if (simConfig.gameMode == null || simConfig.gameMode.isBlank()) {
+            throw new IllegalArgumentException("Simulation mode must not be blank");
+        }
         if (simConfig.rounds <= 0) {
             throw new IllegalArgumentException("Simulation rounds must be greater than zero");
         }

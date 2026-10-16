@@ -66,18 +66,28 @@ public final class SimulationTests {
 
     private static void testWinBandBoundaries() {
         StandardStats stats = new StandardStats(1.0, new int[4]);
-        for (double win : new double[] {0.0, 1.0, 2.0, 3.0, 5.0, 10_000_000.0}) {
+        for (double win : new double[] {0.0, 1.0, 2.0, 3.0, 5.0,
+                20_000.0, 25_000.0, 10_000_000.0}) {
             stats.recordWinInDistribution(win);
         }
 
         var bands = stats.getAggregatedWinDistribution(6.0);
-        check(bands.size() == 19, "expected number of win bands");
-        for (int index : new int[] {0, 1, 2, 3, 4, 18}) {
+        check(bands.size() == 18, "expected number of win bands");
+        for (int index : new int[] {0, 1, 2, 3, 4, 16}) {
             check(bands.get(index).getHits() == 1, "exact value belongs in band " + index);
         }
-        check(bands.get(1).getUpperBound() == 1.0, "first positive band upper boundary");
-        checkClose(bands.get(1).getPercentOfHits(), 100.0 / 6.0, "band hit percentage");
-        checkClose(bands.get(1).getFrequency(), 6.0, "band frequency");
+        check(bands.get(17).getHits() == 2,
+                "exact upper threshold moves to the next band and final band has no upper cap");
+        check(bands.stream().mapToLong(StandardStats.WinBand::getHits).sum() == 8,
+                "all observed wins are assigned to exactly one band");
+        check(bands.get(0).getLowerBound() == 0.0 && bands.get(0).getUpperBound() == 1.0,
+                "first band is inclusive at zero and exclusive at one");
+        check(bands.get(1).getLowerBound() == 1.0 && bands.get(1).getUpperBound() == 2.0,
+                "exact threshold belongs to the band beginning at that threshold");
+        check(Double.isInfinite(bands.get(17).getUpperBound()),
+                "final band includes all wins at or above its minimum");
+        checkClose(bands.get(1).getPercentOfHits(), 100.0 / 8.0, "band hit percentage");
+        checkClose(bands.get(1).getFrequency(), 8.0, "band frequency");
         checkClose(bands.get(1).getRtp(), 100.0 / 6.0, "band RTP");
     }
 
@@ -258,6 +268,11 @@ public final class SimulationTests {
                     "freegame distribution includes one entry per trigger");
             check(distributionsCsv.contains("Total Game,"), "raw CSV contains merged total-game data");
             check(aggregatedCsv.contains("Freegame,"), "aggregated CSV contains freegame data");
+            check(aggregatedCsv.startsWith(
+                            "Distribution,Range Min (>=),Range Max (<),Hits,Hit Rate,HR Freq,RTP\n"),
+                    "aggregated CSV uses the revised range and hit headers");
+            check(!aggregatedCsv.contains("% Of Winnings") && !aggregatedCsv.contains("Total Win"),
+                    "aggregated CSV omits removed columns");
         } finally {
             deleteTree(reportRoot);
         }

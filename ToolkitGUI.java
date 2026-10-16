@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,6 +16,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Random;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -41,8 +44,10 @@ import toolkit.replay.ReplayerMain;
 import toolkit.player.PrototypePlayerFrame;
 import toolkit.player.ExpandingWildPlayerAdapter;
 import toolkit.player.PlayerDisplayData;
+import toolkit.par.ParWorkbookModes;
 import toolkit.viewer.WinFinder;
 import toolkit.viewer.WinScreenPrinter;
+import toolkit.wizard.GameProjectWizard;
 
 /** Small desktop launcher for the simulator and its command-line toolkit. */
 public final class ToolkitGUI extends JFrame {
@@ -68,6 +73,7 @@ public final class ToolkitGUI extends JFrame {
         tabs.addTab("Full reelset", createReelsetTab());
         tabs.addTab("Replay", createReplayTab());
         tabs.addTab("Prototype player", createPlayerTab());
+        tabs.addTab("New game", createGameWizardTab());
         add(tabs, BorderLayout.NORTH);
 
         outputArea.setEditable(false);
@@ -87,6 +93,7 @@ public final class ToolkitGUI extends JFrame {
         JComboBox<String> game = gameSelector();
         JTextField parWorkbook = new JTextField(
                 Path.of("game", "expandingwild", "expandingWildPAR.xlsx").toString(), 30);
+        JComboBox<String> mode = new JComboBox<>(new String[] {"Normal"});
         JButton choosePar = new JButton("Choose PAR…");
         JPanel parRow = new JPanel(new BorderLayout(6, 0));
         parRow.add(parWorkbook, BorderLayout.CENTER);
@@ -96,8 +103,17 @@ public final class ToolkitGUI extends JFrame {
             chooser.setFileFilter(new FileNameExtensionFilter("Excel PAR workbook", "xlsx"));
             if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 parWorkbook.setText(chooser.getSelectedFile().getAbsolutePath());
+                refreshParModes(parWorkbook, mode);
             }
         });
+        parWorkbook.addActionListener(event -> refreshParModes(parWorkbook, mode));
+        parWorkbook.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent event) {
+                refreshParModes(parWorkbook, mode);
+            }
+        });
+        refreshParModes(parWorkbook, mode);
         JSpinner rounds = spinner(1_000_000L, 1L, Long.MAX_VALUE, 100_000L);
         JTextField stake = new JTextField("1.0", 14);
         JCheckBox useSeed = new JCheckBox("Use this seed");
@@ -111,27 +127,29 @@ public final class ToolkitGUI extends JFrame {
 
         addRow(panel, 0, "Game", game);
         addRow(panel, 1, "PAR workbook", parRow);
-        addRow(panel, 2, "Rounds", rounds);
-        addRow(panel, 3, "Stake per round", stake);
+        addRow(panel, 2, "Mode", mode);
+        addRow(panel, 3, "Rounds", rounds);
+        addRow(panel, 4, "Stake per round", stake);
         JPanel seedRow = new JPanel(new BorderLayout(8, 0));
         seedRow.add(useSeed, BorderLayout.WEST);
         seedRow.add(seed, BorderLayout.CENTER);
         useSeed.addActionListener(event -> seed.setEnabled(useSeed.isSelected()));
         seed.setEnabled(false);
-        addRow(panel, 4, "Seed", seedRow);
-        addRow(panel, 5, "Worker threads", threads);
-        addRow(panel, 6, "Logical partitions", partitions);
-        addRow(panel, 7, "Replay records to keep", saved);
+        addRow(panel, 5, "Seed", seedRow);
+        addRow(panel, 6, "Worker threads", threads);
+        addRow(panel, 7, "Logical partitions", partitions);
+        addRow(panel, 8, "Replay records to keep", saved);
         JPanel options = new JPanel();
         options.add(exportReport);
         options.add(showAwards);
-        addRow(panel, 8, "Options", options);
+        addRow(panel, 9, "Options", options);
 
         JButton run = runButton("Run simulation", panel);
         run.addActionListener(event -> {
             try {
                 SimConfig config = new SimConfig();
                 config.gameId = (String) game.getSelectedItem();
+                config.gameMode = String.valueOf(mode.getSelectedItem());
                 String selectedPar = parWorkbook.getText().trim();
                 if (selectedPar.isEmpty()) {
                     throw new IllegalArgumentException("Select a PAR workbook before starting a simulation.");
@@ -152,7 +170,8 @@ public final class ToolkitGUI extends JFrame {
                     PrintStream previousError = System.err;
                     try {
                         System.setErr(output);
-                        Game selectedGame = GameFactory.create(config.gameId, config.parWorkbookPath);
+                        Game selectedGame = GameFactory.create(config.gameId,
+                                config.parWorkbookPath, config.gameMode);
                         SimulationResult result = new SimulationRunner(config, selectedGame).run();
                         new Print(result).printToConsole(config,
                                 new PrintWriter(output, true, StandardCharsets.UTF_8));
@@ -165,6 +184,28 @@ public final class ToolkitGUI extends JFrame {
             }
         });
         return panel;
+    }
+
+    private void refreshParModes(JTextField workbookPath, JComboBox<String> modeSelector) {
+        String selectedMode = String.valueOf(modeSelector.getSelectedItem());
+        List<String> modes;
+        try {
+            String path = workbookPath.getText().trim();
+            modes = path.isEmpty() ? List.of("Normal")
+                    : ParWorkbookModes.availableModes(Path.of(path));
+        } catch (Exception exception) {
+            modes = List.of("Normal");
+            modeSelector.setToolTipText(exception.getMessage());
+        }
+        modeSelector.removeAllItems();
+        for (String availableMode : modes) {
+            modeSelector.addItem(availableMode);
+        }
+        int existingSelection = modes.indexOf(selectedMode);
+        int normalIndex = modes.indexOf("Normal");
+        modeSelector.setSelectedIndex(existingSelection >= 0 ? existingSelection
+                : normalIndex >= 0 ? normalIndex : 0);
+        modeSelector.setToolTipText("The selected mode is used for every round in this simulation.");
     }
 
     private JPanel createViewerTab() {
@@ -320,6 +361,67 @@ public final class ToolkitGUI extends JFrame {
         JButton openPlayer = new JButton("Open prototype player");
         openPlayer.addActionListener(event -> PrototypePlayerFrame.open());
         panel.add(openPlayer, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    private JPanel createGameWizardTab() {
+        JPanel panel = formPanel();
+        JTextField gameName = new JTextField(28);
+        JTextField gamesRoot = new JTextField(Path.of("game").toString(), 28);
+        JButton chooseRoot = new JButton("Choose folder…");
+        JPanel rootRow = new JPanel(new BorderLayout(6, 0));
+        rootRow.add(gamesRoot, BorderLayout.CENTER);
+        rootRow.add(chooseRoot, BorderLayout.EAST);
+        chooseRoot.addActionListener(event -> {
+            JFileChooser chooser = new JFileChooser(Path.of("game").toFile());
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setDialogTitle("Choose the parent folder for game workspaces");
+            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                gamesRoot.setText(chooser.getSelectedFile().getAbsolutePath());
+            }
+        });
+
+        addRow(panel, 0, "Game name", gameName);
+        addRow(panel, 1, "Game folder root", rootRow);
+        JLabel guidance = new JLabel("<html>Creates source templates, a two-sheet PAR workbook, a placeholder flowchart, "
+                + "and an agent review log. It does not generate game logic.</html>");
+        GridBagConstraints guidanceConstraints = new GridBagConstraints();
+        guidanceConstraints.gridx = 1;
+        guidanceConstraints.gridy = 2;
+        guidanceConstraints.anchor = GridBagConstraints.LINE_START;
+        guidanceConstraints.fill = GridBagConstraints.HORIZONTAL;
+        guidanceConstraints.insets = new Insets(8, 0, 8, 5);
+        panel.add(guidance, guidanceConstraints);
+
+        JButton create = new JButton("Initialize game workspace");
+        runButtons.add(create);
+        GridBagConstraints createConstraints = new GridBagConstraints();
+        createConstraints.gridx = 1;
+        createConstraints.gridy = 3;
+        createConstraints.anchor = GridBagConstraints.LINE_START;
+        createConstraints.insets = new Insets(8, 0, 4, 5);
+        panel.add(create, createConstraints);
+        create.addActionListener(event -> {
+            String name = gameName.getText().trim();
+            String root = gamesRoot.getText().trim();
+            if (name.isEmpty()) {
+                showInputError(new IllegalArgumentException("Enter a game name."));
+                return;
+            }
+            if (root.isEmpty()) {
+                showInputError(new IllegalArgumentException("Choose the game folder root."));
+                return;
+            }
+            runTask("New game workspace", output -> {
+                GameProjectWizard.CreatedWorkspace workspace =
+                        GameProjectWizard.create(Path.of(root), name);
+                output.println("Game workspace created.");
+                output.println("Game code: " + workspace.gameCode());
+                output.println("Game folder: " + workspace.directory());
+                output.println("Suggested Java package: " + workspace.suggestedPackage());
+                output.println("Read README.md first, then fill the files under source/.");
+            });
+        });
         return panel;
     }
 

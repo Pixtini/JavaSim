@@ -11,9 +11,9 @@ import game.model.SpinResult;
 public class StandardStats {
 
     private static final double[] WIN_BAND_UPPER_BOUNDS = {
-            0, 1, 2, 3, 5, 10, 20, 50, 100, 200,
+            1, 2, 3, 5, 10, 20, 50, 100, 200,
             500, 1_000, 2_000, 5_000, 10_000, 15_000,
-            20_000, 25_000, 10_000_000
+            20_000, 25_000, Double.POSITIVE_INFINITY
     };
 
     private double totalWinnings;
@@ -148,9 +148,7 @@ public class StandardStats {
 
             for (Map.Entry<Double, Long> entry : winDist.entrySet()) {
                 double win = entry.getKey();
-                boolean inBand = bandIndex == 0
-                        ? win <= upperBound
-                        : win > lowerBound && win <= upperBound;
+                boolean inBand = win >= lowerBound && win < upperBound;
                 if (inBand) {
                     bandHits += entry.getValue();
                     bandWinnings += win * entry.getValue();

@@ -1,5 +1,5 @@
 # Next steps
 
-## Compare PAR results with the intended RTP target
+## Implement the G001 parser and game engine
 
-The shared stats report now includes RTP by mode, hit and feature frequencies, max-win frequency, and standard deviation by observation unit. Compare the seeded result and per-mode/set RTP contributions with the intended target, then tune PAR inputs while keeping the confirmed total-bet payout convention fixed.
+The G001 docs now specify wild relocation through a temporary copy of the Freegame location weights, zeroing occupied cells while preserving source PAR values, with a five-wild cap. Implement the G001-specific parser and game using the selected mode's Config/Reels pair, then validate these rules with deterministic cases and a seeded simulation. Complete the remaining game-creation intake and source metadata as part of handover.

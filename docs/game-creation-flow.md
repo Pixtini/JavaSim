@@ -2,6 +2,8 @@
 
 Use this workflow when adding a game module. Keep game math and round orchestration inside `game/<game-name>/`; keep generic simulation, statistics, and reporting in `simulation/`.
 
+Start with the toolkit's **New game** tab. It creates a source intake workspace, blank Config/Reels workbook, placeholder flowchart, game creation form, and `AGENT-REVIEW.md`. Complete and reconcile those source materials before implementing game logic.
+
 ```mermaid
 flowchart TD
     Idea[Define game rules and math inputs]

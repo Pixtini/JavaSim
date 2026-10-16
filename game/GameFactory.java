@@ -35,15 +35,23 @@ public final class GameFactory {
 
     /** Constructs a PAR-backed game and rejects workbook formats unsupported by that game. */
     public static Game create(String gameId, Path parWorkbookPath) throws IOException {
+        return create(gameId, parWorkbookPath, "Normal");
+    }
+
+    /** Constructs a PAR-backed game from one isolated workbook mode. */
+    public static Game create(String gameId, Path parWorkbookPath, String gameMode) throws IOException {
         if (gameId == null) {
             throw new IllegalArgumentException("Game ID must not be null");
         }
         if (parWorkbookPath == null) {
             throw new IllegalArgumentException("Select a PAR workbook before starting a simulation");
         }
+        if (gameMode == null || gameMode.isBlank()) {
+            throw new IllegalArgumentException("Simulation mode must not be blank");
+        }
         return switch (gameId) {
             case "expanding-wild" -> new ExpandingWildGame(
-                    new ExpandingWildParParser().parse(parWorkbookPath));
+                    new ExpandingWildParParser().parse(parWorkbookPath, gameMode));
             default -> throw new IllegalArgumentException(
                     "No PAR workbook parser is registered for game '" + gameId + "'");
         };

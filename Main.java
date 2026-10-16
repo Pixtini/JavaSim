@@ -10,10 +10,14 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         SimConfig simConfig = new SimConfig();
+        if (args.length > 1) {
+            simConfig.gameMode = args[1];
+        }
         simConfig.parWorkbookPath = args.length == 0
                 ? Path.of("game", "expandingwild", "expandingWildPAR.xlsx")
                 : Path.of(args[0]).toAbsolutePath().normalize();
-        Game game = GameFactory.create(simConfig.gameId, simConfig.parWorkbookPath);
+        Game game = GameFactory.create(simConfig.gameId, simConfig.parWorkbookPath,
+                simConfig.gameMode);
 
         SimulationResult result = new SimulationRunner(
                 simConfig, game).run();

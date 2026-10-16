@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import toolkit.par.ExcelWorkbookReader;
+import toolkit.par.ParWorkbookModes;
 
 /** Maps the common Config/Reels PAR workbook layout into Expanding Wild game configuration. */
 public final class ExpandingWildParParser {
@@ -29,9 +30,14 @@ public final class ExpandingWildParParser {
             ExpandingWildConfig.SCATTER, ExpandingWildConfig.BANNER, ExpandingWildConfig.WILD);
 
     public ExpandingWildConfig parse(Path workbookPath) throws IOException {
+        return parse(workbookPath, "Normal");
+    }
+
+    public ExpandingWildConfig parse(Path workbookPath, String gameMode) throws IOException {
         var workbook = ExcelWorkbookReader.read(workbookPath);
-        var configSheet = workbook.requireSheet("Config");
-        var reelsSheet = workbook.requireSheet("Reels");
+        var selectedSheets = ParWorkbookModes.select(workbook, gameMode);
+        var configSheet = workbook.requireSheet(selectedSheets.configSheet());
+        var reelsSheet = workbook.requireSheet(selectedSheets.reelsSheet());
         ExpandingWildConfig config = new ExpandingWildConfig();
 
         Map<String, String> gameWide = readGameWideValues(configSheet);

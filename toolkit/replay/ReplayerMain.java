@@ -40,7 +40,7 @@ public final class ReplayerMain {
     /** Replays and validates a gameplay record using the supplied output stream. */
     public static void replay(Path csvPath, long gameplayId, PrintStream output) throws Exception {
         SavedGameplay saved = SavedGameplayCsv.readById(csvPath, gameplayId);
-        Game game = createGameForReplay(saved.gameId(), csvPath);
+        Game game = createGameForReplay(saved.gameId(), saved.gameMode(), csvPath);
         GameSession session = game.createSession(new Random(0));
         GameRoundResult replayed = session.replayRound(saved.stake(),
                 game.getMaxWinMultiplier() * saved.stake(), saved.events());
@@ -51,9 +51,13 @@ public final class ReplayerMain {
         }
     }
 
-    private static Game createGameForReplay(String gameId, Path csvPath) throws Exception {
+    private static Game createGameForReplay(String gameId, String gameMode, Path csvPath) throws Exception {
         Path reportFolder = csvPath.toAbsolutePath().normalize().getParent();
         if (reportFolder == null || !Files.isDirectory(reportFolder)) {
+            if (!gameMode.equalsIgnoreCase("Normal")) {
+                throw new IllegalArgumentException("Replay requires a PAR workbook for mode '"
+                        + gameMode + "'");
+            }
             return GameFactory.create(gameId);
         }
         List<Path> workbooks;
@@ -66,9 +70,14 @@ public final class ReplayerMain {
             throw new IllegalArgumentException("Replay report folder contains multiple PAR workbooks; "
                     + "keep the matching workbook beside saved_gameplays.csv");
         }
-        return workbooks.isEmpty()
-                ? GameFactory.create(gameId)
-                : GameFactory.create(gameId, workbooks.get(0));
+        if (workbooks.isEmpty()) {
+            if (!gameMode.equalsIgnoreCase("Normal")) {
+                throw new IllegalArgumentException("Replay report has no PAR workbook for mode '"
+                        + gameMode + "'");
+            }
+            return GameFactory.create(gameId);
+        }
+        return GameFactory.create(gameId, workbooks.get(0), gameMode);
     }
 
     private static boolean matches(SavedGameplay saved, GameRoundResult replayed) {

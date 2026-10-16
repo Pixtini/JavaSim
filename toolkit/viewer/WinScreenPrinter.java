@@ -34,7 +34,8 @@ public final class WinScreenPrinter {
     /** Prints every recalculated screen in a saved round and its validation summary. */
     public static void printReplay(SavedGameplay saved, GameRoundResult replayed,
             boolean matches, PrintStream output) {
-        output.printf("Replay %d (%s)%n", saved.id(), saved.gameId());
+        output.printf("Replay %d (%s, mode %s)%n",
+                saved.id(), saved.gameId(), saved.gameMode());
         printReplaySpin("Basegame", replayed.getBaseGameResult(), saved.stake(), output);
         for (int index = 0; index < replayed.getFreeGameResults().size(); index++) {
             printReplaySpin("Freegame spin " + (index + 1),
