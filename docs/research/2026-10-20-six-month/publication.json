@@ -1,0 +1,157 @@
+{
+  "title": "Slot Market Deep Dive — 21 April–20 October 2026",
+  "research_window": {
+    "start": "2026-04-21",
+    "end": "2026-10-20",
+    "timezone": "Europe/London"
+  },
+  "research_started_at_utc": "2026-10-20T14:25:51Z",
+  "publication_verified_at_utc": "2026-10-20T15:17:35Z",
+  "page_id": "3ffa48e4-0060-8135-8bbf-c0eb98c6da78",
+  "url": "https://app.notion.com/p/3ffa48e4006081358bbfc0eb98c6da78",
+  "parent_page_id": "3ffa48e4-0060-8109-b14b-ec228a729876",
+  "sources_registered": 53,
+  "claims": 100,
+  "mechanics_cases": 16,
+  "attachment_uploads": [
+    {
+      "local_file": "evidence-ledger.csv",
+      "filename": "six-month-evidence-ledger-v2.csv",
+      "file_upload_id": "3ffa48e4-0060-81b1-b71b-00b218146ed6"
+    },
+    {
+      "local_file": "sources.md",
+      "filename": "six-month-source-register-v2.md",
+      "file_upload_id": "3ffa48e4-0060-81e1-81c7-00b2cf917da8"
+    },
+    {
+      "local_file": "method-notes.md",
+      "filename": "six-month-method-notes-v2.md",
+      "file_upload_id": "3ffa48e4-0060-81e9-b5fd-00b24d5c0c5a"
+    },
+    {
+      "local_file": "candidate-disposition.csv",
+      "filename": "six-month-candidate-disposition.csv",
+      "file_upload_id": "3ffa48e4-0060-81c0-bdee-00b21e11f571"
+    },
+    {
+      "local_file": "stake-engine-snapshot.json",
+      "filename": "stake-engine-snapshot-2026-10-20.json",
+      "file_upload_id": "3ffa48e4-0060-81ea-8e5b-00b2f06381fd"
+    }
+  ],
+  "verification": {
+    "correctParent": true,
+    "correctionNotice": true,
+    "recentRankAndVolume": true,
+    "case16": true,
+    "recentTable": true,
+    "activeAttachments": true,
+    "retainedOriginalAttachments": true,
+    "reviewLinked": true,
+    "evaluationParent": true,
+    "reviewComplete": true,
+    "noLocalReviewLinks": true,
+    "noUnknownBlocks": true
+  },
+  "validation": {
+    "skill_metadata": "passed",
+    "csv_structure_provenance_unique_claim_ids": "passed",
+    "local_markdown_links": "passed",
+    "git_diff_check": "passed",
+    "java_tests_or_simulations": "not applicable; research/documentation-only changes",
+    "public_snapshot_sort_and_conversion": "passed; four saved ranking views, display scale checked against public client",
+    "candidate_dispositions": "23 distinct candidates retained with decisions and reasons",
+    "claim_source_counts": "100 claims / 53 registered sources",
+    "methodology_coverage_review": "original priority-market omission documented; unresolved scope/history/sentiment remain explicit"
+  },
+  "artifact_sha256": {
+    "docs/research/2026-10-20-six-month/market-report.md": "2060695ae4696d2598edcfb7b93c9aa4d7104d76bf7927079288d5414c6b59c5",
+    "docs/research/2026-10-20-six-month/method-notes.md": "a3be6a5050121ebbe6dc213c74af88938282fa13d051831328238481207aba37",
+    "docs/research/2026-10-20-six-month/methodology-review.md": "df368c8a8970c360d42778b98757fc149aeceb31663cbae0271ba91816a8253e",
+    "docs/research/2026-10-20-six-month/sources.md": "9e32b44e6c3f5340b6f8de818ddfc40f58549ee58f223a8cde7c6b8544394f34",
+    "docs/research/2026-10-20-six-month/candidate-disposition.csv": "b65a3391a191a629fcf5d1badc3c6408fcc9f0205707ae002b9c57493a7d3f59",
+    "docs/research/2026-10-20-six-month/evidence-ledger.csv": "44a438373b5163748ea6430479194e3f6283de745a3ec61072f3a35d80c2da31",
+    "docs/research/2026-10-20-six-month/stake-engine-snapshot.json": "2792894f351904e7eec8b9077dcde2149ecef3dfd8ffefaeaaa9da3239dab7d4",
+    ".agents/skills/javasim-research-slot-market/SKILL.md": "6d0061aae139532a09ae67447ceca7406ac024d963e44f3f97e02f730ceeec29",
+    ".agents/skills/javasim-research-slot-market/references/discovery.md": "5e436ec78ca75223e9df4cfab431336c4fd2e02756f0505dae123c94f4b2d110",
+    ".agents/skills/javasim-research-slot-market/references/evidence.md": "4a9a1b7c70f0d5bfac33439e64b76a647e4bfff50698852c5b3df16cd935fa7c",
+    ".agents/skills/javasim-research-slot-market/references/source-directory.md": "0fc5a3090331ea1cdc9fd6fca850ba8d62823c5b022dd7f5532672950a781d42",
+    ".agents/skills/javasim-research-slot-market/assets/market-report.md": "a4d3f52e1214d89c357aacfef48c3c1548206efb9927bc42b20f2fe360dc2a90",
+    ".agents/skills/javasim-research-slot-market/assets/candidate-disposition.csv": "97671b69c5c227fa3686266d463dd18e8e00aba3001b025748d05d33f6ba546f"
+  },
+  "previous_publications": [
+    {
+      "title": "Slot Market Deep Dive — 21 April–20 October 2026",
+      "research_window": {
+        "start": "2026-04-21",
+        "end": "2026-10-20",
+        "timezone": "Europe/London"
+      },
+      "research_started_at_utc": "2026-10-20T14:25:51Z",
+      "publication_verified_at_utc": "2026-10-20T14:39:48Z",
+      "page_id": "3ffa48e4-0060-8135-8bbf-c0eb98c6da78",
+      "url": "https://app.notion.com/p/3ffa48e4006081358bbfc0eb98c6da78",
+      "parent_page_id": "3ffa48e4-0060-8109-b14b-ec228a729876",
+      "sources_registered": 45,
+      "claims": 72,
+      "mechanics_cases": 15,
+      "attachment_uploads": [
+        {
+          "filename": "six-month-evidence-ledger.csv",
+          "file_upload_id": "3ffa48e4-0060-81e1-bb84-00b23b4d88bc"
+        },
+        {
+          "filename": "six-month-source-register.md",
+          "file_upload_id": "3ffa48e4-0060-8173-828c-00b2d30f331f"
+        },
+        {
+          "filename": "six-month-method-notes.md",
+          "file_upload_id": "3ffa48e4-0060-817f-8d4e-00b2c80fd6d9"
+        }
+      ],
+      "verification": {
+        "destination": true,
+        "tables": true,
+        "caseStudies": true,
+        "attachments": true,
+        "lastSection": true,
+        "sourceLinks": true,
+        "pilotPreserved": true,
+        "noUnknownBlocks": true
+      },
+      "validation": {
+        "skill_metadata": "passed",
+        "csv_structure_provenance_unique_claim_ids": "passed",
+        "local_markdown_links": "passed",
+        "git_diff_check": "passed",
+        "java_tests_or_simulations": "not applicable; research/documentation-only changes",
+        "public_snapshot_sort_and_conversion": "passed; four saved ranking views, display scale checked against public client",
+        "candidate_dispositions": "23 distinct candidates retained with decisions and reasons",
+        "claim_source_counts": "100 claims / 53 registered sources",
+        "methodology_coverage_review": "original priority-market omission documented; unresolved scope/history/sentiment remain explicit"
+      },
+      "artifact_sha256": {
+        "docs/research/2026-10-20-six-month/market-report.md": "ca4c570dd967598ebae5883a24f19d841bad862567842f936ac1dbbc9e069475",
+        "docs/research/2026-10-20-six-month/method-notes.md": "dea7a904e543e58dfb524f7d732f6c489460c20e99ee973846aa00b09dc7b358",
+        "docs/research/2026-10-20-six-month/sources.md": "fc94e3733f804ecb7343cf93fa51b5fec81536acba48df7bf740db058f62ec7f",
+        "docs/research/2026-10-20-six-month/evidence-ledger.csv": "01d85674ae3b2329d5c1ca830006bbd79563d0e355673b534f13ce43c4a2af8c",
+        ".agents/skills/javasim-research-slot-market/references/source-directory.md": "b7f0ef92969b93e51d0f1101c9cce9433333ddeb8cebca5d0739b6b7f24dc765",
+        ".agents/skills/javasim-research-slot-market/references/discovery.md": "f2c8a6858ebd5ebfc661bd276964247d57165260b3f39ac1e5f21ab226d8cc20"
+      },
+      "status": "superseded by methodology correction; original attachments retained on page"
+    }
+  ],
+  "revision": 2,
+  "original_publication_verified_at_utc": "2026-10-20T14:39:48Z",
+  "candidate_games_registered": 23,
+  "correction_reason": "Missed first-party Engine analytics and omitted Waylanders Forge despite a prior lobby observation; original priority-market performer coverage incomplete",
+  "coverage_status": "Corrected sampled survey; not a complete six-month title census or all-Stake ranking",
+  "methodology_review": {
+    "page_id": "3ffa48e4-0060-813c-b91b-d7a55743e315",
+    "url": "https://app.notion.com/p/3ffa48e40060813cb91bd7a55743e315?pvs=204",
+    "parent_page_id": "3ffa48e4-0060-817a-9a30-c6869c805640",
+    "local_path": "methodology-review.md"
+  },
+  "attachment_history_note": "The original three attachments remain on Notion; the revised evidence bundle explicitly supersedes them."
+}

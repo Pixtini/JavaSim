@@ -1,0 +1,4 @@
+interface:
+  display_name: "JavaSim Fallback Game Spec"
+  short_description: "Draft small game specs from reviewed market research"
+  default_prompt: "Use $javasim-draft-game-spec to draft a simple line-game specification from the latest relevant research, within its scope limits."

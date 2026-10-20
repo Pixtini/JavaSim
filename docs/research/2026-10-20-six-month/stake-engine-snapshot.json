@@ -1,0 +1,552 @@
+{
+  "captured_date": "2026-10-20",
+  "dashboard": "https://stake-engine.com/insights",
+  "scope": "Engine-published game rankings; operator split and entire Stake catalog coverage not established",
+  "evidence_status": "self-reported platform analytics; no independent audit",
+  "unit_conversion": {
+    "raw_ranking_turnover_divisor": 1000000,
+    "display_currency": "USD",
+    "basis": "Public Insights client divides ranking turnover by1e6 and formats USD; stats endpoint is displayed without that divisor",
+    "client_url": "https://stake-engine.com/_app/immutable/nodes/140.bjIXCNRA.js",
+    "client_sha256": "c6e13cf130ce359c9d74ff5e644d9bb4ef6a5e82f464b56626869d0194ed0814"
+  },
+  "supported_ui_periods": [
+    "1day",
+    "yesterday",
+    "today",
+    "thisWeek",
+    "pastWeek",
+    "thisMonth",
+    "pastMonth",
+    "past30Days",
+    "thisYear",
+    "allTime",
+    "launchDay",
+    "launchWeek",
+    "launchMonth"
+  ],
+  "views": [
+    {
+      "source_url": "https://stake-engine.com/api/gameRanking?sort=turnover&time=past30Days&size=10",
+      "sort": "turnover",
+      "time_parameter": "past30Days",
+      "retrieval_completed_at_utc": "2026-10-20T15:08:47.821806+00:00",
+      "server_measurement_boundaries": "not returned",
+      "raw_response": [
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "019c9895-cf20-725e-8fdb-c47989b2fed3",
+            "name": "Waylanders Forge"
+          },
+          "turnover": 1173496311882326,
+          "betCount": 93888554
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a01a46-6490-7b78-b8a1-f5143033b4d4",
+            "name": "Odins Vault"
+          },
+          "turnover": 175881482754578,
+          "betCount": 108138044
+        },
+        {
+          "team": {
+            "image": "019be508-e37f-7cc3-9acc-699cddec76b7",
+            "name": "Donut Gaming"
+          },
+          "game": {
+            "image": "019fa867-515f-7d68-a853-cfa41a6c5e3f",
+            "name": "Ganja Snail"
+          },
+          "turnover": 126562143485690,
+          "betCount": 100156631
+        },
+        {
+          "team": {
+            "image": "019b219a-e39e-7899-9c54-d0e6788ed104",
+            "name": "Twist Gaming"
+          },
+          "game": {
+            "image": "01a018ed-b5cc-7b0e-9f2e-02ca522baaae",
+            "name": "Tongue Game"
+          },
+          "turnover": 54445842524568,
+          "betCount": 47219145
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a054fa-dc5f-7c6e-915a-627f7c86512b",
+            "name": "Retro Gangster"
+          },
+          "turnover": 53450487982334,
+          "betCount": 13366905
+        },
+        {
+          "team": {
+            "image": "019b0bc1-9f1c-7dda-ad3c-e01787265fd1",
+            "name": "Paperclip Gaming"
+          },
+          "game": {
+            "image": "019ff3c8-dd7d-72de-ace5-0481101f3e7f",
+            "name": "Candy Dash 2"
+          },
+          "turnover": 39337399251211,
+          "betCount": 13324441
+        },
+        {
+          "team": {
+            "image": "01987055-fc9b-770d-8f45-ab16bc773b6d",
+            "name": "Coreffect Interactive"
+          },
+          "game": {
+            "image": "01a138bf-ce55-7df9-b808-ada3e3fa66cc",
+            "name": "Candy Swipe MatchWin™"
+          },
+          "turnover": 33568096780793,
+          "betCount": 43859382
+        },
+        {
+          "team": {
+            "image": "019b219a-e39e-7899-9c54-d0e6788ed104",
+            "name": "Twist Gaming"
+          },
+          "game": {
+            "image": "01a03187-3b9f-70da-9c54-61e1982c5643",
+            "name": "Welcome To Miami"
+          },
+          "turnover": 33347375068497,
+          "betCount": 11809865
+        },
+        {
+          "team": {
+            "image": "019df36e-d03d-7472-b6a8-979c5c5765c2",
+            "name": "Colorful Play"
+          },
+          "game": {
+            "image": "019ec270-1279-74a6-82ac-f9b15f4538bf",
+            "name": "Graffiti Ways"
+          },
+          "turnover": 33186168760484,
+          "betCount": 3600965
+        },
+        {
+          "team": {
+            "image": "019b0bc1-9f1c-7dda-ad3c-e01787265fd1",
+            "name": "Paperclip Gaming"
+          },
+          "game": {
+            "image": "019e39fb-fafc-7dc1-a923-ef649229a8b4",
+            "name": "Candy Dash"
+          },
+          "turnover": 32834066893896,
+          "betCount": 7729251
+        }
+      ]
+    },
+    {
+      "source_url": "https://stake-engine.com/api/gameRanking?sort=betcount&time=past30Days&size=10",
+      "sort": "betcount",
+      "time_parameter": "past30Days",
+      "retrieval_completed_at_utc": "2026-10-20T15:09:22.406576+00:00",
+      "server_measurement_boundaries": "not returned",
+      "raw_response": [
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a01a46-6490-7b78-b8a1-f5143033b4d4",
+            "name": "Odins Vault"
+          },
+          "turnover": 175882688678186,
+          "betCount": 108139732
+        },
+        {
+          "team": {
+            "image": "019be508-e37f-7cc3-9acc-699cddec76b7",
+            "name": "Donut Gaming"
+          },
+          "game": {
+            "image": "019fa867-515f-7d68-a853-cfa41a6c5e3f",
+            "name": "Ganja Snail"
+          },
+          "turnover": 126564728512289,
+          "betCount": 100158671
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "019c9895-cf20-725e-8fdb-c47989b2fed3",
+            "name": "Waylanders Forge"
+          },
+          "turnover": 1173501312125088,
+          "betCount": 93890563
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a0f00d-7d84-7165-bf3a-35252ab0303d",
+            "name": "Ravens Revenge"
+          },
+          "turnover": 29595843763642,
+          "betCount": 51638427
+        },
+        {
+          "team": {
+            "image": "019b219a-e39e-7899-9c54-d0e6788ed104",
+            "name": "Twist Gaming"
+          },
+          "game": {
+            "image": "01a018ed-b5cc-7b0e-9f2e-02ca522baaae",
+            "name": "Tongue Game"
+          },
+          "turnover": 54446447457394,
+          "betCount": 47219810
+        },
+        {
+          "team": {
+            "image": "01987055-fc9b-770d-8f45-ab16bc773b6d",
+            "name": "Coreffect Interactive"
+          },
+          "game": {
+            "image": "01a138bf-ce55-7df9-b808-ada3e3fa66cc",
+            "name": "Candy Swipe MatchWin™"
+          },
+          "turnover": 33569746106283,
+          "betCount": 43861206
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a12d74-c4a9-73d3-8100-56b37954cd47",
+            "name": "The Last Harvest"
+          },
+          "turnover": 12181984395810,
+          "betCount": 38169723
+        },
+        {
+          "team": {
+            "image": "01a06777-01a2-7e79-b587-fbbae909d240",
+            "name": "Maverick Studios"
+          },
+          "game": {
+            "image": "01a0edb7-7b5a-75ac-a147-36082b58feca",
+            "name": "Farm 51"
+          },
+          "turnover": 14769207082930,
+          "betCount": 29715033
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a0bdbf-ec2c-736e-90ff-0cbb6b2bf033",
+            "name": "Tome of Hercules"
+          },
+          "turnover": 14823665358718,
+          "betCount": 29259722
+        },
+        {
+          "team": {
+            "image": "019b3330-49e9-74d1-a535-27e0a662427b",
+            "name": "Evoslot "
+          },
+          "game": {
+            "image": "01a1090f-758c-7413-b78e-e376d8575bbb",
+            "name": "Haunted Duels"
+          },
+          "turnover": 25235307258393,
+          "betCount": 19797205
+        }
+      ]
+    },
+    {
+      "source_url": "https://stake-engine.com/api/gameRanking?sort=turnover&time=pastMonth&size=10",
+      "sort": "turnover",
+      "time_parameter": "pastMonth",
+      "retrieval_completed_at_utc": "2026-10-20T15:09:22.518711+00:00",
+      "server_measurement_boundaries": "not returned",
+      "raw_response": [
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "019c9895-cf20-725e-8fdb-c47989b2fed3",
+            "name": "Waylanders Forge"
+          },
+          "turnover": 661002465820931,
+          "betCount": 93502090
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a01a46-6490-7b78-b8a1-f5143033b4d4",
+            "name": "Odins Vault"
+          },
+          "turnover": 273363763680506,
+          "betCount": 150933389
+        },
+        {
+          "team": {
+            "image": "019b0bc1-9f1c-7dda-ad3c-e01787265fd1",
+            "name": "Paperclip Gaming"
+          },
+          "game": {
+            "image": "019e39fb-fafc-7dc1-a923-ef649229a8b4",
+            "name": "Candy Dash"
+          },
+          "turnover": 135973130796020,
+          "betCount": 7933578
+        },
+        {
+          "team": {
+            "image": "019be508-e37f-7cc3-9acc-699cddec76b7",
+            "name": "Donut Gaming"
+          },
+          "game": {
+            "image": "019fa867-515f-7d68-a853-cfa41a6c5e3f",
+            "name": "Ganja Snail"
+          },
+          "turnover": 130444172346071,
+          "betCount": 103200647
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a054fa-dc5f-7c6e-915a-627f7c86512b",
+            "name": "Retro Gangster"
+          },
+          "turnover": 85543964037167,
+          "betCount": 53695249
+        },
+        {
+          "team": {
+            "image": "019b0bc1-9f1c-7dda-ad3c-e01787265fd1",
+            "name": "Paperclip Gaming"
+          },
+          "game": {
+            "image": "019ff3c8-dd7d-72de-ace5-0481101f3e7f",
+            "name": "Candy Dash 2"
+          },
+          "turnover": 51584075206626,
+          "betCount": 22307310
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "019ecf92-034c-786d-b426-1f371195e056",
+            "name": "Waylanders Cup"
+          },
+          "turnover": 49809101161371,
+          "betCount": 8256824
+        },
+        {
+          "team": {
+            "image": "019b219a-e39e-7899-9c54-d0e6788ed104",
+            "name": "Twist Gaming"
+          },
+          "game": {
+            "image": "01a03187-3b9f-70da-9c54-61e1982c5643",
+            "name": "Welcome To Miami"
+          },
+          "turnover": 34178323744075,
+          "betCount": 17442276
+        },
+        {
+          "team": {
+            "image": "019df36e-d03d-7472-b6a8-979c5c5765c2",
+            "name": "Colorful Play"
+          },
+          "game": {
+            "image": "019ec270-1279-74a6-82ac-f9b15f4538bf",
+            "name": "Graffiti Ways"
+          },
+          "turnover": 27374129091333,
+          "betCount": 3062680
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "019ecaa9-418f-7a8e-a941-6a995a1d6900",
+            "name": "Red Strike"
+          },
+          "turnover": 26786273300168,
+          "betCount": 6818275
+        }
+      ]
+    },
+    {
+      "source_url": "https://stake-engine.com/api/gameRanking?sort=turnover&time=allTime&size=10",
+      "sort": "turnover",
+      "time_parameter": "allTime",
+      "retrieval_completed_at_utc": "2026-10-20T15:09:22.670406+00:00",
+      "server_measurement_boundaries": "not returned",
+      "raw_response": [
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "019c9895-cf20-725e-8fdb-c47989b2fed3",
+            "name": "Waylanders Forge"
+          },
+          "turnover": 3894009174113514,
+          "betCount": 638529408
+        },
+        {
+          "team": {
+            "image": "019b0bc1-9f1c-7dda-ad3c-e01787265fd1",
+            "name": "Paperclip Gaming"
+          },
+          "game": {
+            "image": "019e39fb-fafc-7dc1-a923-ef649229a8b4",
+            "name": "Candy Dash"
+          },
+          "turnover": 916480328699803,
+          "betCount": 174612818
+        },
+        {
+          "team": {
+            "image": "019b219b-60ed-79af-a84d-7f12839df250",
+            "name": "Massive Studios"
+          },
+          "game": {
+            "image": "0198c6c4-62ea-7304-a44b-af9ad35d24b1",
+            "name": "Drac's Stacks"
+          },
+          "turnover": 605499689284429,
+          "betCount": 49705977
+        },
+        {
+          "team": {
+            "image": "019b219b-60ed-79af-a84d-7f12839df250",
+            "name": "Massive Studios"
+          },
+          "game": {
+            "image": "0198c6c5-66be-7316-9a2d-b5f78ca10c9a",
+            "name": "Hexappeal"
+          },
+          "turnover": 600236374657084,
+          "betCount": 42631905
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "01a01a46-6490-7b78-b8a1-f5143033b4d4",
+            "name": "Odins Vault"
+          },
+          "turnover": 550414344650698,
+          "betCount": 356741725
+        },
+        {
+          "team": {
+            "image": "019b219b-60ed-79af-a84d-7f12839df250",
+            "name": "Massive Studios"
+          },
+          "game": {
+            "image": "0198c6c7-4072-7bd8-8ac0-4ee135fa0392",
+            "name": "Roosters Return"
+          },
+          "turnover": 502719690610039,
+          "betCount": 61330521
+        },
+        {
+          "team": {
+            "image": "01975e9b-bb65-7075-b84c-e3580ae0033f",
+            "name": "Valkyrie"
+          },
+          "game": {
+            "image": "019ecf92-034c-786d-b426-1f371195e056",
+            "name": "Waylanders Cup"
+          },
+          "turnover": 400514652271163,
+          "betCount": 91222807
+        },
+        {
+          "team": {
+            "image": "019b219b-20c5-71b6-a6be-6a71bfd5acb8",
+            "name": "Titan Gaming"
+          },
+          "game": {
+            "image": "019810b4-c668-7db5-8a5a-cb38b39bd11d",
+            "name": "Puffer Stacks"
+          },
+          "turnover": 391450699402426,
+          "betCount": 16583171
+        },
+        {
+          "team": {
+            "image": "019b219b-60ed-79af-a84d-7f12839df250",
+            "name": "Massive Studios"
+          },
+          "game": {
+            "image": "0198c6c3-dd16-76fc-8d23-b523ffa22677",
+            "name": "Roosters Revenge"
+          },
+          "turnover": 368311100890928,
+          "betCount": 20946644
+        },
+        {
+          "team": {
+            "image": "019b0bc1-9f1c-7dda-ad3c-e01787265fd1",
+            "name": "Paperclip Gaming"
+          },
+          "game": {
+            "image": "019b2729-24e9-72b1-adee-0382d34c6afc",
+            "name": "Dragonspire"
+          },
+          "turnover": 340825827041824,
+          "betCount": 262247145
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No six-month selector or exact time boundaries in inspected UI/response",
+    "Cash/demo, affiliate/promotional activity, currency conversion, bonus-buy treatment and operator split not established",
+    "Cached indexed values differ; saved live responses take precedence for this correction",
+    "Bet counts do not identify unique players or player satisfaction"
+  ]
+}

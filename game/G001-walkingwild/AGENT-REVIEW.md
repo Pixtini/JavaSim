@@ -73,7 +73,7 @@ The Normal PAR gives BG-0 a set-selection weight of 3 and BG-1 a weight of 1, wh
 - Normal: 1,000,000 rounds, seed `1001001`, RTP `42.3257%`, 2,474 Freegame triggers, report at `reports/G001-walkingwild/Normal/`.
 - BB1: 1,000,000 rounds, seed `1001002`, RTP `1.2157%` against its 100× purchase cost, 500,367 Freegame triggers, report at `reports/G001-walkingwild/BB1/`.
 - BB1's configured max win remains 100× base stake; the cost multiplier changes stake exposure only. Review these PAR-driven results for balance intent before treating them as approved targets.
-- Framework changes: a game-provided mode cost is now carried into stake exposure and report metadata, and total-game stats accumulate one round result per simulated round. See root `G001-LESSONS-LEARNED.md`.
+- Framework changes: a game-provided mode cost is now carried into stake exposure and report metadata, and total-game stats accumulate one round result per simulated round. See [G001 lessons learned](../../docs/lessons/G001-LESSONS-LEARNED.md).
 - Presentation/replay: G001 outcomes expose the grid and selected line awards to the Game launcher and Win viewer. Reports now include G001 event payloads; replay rebuilds screens from recorded stops and placements, re-evaluates wins, and passes validation for both modes.
 
 ## Decisions and change history

@@ -2,6 +2,8 @@
 
 Use this workflow when adding a game module. Keep each game's source documents, PAR, Java implementation, and game-specific tests together in one `game/GXXX-game-name/` workspace. Put game code under that workspace's `src/main/java/` and game tests under `src/test/java/`. Keep generic simulation, statistics, and reporting in the repository-level `simulation/` and `toolkit/` packages.
 
+Human-assisted specification remains the usual starting point. When that route has stalled, [javasim-draft-game-spec](../.agents/skills/javasim-draft-game-spec/SKILL.md) can propose a small game from existing market research within the available broad GDDs. It produces a documentation-only draft under `docs/game-specs/<slug>/` by default, with one Basegame, one Freegame and Normal/EM1/BB1 purchase modes. Review the rules and unresolved math before promoting the documents into the workspace below; creating a fallback draft does not allocate a game ID, populate an approved PAR or implement the game.
+
 Start with the toolkit's **New game** tab. It creates the complete `GXXX-game-name/` workspace: source intake documents and blank Config/Reels workbook under `source/`, plus package-shaped implementation and test locations under `src/`. Complete and reconcile the source materials before implementing game logic; keep all game-owned assets in this workspace.
 
 ```mermaid
@@ -54,7 +56,7 @@ flowchart TD
 7. **Create a playable prototype when the game needs visual inspection.** Add a game adapter that converts a normal `GameSession` round into shared display data: stopped and transformed grids, award details, winning positions, feature sequence, and metadata. Reuse the player window for stake/balance, spin, autoplay, and last-round playback; keep presentation out of game math and simulation statistics. Check basegame wins and losses plus a complete randomly triggered feature round. If the game uses a different screen or win presentation, extend the display data only as needed.
 8. **Test rules and integration.** Use controlled random streams for edge cases and trigger paths. Cover wins, losses, feature awards and counts, caps, invalid config, and any set-selection behavior. Add a seeded simulation test that checks accounting and repeatability across worker counts with a fixed partition count. Verify the prototype display matches the underlying typed result.
 9. **Add replay when the game needs it.** Store the decisions needed to recalculate each spin in versioned `ReplayEvent` payloads, implement `replayRound`, and test that replay reproduces basegame, freegame, and total wins. Ensure the prototype can display a found or replayed round where supported. Keep replay optional if the game does not need saved gameplay support.
-10. **Document and verify.** Add a game-specific rules/config note, update `docs/architecture.md` and `nextsteps.md`, compile, run relevant tests, and run a small seeded simulation with and without report export. Include prototype coverage and any presentation limitations in the handoff.
+10. **Document and verify.** Add a game-specific rules/config note, update `docs/architecture.md`, compile, run relevant tests, and run a small seeded simulation with and without report export. Include prototype coverage and any presentation limitations in the handoff.
 
 ## Existing reference points
 

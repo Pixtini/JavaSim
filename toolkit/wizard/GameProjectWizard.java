@@ -139,7 +139,7 @@ public final class GameProjectWizard {
 
                 Implement game-specific config and logic in `src/main/java/game/%s/`, with Java package `game.%s`. Add deterministic rule tests under `src/test/java/game/%s/tests/`. Reuse `GameModuleFramework` where its behavior matches the rules, and keep Basegame and randomly triggered Feature Game logic separate. Register `%s` in `game/GameFactory.java`, then use `./build.sh` to compile every game workspace into the shared runtime classpath and run a seeded simulation through the existing engine.
 
-                Check RTP by mode and set, triggers, hit rate, distributions, caps, and report assets. Document assumptions and validation evidence in the game handover. Update `docs/architecture.md` and `nextsteps.md` when the implementation changes the framework or completes a task.
+                Check RTP by mode and set, triggers, hit rate, distributions, caps, and report assets. Document assumptions and validation evidence in the game handover. Update `docs/architecture.md` when the implementation changes the framework or completes a task.
 
                 ## Workspace files
 
@@ -303,8 +303,7 @@ public final class GameProjectWizard {
         return Files.readString(template, StandardCharsets.UTF_8)
                 .replace("(game-creation-flow.md)", "(../../docs/game-creation-flow.md)")
                 .replace("(game-math-validation-flow.md)", "(../../docs/game-math-validation-flow.md)")
-                .replace("(architecture.md)", "(../../docs/architecture.md)")
-                .replace("(../nextsteps.md)", "(../../nextsteps.md)");
+                .replace("(architecture.md)", "(../../docs/architecture.md)");
     }
 
     private static void deleteTree(Path root) {

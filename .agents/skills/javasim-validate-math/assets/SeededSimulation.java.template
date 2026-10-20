@@ -1,0 +1,48 @@
+import game.Game;
+import game.GameFactory;
+import java.nio.file.Path;
+import simulation.config.SimConfig;
+import simulation.engine.SimulationRunner;
+import simulation.reporting.Print;
+import simulation.result.SimulationResult;
+
+/** Temporary controlled run; compile outside the repository source tree. */
+public final class SeededSimulation {
+    private SeededSimulation() {}
+
+    public static void main(String[] args) throws Exception {
+        if (args.length != 10) {
+            throw new IllegalArgumentException(
+                    "Expected: gameId workbook|- mode rounds stake seed threads partitions reportRoot|- maxSaved");
+        }
+        SimConfig config = new SimConfig();
+        config.gameId = args[0];
+        config.gameMode = args[2];
+        config.rounds = Long.parseLong(args[3]);
+        config.stake = Double.parseDouble(args[4]);
+        config.seed = Long.parseLong(args[5]);
+        config.usePreviousSeed = true;
+        config.threads = Integer.parseInt(args[6]);
+        config.partitions = Integer.parseInt(args[7]);
+        config.exportReport = !args[8].equals("-");
+        config.maxSavedGameplays = Integer.parseInt(args[9]);
+        Game game;
+        if (args[1].equals("-")) {
+            if (!config.gameMode.equals("Normal")) {
+                throw new IllegalArgumentException("Non-PAR template runs support Normal mode only");
+            }
+            game = GameFactory.create(config.gameId);
+        } else {
+            config.parWorkbookPath = Path.of(args[1]).toAbsolutePath().normalize();
+            game = GameFactory.create(config.gameId, config.parWorkbookPath, config.gameMode);
+        }
+        SimulationResult result = new SimulationRunner(config, game).run();
+        if (config.exportReport) {
+            Path reportRoot = Path.of(args[8]).toAbsolutePath().normalize();
+            new Print(result, reportRoot).printToConsole(config);
+            System.out.println("Report root: " + reportRoot);
+        } else {
+            new Print(result).printToConsole(config);
+        }
+    }
+}

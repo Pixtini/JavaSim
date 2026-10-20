@@ -154,7 +154,6 @@ Record commands, settings, and outcomes. A successful run confirms execution; ma
 - [ ] Document rules, config structure, assumptions, known limits, and test/validation evidence.
 - [ ] Document any suggested framework/GMF changes without implementing them automatically.
 - [ ] Update [`docs/architecture.md`](../../docs/architecture.md) if the architecture or supported game behavior changed.
-- [ ] Replace the previous entry in [`nextsteps.md`](../../nextsteps.md) with one clear suggestion under 100 words.
 - [ ] Review unrelated config and files to ensure they were not changed.
 
 **Status:** [ ] Not started / [ ] In progress / [ ] Ready for review / [ ] Complete

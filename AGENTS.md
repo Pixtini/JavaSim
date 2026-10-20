@@ -76,15 +76,14 @@ Simulation implementations should not contain generic Game logic.
 
 ## Validation
 
-After making changes:
+Choose validation from the behaviour affected by the current task. Existing unrelated changes in the working tree do not justify additional testing.
 
-1. Compile the project.
+- **Documentation, instructions, research, and non-executable skill/template changes:** check the changed content, local links, and relevant formats or skill metadata. Do not compile Java, run game/engine test suites, or launch simulations for these changes alone. This also applies to documentation inside a game workspace.
+- **Game, mathematical configuration/PAR, parser, shared game math, result contract, or simulation engine changes:** compile the project, run the affected deterministic and integration tests, and run a small seeded simulation of the affected game/mode. Include existing consumers when shared behaviour changes; do not default to G001 for unrelated work.
+- **Other executable changes, including toolkit, reporting, build scripts, and runnable skill helpers:** compile or check the affected code as appropriate and run focused tests for that behaviour. Include game/engine tests or a simulation only when that behaviour is affected or executing the changed helper requires it.
+- **Explicit validation or debugging requests:** run the requested relevant checks even when no implementation changes are needed. A request to research the slot market or edit a skill is not a request to validate game maths.
 
-2. Run relevant tests.
-
-3. Run a small simulation to verify behaviour.
-
-4. Report any tests or validation that could not be run.
+Report the checks performed and any applicable checks that could not run. Checks outside the task's scope are not required and should not be reported as failures or blockers. Do not add tests that merely repeat documentation wording.
 
 ## Important
 
@@ -97,9 +96,5 @@ Do not make lasting edits to any game config unless specifically asked to do so.
 Before implementing a significant architectural change, explain the proposed approach first.
 
 Any task is not finished until Architecture.md has been updated.
-
-Any task is not finished until nextsteps.md has been updated with a suggestion of the most effective next change within less than 100 words. 
-
-Any change that was previously listed in nextsteps.md must be cleared for clarity and adding another suggestion.
 
 Remember at all time, that this is meant to act as the simulator for a slot game. Any creation within the simulator itself must respect that new games will be added with a Basegame and Randomly triggered FG modes.

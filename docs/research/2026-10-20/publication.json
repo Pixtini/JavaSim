@@ -1,0 +1,29 @@
+{
+  "scope": "Releases 2026-10-07 through 2026-10-20 inclusive; separately dated established performers",
+  "market_report_url": "https://app.notion.com/p/3ffa48e4006081fda60dc5a324ef9042",
+  "skill_experience_url": "https://app.notion.com/p/3ffa48e4006081f8be45ee93890b6e8a",
+  "notion_placement": "Two workspace-level private drafts; no explicit destination supplied",
+  "evidence_attachment_id": "3ffa48e4-0060-81b6-b7a3-00b2af6a865f",
+  "research_started_utc": "2026-10-20T13:57:49Z",
+  "repository_checks_completed_utc": "2026-10-20T14:07:48Z",
+  "elapsed_seconds_through_checks": 599,
+  "validation": {
+    "compile": "passed",
+    "SimulationTests": "88 assertions passed",
+    "small_simulation": "1000 G001 Normal rounds; seed 440055; 2 workers; 16 partitions; 3 FG triggers",
+    "evidence_claims": 42,
+    "profiles": 12,
+    "skill_files_unchanged": 6
+  },
+  "limitations": [
+    "No global or four-operator verified turnover ranking",
+    "No representative fresh independent sentiment sample",
+    "Paid panel details not acquired",
+    "No interactive demo or deployed PAR verification"
+  ],
+  "current_notion_placement": "Market report under Research Hub / Market Reports; process evaluation under Research Hub / Skill Evaluations",
+  "research_hub_url": "https://app.notion.com/p/3ffa48e4006081d1ac88d55ba4073624",
+  "market_reports_parent_id": "3ffa48e4-0060-8109-b14b-ec228a729876",
+  "skill_evaluations_parent_id": "3ffa48e4-0060-817a-9a30-c6869c805640",
+  "moved_to_hub_on": "2026-10-20"
+}

@@ -319,6 +319,8 @@ The simulator should be able to execute the game without knowing its internal im
 
 ## Testing
 
+Apply the root `AGENTS.md` validation policy. The game tests and simulation requirements here apply to game implementation or mathematical behaviour changes, or an explicit validation request. Source-document, review-log, README, and other documentation-only updates do not require Java compilation, game tests, or simulations.
+
 Every new game should have tests covering at minimum:
 
 - Symbol evaluation.
