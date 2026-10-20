@@ -1,3 +1,4 @@
+import game.ember_forge.config.EmberForgeConfig;
 import game.ExhaustiveReelGame;
 import game.Game;
 import game.GameFactory;
@@ -52,7 +53,7 @@ import toolkit.wizard.GameProjectWizard;
 
 /** Small desktop launcher for the simulator and its command-line toolkit. */
 public final class ToolkitGUI extends JFrame {
-    private static final String[] GAME_IDS = {"expanding-wild", "basic-proxy", "G001-walkingwild"};
+    private static final String[] GAME_IDS = {"expanding-wild", "basic-proxy", "G001-walkingwild", "G002-ember-forge"};
 
     private final JTextArea outputArea = new JTextArea();
     private final JLabel statusLabel = new JLabel("Ready");
@@ -98,7 +99,9 @@ public final class ToolkitGUI extends JFrame {
         JComboBox<String> mode = new JComboBox<>(new String[] {"Normal"});
         game.addActionListener(event -> {
             String selectedGame = String.valueOf(game.getSelectedItem());
-            if (selectedGame.equals("G001-walkingwild")) {
+            if (selectedGame.equals("G002-ember-forge")) {
+                parWorkbook.setText(EmberForgeConfig.DEFAULT_PAR.toString());
+            } else if (selectedGame.equals("G001-walkingwild")) {
                 parWorkbook.setText(Path.of("game", "G001-walkingwild", "source",
                         "G001-walkingWildsPAR.xlsx").toString());
             } else if (selectedGame.equals("expanding-wild")) {
@@ -228,7 +231,9 @@ public final class ToolkitGUI extends JFrame {
         JComboBox<String> mode = new JComboBox<>(new String[] {"Normal"});
         game.addActionListener(event -> {
             String selected = String.valueOf(game.getSelectedItem());
-            if (selected.equals("G001-walkingwild")) {
+            if (selected.equals("G002-ember-forge")) {
+                parWorkbook.setText(EmberForgeConfig.DEFAULT_PAR.toString());
+            } else if (selected.equals("G001-walkingwild")) {
                 parWorkbook.setText(Path.of("game", "G001-walkingwild", "source",
                         "G001-walkingWildsPAR.xlsx").toString());
             } else if (selected.equals("expanding-wild")) {
@@ -394,8 +399,8 @@ public final class ToolkitGUI extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(12, 12));
         panel.setBorder(BorderFactory.createEmptyBorder(18, 22, 18, 22));
         JTextArea description = new JTextArea(
-                "Choose Expanding Wild or G001 Walking Wild, select its PAR workbook and mode, "
-                + "then launch the resizable player. Both players show reel outcomes, winning lines, "
+                "Choose Expanding Wild, G001 Walking Wild or G002 Ember Forge, select its PAR workbook and mode, "
+                + "then launch the resizable player. The players show reel outcomes, winning lines, "
                 + "freegame flow, auto play, balance, and replay of the last round.");
         description.setLineWrap(true);
         description.setWrapStyleWord(true);

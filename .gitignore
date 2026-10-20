@@ -2,8 +2,11 @@
 *.class
 
 *.xlsx
+!game/G002-ember-forge/source/PAR.xlsx
+!game/G002-ember-forge/validation/runs/**/*.xlsx
 
 *.html
+!game/G002-ember-forge/validation/runs/**/config.html
 !docs/expanding-wild-config-tables.html
 !docs/expanding-wild-game-info.html
 

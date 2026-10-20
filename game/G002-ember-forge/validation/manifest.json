@@ -1,0 +1,41 @@
+{
+  "status": "rough prototype, no production approval",
+  "date": "2026-10-20",
+  "git_head": "f9d89fb01157af0f3fd866bfb3c43661dd1b0c7b",
+  "working_tree": "Uncommitted G002 additions and integration edits; hashes identify exact files.",
+  "java": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment Homebrew (build 21.0.12.1)\nOpenJDK 64-Bit Server VM Homebrew (build 21.0.12.1, mixed mode, sharing)",
+  "settings": {
+    "stake": 1,
+    "threads": 2,
+    "partitions": 16,
+    "maxSavedGameplays": 10,
+    "seeds": {
+      "Normal": 440055,
+      "EM1": 440056,
+      "BB1": 440057
+    }
+  },
+  "files_sha256": {
+    "ToolkitGUI.java": "e3cb083d8b92b439647a6f6ade7fe4db4ce07ca73c92b2cc8e01cecbae7e59e4",
+    "game/G002-ember-forge/source/PAR.xlsx": "bc96994f60b7d0fb467e08ee30bde5904754ff1b90d4e2012ed550e6f86bdd65",
+    "game/G002-ember-forge/source/balance-input.json": "9e50a64caf8d1eba6053b0c1638d83d0a4bd194d498dec38cc7f31c0008d940f",
+    "game/G002-ember-forge/source/build_par.py": "7588ec4673e5d5843f40dd60215b310b96e7cfc02de77507c64277ae3d1e0844",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/EmberForgeEvaluator.java": "42c87cea62e6269835f265e23bec600cbd03515ecc1fca17b72fa87824c28ad2",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/EmberForgeGame.java": "23f90d409bf1b570a81c544d13a82c8917fc86e108804f74c27bbc3f85cf1ce6",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/EmberForgeSession.java": "f63e974abb50b869ceeadd8f7eefd0b4e324eb5f2fb253fe2e25a8969d4f4012",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/basegame/EmberForgeBaseGame.java": "75c05a99cc024c1210ef5cf070a439cad49aef6fafb53e061d8184dec68e11f2",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/config/EmberForgeConfig.java": "288a01e8b1f2aaf885b1af4d539465dc0218c224199df1e34f716b9e3c0cd91c",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/config/EmberForgeParParser.java": "4b3f7dc801b9e4baa8a949aebd0f2e9f1b23a15c8a079a42e5a3bcf8b90153a3",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/features/EmberForgeFreeGame.java": "bc45eac8a92a48c62b807b8d1bde33ca8e06c88d401ac59af15744fd2f655638",
+    "game/G002-ember-forge/src/main/java/game/ember_forge/model/EmberForgeSpin.java": "544e1e39321fd58be19e03b3c6d3f67bdfd38176b2b8ddbc5afbe2fc97469172",
+    "game/G002-ember-forge/src/test/java/game/ember_forge/tests/EmberForgeGameTests.java": "c2d74a9910c888ebe189469c5e0842ca4fbdf5d9fab251b56c588ba65983d23f",
+    "game/G002-ember-forge/src/test/java/game/ember_forge/tests/EmberForgeMathAudit.java": "4757872861c373c708d8e0621591674f745f2939321eb776f2baf08cfe747e17",
+    "game/G002-ember-forge/src/test/java/game/ember_forge/tests/EmberForgePrototypeCheck.java": "fb4886a9d6fa773887643ecb573a65373f968a687af58d3be5fc8de41e7b8dc0",
+    "game/GameFactory.java": "36a823ccd92438b83eaf3ae30e9e52737f24d7be610f35ac43a8ebb4736f880c",
+    "toolkit/player/EmberForgePlayerAdapter.java": "e6aadc8b2dba69e2e108a6018cf9da350ce116784f2cd1323c42d9e93ee23826",
+    "toolkit/player/EmberForgePlayerMain.java": "8bf633dc09a369982bb11e31b03b2599df6be2f8bdeb32f3da5571ee142d42d6",
+    "toolkit/player/GameLauncherFrame.java": "eec7e360a2252596dbcb47ac2a844687923c924afdb2ede89f2e61420a2b31c4",
+    "toolkit/player/PlayerAdapterFactory.java": "46d57ca49b083f6d4d3ff633d23a15766cdfaadf298aa5cd5125e64525f8e0b9",
+    "toolkit/viewer/WinScreenPrinter.java": "cb5dcc48d4e21e2e81ac6cecb79659be26eb6a4e71f48be674a77fe34c785437"
+  }
+}

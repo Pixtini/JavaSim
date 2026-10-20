@@ -1,5 +1,6 @@
 package toolkit.player;
 
+import game.ember_forge.config.EmberForgeConfig;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -21,7 +22,7 @@ import toolkit.par.ParWorkbookModes;
 /** Selects a game/PAR mode and launches its balancing player. */
 public final class GameLauncherFrame extends JFrame {
     private final JComboBox<String> game = new JComboBox<>(
-            new String[] {"expanding-wild", "G001-walkingwild"});
+            new String[] {"expanding-wild", "G001-walkingwild", "G002-ember-forge"});
     private final JTextField workbook = new JTextField(36);
     private final JComboBox<String> mode = new JComboBox<>();
 
@@ -75,7 +76,9 @@ public final class GameLauncherFrame extends JFrame {
 
     private void updateWorkbookAndModes() {
         String selected = String.valueOf(game.getSelectedItem());
-        Path par = selected.equals("G001-walkingwild")
+        Path par = selected.equals("G002-ember-forge")
+                ? EmberForgeConfig.DEFAULT_PAR
+                : selected.equals("G001-walkingwild")
                 ? Path.of("game", "G001-walkingwild", "source", "G001-walkingWildsPAR.xlsx")
                 : Path.of("game", "expandingwild", "expandingWildPAR.xlsx");
         workbook.setText(par.toString());

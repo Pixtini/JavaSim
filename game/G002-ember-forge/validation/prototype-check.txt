@@ -1,0 +1,9 @@
+Normal initial charge verified: 1.0
+EM1 initial charge verified: 2.0
+BB1 initial charge verified: 47.0
+Captured actual animated Freegame window with Heat: game/G002-ember-forge/validation/prototype.png
+JavaSim Player · Ember Forge · Normal: settled 0 feature spins, win 0.0, wallet 999.0
+JavaSim Player · Ember Forge · EM1: settled 0 feature spins, win 0.0, wallet 998.0
+JavaSim Player · Ember Forge · BB1: settled 8 feature spins, win 4.35, wallet 957.35
+Replay button starts a charged repeat of the same stored display outcome.
+Passed desktop prototype integration check.

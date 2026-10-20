@@ -1,0 +1,8 @@
+java -Xmx512m -cp build/classes SimulationTests
+Passed 88 assertions.
+java -Xmx512m -cp build/classes PlayerTests
+Passed 12 player assertions.
+java -Xmx512m -cp build/classes ViewerTests
+Passed 10 viewer assertions.
+java -Xmx512m -cp build/classes ReplayTests
+Passed 16 replay assertions.

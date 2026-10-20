@@ -1,0 +1,2032 @@
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=1
+Replay 1 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | S   | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | S   |
+Freegame spin 1 (set 0): 0.2000 (0.2000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | IRON | SILVER | IRON |
+| W   | IRON | COPPER | SILVER | IRON |
+| EMBER | COPPER | COAL | IRON | COPPER |
+Line 8: 3 oak IRON = 0.2000 (0.2000x stake)
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | W   | EMBER | IRON | W   |
+| COPPER | EMBER | GOLD | IRON | EMBER |
+| COAL | EMBER | GOLD | COPPER | EMBER |
+Freegame spin 3 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | EMBER | EMBER | GOLD |
+| SILVER | COPPER | GOLD | EMBER | GOLD |
+| IRON | COAL | GOLD | GOLD | SILVER |
+Freegame spin 4 (set 0): 3.8000 (3.8000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | SILVER | SILVER | COPPER | W   |
+| EMBER | IRON | SILVER | COAL | EMBER |
+| EMBER | IRON | IRON | W   | EMBER |
+Line 2: 3 oak SILVER = 0.7000 (0.7000x stake)
+Line 4: 3 oak IRON = 0.4000 (0.4000x stake)
+Line 6: 4 oak SILVER = 2.7000 (2.7000x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | IRON | SILVER | IRON |
+| SILVER | SILVER | IRON | SILVER | IRON |
+| IRON | SILVER | COPPER | IRON | COPPER |
+Freegame spin 6 (set 0): 0.6000 (0.6000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | SILVER | W   | COAL |
+| W   | IRON | IRON | EMBER | W   |
+| EMBER | COPPER | IRON | EMBER | EMBER |
+Line 1: 3 oak IRON = 0.6000 (0.6000x stake)
+Freegame spin 7 (set 0): 1.2000 (1.2000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | IRON | COPPER | SILVER | W   |
+| COPPER | COPPER | COAL | SILVER | EMBER |
+| COAL | COAL | W   | IRON | EMBER |
+Line 3: 3 oak COAL = 0.6000 (0.6000x stake)
+Line 7: 3 oak COAL = 0.6000 (0.6000x stake)
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | IRON | W   | SILVER |
+| SILVER | EMBER | IRON | EMBER | IRON |
+| SILVER | EMBER | COPPER | EMBER | IRON |
+Recalculated total win: 5.8000 (5.8000x stake)
+Recorded total/basegame/feature wins: 5.8000 / 0.0000 / 5.8000
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=2
+Replay 2 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | S   | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | IRON | SILVER | EMBER | GOLD |
+| COAL | IRON | SILVER | EMBER | SILVER |
+| W   | COPPER | IRON | EMBER | SILVER |
+Freegame spin 2 (set 0): 0.7000 (0.7000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | GOLD | EMBER | W   | IRON |
+| SILVER | GOLD | EMBER | EMBER | IRON |
+| SILVER | SILVER | GOLD | EMBER | COPPER |
+Line 4: 3 oak GOLD = 0.7000 (0.7000x stake)
+Freegame spin 3 (set 0): 0.7000 (0.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | SILVER | EMBER | IRON |
+| GOLD | COAL | SILVER | EMBER | COPPER |
+| SILVER | W   | IRON | GOLD | COAL |
+Line 7: 3 oak SILVER = 0.7000 (0.7000x stake)
+Freegame spin 4 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | IRON | COAL | COPPER | IRON |
+| GOLD | IRON | W   | COAL | COPPER |
+| SILVER | COPPER | EMBER | W   | COAL |
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | GOLD | SILVER | SILVER |
+| IRON | COPPER | SILVER | SILVER | IRON |
+| IRON | COAL | SILVER | IRON | IRON |
+Freegame spin 6 (set 0): 32.4000 (32.4000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | W   | COAL | EMBER | COPPER |
+| GOLD | EMBER | W   | EMBER | COAL |
+| SILVER | EMBER | EMBER | GOLD | W   |
+Line 6: 5 oak GOLD = 32.4000 (32.4000x stake)
+Freegame spin 7 (set 0): 29.8000 (29.8000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | COPPER | COAL | GOLD |
+| EMBER | EMBER | COAL | W   | SILVER |
+| GOLD | GOLD | W   | EMBER | SILVER |
+Line 3: 3 oak GOLD = 2.8000 (2.8000x stake)
+Line 4: 4 oak EMBER = 27.0000 (27.0000x stake)
+Freegame spin 8 (set 0): 6.7500 (6.7500x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | GOLD | COPPER | SILVER | COAL |
+| EMBER | SILVER | COAL | SILVER | W   |
+| EMBER | SILVER | W   | IRON | EMBER |
+Line 4: 4 oak SILVER = 6.7500 (6.7500x stake)
+Recalculated total win: 70.3500 (70.3500x stake)
+Recorded total/basegame/feature wins: 70.3500 / 0.0000 / 70.3500
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=3
+Replay 3 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | S   |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | EMBER | W   | GOLD |
+| GOLD | IRON | EMBER | EMBER | SILVER |
+| GOLD | IRON | GOLD | EMBER | SILVER |
+Freegame spin 2 (set 0): 5.4000 (5.4000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | W   | GOLD | SILVER |
+| GOLD | EMBER | EMBER | SILVER | IRON |
+| GOLD | EMBER | EMBER | SILVER | IRON |
+Line 2: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 4: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 6: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 10: 3 oak EMBER = 1.3500 (1.3500x stake)
+Freegame spin 3 (set 0): 2.7000 (2.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | W   | EMBER | SILVER | EMBER |
+| COAL | EMBER | GOLD | IRON | EMBER |
+| W   | EMBER | GOLD | IRON | GOLD |
+Line 5: 3 oak EMBER = 2.7000 (2.7000x stake)
+Freegame spin 4 (set 0): 22.3500 (22.3500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | EMBER | SILVER | COPPER |
+| EMBER | EMBER | EMBER | SILVER | COAL |
+| GOLD | GOLD | GOLD | IRON | W   |
+Line 1: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 2: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 3: 3 oak GOLD = 2.1000 (2.1000x stake)
+Line 6: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 8: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 10: 3 oak EMBER = 4.0500 (4.0500x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | IRON | EMBER | COAL |
+| SILVER | EMBER | COPPER | EMBER | W   |
+| IRON | GOLD | COAL | EMBER | EMBER |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | IRON | W   | GOLD |
+| SILVER | SILVER | IRON | EMBER | SILVER |
+| IRON | SILVER | COPPER | EMBER | SILVER |
+Freegame spin 7 (set 0): 2.8000 (2.8000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | EMBER | COAL | SILVER | EMBER |
+| COAL | GOLD | W   | IRON | GOLD |
+| W   | GOLD | EMBER | IRON | GOLD |
+Line 7: 3 oak GOLD = 2.8000 (2.8000x stake)
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | SILVER | IRON | SILVER |
+| EMBER | IRON | IRON | COPPER | SILVER |
+| EMBER | IRON | IRON | COAL | IRON |
+Recalculated total win: 33.2500 (33.2500x stake)
+Recorded total/basegame/feature wins: 33.2500 / 0.0000 / 33.2500
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=4
+Replay 4 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.7000 (0.7000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COAL | GOLD | EMBER | GOLD |
+| SILVER | W   | GOLD | EMBER | GOLD |
+| SILVER | EMBER | SILVER | GOLD | SILVER |
+Line 10: 3 oak GOLD = 0.7000 (0.7000x stake)
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | EMBER | SILVER | W   |
+| GOLD | EMBER | EMBER | IRON | EMBER |
+| SILVER | EMBER | EMBER | IRON | EMBER |
+Freegame spin 3 (set 0): 0.4000 (0.4000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | IRON | SILVER | EMBER | IRON |
+| EMBER | COPPER | IRON | EMBER | IRON |
+| EMBER | COAL | IRON | GOLD | COPPER |
+Line 6: 3 oak IRON = 0.4000 (0.4000x stake)
+Freegame spin 4 (set 0): 12.1500 (12.1500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | W   | GOLD | GOLD | IRON |
+| EMBER | EMBER | SILVER | GOLD | IRON |
+| EMBER | EMBER | SILVER | SILVER | COPPER |
+Line 2: 4 oak GOLD = 8.1000 (8.1000x stake)
+Line 6: 4 oak SILVER = 4.0500 (4.0500x stake)
+Freegame spin 5 (set 0): 59.4000 (59.4000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | EMBER | EMBER | COPPER | GOLD |
+| EMBER | EMBER | EMBER | COAL | GOLD |
+| EMBER | GOLD | EMBER | W   | SILVER |
+Line 1: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 2: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 4: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 5: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 6: 4 oak EMBER = 27.0000 (27.0000x stake)
+Line 8: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 10: 3 oak EMBER = 5.4000 (5.4000x stake)
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | IRON | EMBER | EMBER | EMBER |
+| EMBER | IRON | GOLD | GOLD | EMBER |
+| GOLD | COPPER | GOLD | GOLD | GOLD |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | IRON | IRON | W   |
+| EMBER | SILVER | COPPER | COPPER | EMBER |
+| EMBER | IRON | COAL | COAL | EMBER |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | W   | IRON | IRON | W   |
+| GOLD | EMBER | IRON | IRON | EMBER |
+| SILVER | EMBER | COPPER | COPPER | EMBER |
+Recalculated total win: 72.6500 (72.6500x stake)
+Recorded total/basegame/feature wins: 72.6500 / 0.0000 / 72.6500
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=5
+Replay 5 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | IRON | GOLD | W   |
+| SILVER | COAL | IRON | GOLD | EMBER |
+| SILVER | W   | COPPER | SILVER | EMBER |
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | EMBER | COPPER | EMBER |
+| SILVER | GOLD | EMBER | COAL | GOLD |
+| IRON | GOLD | GOLD | W   | GOLD |
+Freegame spin 3 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | EMBER | EMBER | GOLD | EMBER |
+| COPPER | EMBER | GOLD | SILVER | GOLD |
+| COAL | GOLD | GOLD | SILVER | GOLD |
+Freegame spin 4 (set 0): 4.0500 (4.0500x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | W   | COPPER | IRON | IRON |
+| EMBER | EMBER | COAL | COPPER | IRON |
+| EMBER | EMBER | W   | COAL | COPPER |
+Line 3: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 4: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 9: 3 oak EMBER = 1.3500 (1.3500x stake)
+Freegame spin 5 (set 0): 8.3000 (8.3000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | IRON | SILVER | SILVER | SILVER |
+| IRON | IRON | IRON | IRON | SILVER |
+| COPPER | COPPER | IRON | IRON | IRON |
+Line 1: 4 oak IRON = 1.4000 (1.4000x stake)
+Line 4: 4 oak IRON = 1.4000 (1.4000x stake)
+Line 6: 5 oak IRON = 4.1000 (4.1000x stake)
+Line 10: 4 oak IRON = 1.4000 (1.4000x stake)
+Freegame spin 6 (set 0): 2.1000 (2.1000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | GOLD | IRON | W   |
+| GOLD | COAL | SILVER | COPPER | EMBER |
+| SILVER | W   | SILVER | COAL | EMBER |
+Line 3: 3 oak SILVER = 1.0500 (1.0500x stake)
+Line 7: 3 oak SILVER = 1.0500 (1.0500x stake)
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | W   | IRON | SILVER | EMBER |
+| SILVER | EMBER | IRON | SILVER | GOLD |
+| IRON | EMBER | COPPER | IRON | GOLD |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | SILVER | EMBER | COAL | SILVER |
+| IRON | IRON | GOLD | W   | IRON |
+| IRON | IRON | GOLD | EMBER | IRON |
+Recalculated total win: 14.4500 (14.4500x stake)
+Recorded total/basegame/feature wins: 14.4500 / 0.0000 / 14.4500
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=6
+Replay 6 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | S   | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+Freegame spin 1 (set 0): 4.0500 (4.0500x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COPPER | W   | IRON | EMBER |
+| EMBER | COAL | EMBER | IRON | GOLD |
+| EMBER | W   | EMBER | COPPER | GOLD |
+Line 3: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 7: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 9: 3 oak EMBER = 1.3500 (1.3500x stake)
+Freegame spin 2 (set 0): 23.0000 (23.0000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | W   | W   | EMBER | COAL |
+| GOLD | EMBER | EMBER | GOLD | W   |
+| GOLD | EMBER | EMBER | GOLD | EMBER |
+Line 2: 4 oak EMBER = 13.5000 (13.5000x stake)
+Line 4: 3 oak EMBER = 2.7000 (2.7000x stake)
+Line 6: 3 oak EMBER = 2.7000 (2.7000x stake)
+Line 8: 3 oak GOLD = 1.4000 (1.4000x stake)
+Line 10: 3 oak EMBER = 2.7000 (2.7000x stake)
+Freegame spin 3 (set 0): 1.6500 (1.6500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | IRON | IRON | EMBER | EMBER |
+| EMBER | COPPER | IRON | GOLD | EMBER |
+| EMBER | COAL | COPPER | GOLD | GOLD |
+Line 2: 3 oak IRON = 0.6000 (0.6000x stake)
+Line 4: 3 oak COPPER = 0.4500 (0.4500x stake)
+Line 6: 3 oak IRON = 0.6000 (0.6000x stake)
+Freegame spin 4 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | GOLD | IRON | GOLD |
+| GOLD | EMBER | SILVER | IRON | SILVER |
+| SILVER | EMBER | SILVER | COPPER | SILVER |
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | GOLD | GOLD | GOLD | EMBER |
+| COPPER | GOLD | GOLD | SILVER | EMBER |
+| COAL | SILVER | SILVER | SILVER | GOLD |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | SILVER | COAL | COPPER |
+| GOLD | EMBER | SILVER | W   | COAL |
+| GOLD | GOLD | IRON | EMBER | W   |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | EMBER | IRON | EMBER | COPPER |
+| COPPER | EMBER | COPPER | EMBER | COAL |
+| COAL | EMBER | COAL | GOLD | W   |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COPPER | EMBER | COPPER | SILVER |
+| COPPER | COAL | EMBER | COAL | IRON |
+| COAL | W   | GOLD | W   | IRON |
+Recalculated total win: 28.7000 (28.7000x stake)
+Recorded total/basegame/feature wins: 28.7000 / 0.0000 / 28.7000
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=7
+Replay 7 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.3500 (0.3500x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | COPPER | W   | IRON |
+| SILVER | GOLD | COAL | EMBER | COPPER |
+| IRON | SILVER | W   | EMBER | COAL |
+Line 9: 3 oak SILVER = 0.3500 (0.3500x stake)
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | EMBER | GOLD | SILVER |
+| W   | IRON | EMBER | GOLD | IRON |
+| EMBER | COPPER | GOLD | SILVER | IRON |
+Freegame spin 3 (set 0): 5.7000 (5.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | IRON | IRON | IRON |
+| W   | COPPER | COPPER | COPPER | IRON |
+| EMBER | COAL | COAL | COAL | COPPER |
+Line 1: 4 oak COPPER = 0.9000 (0.9000x stake)
+Line 8: 5 oak IRON = 4.1000 (4.1000x stake)
+Line 9: 4 oak COAL = 0.7000 (0.7000x stake)
+Freegame spin 4 (set 0): 1.0500 (1.0500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | COAL | SILVER | SILVER | W   |
+| COAL | W   | IRON | IRON | EMBER |
+| W   | EMBER | IRON | IRON | EMBER |
+Line 5: 3 oak SILVER = 1.0500 (1.0500x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | GOLD | SILVER | GOLD | EMBER |
+| EMBER | SILVER | IRON | SILVER | GOLD |
+| EMBER | SILVER | IRON | SILVER | GOLD |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | GOLD | IRON | IRON |
+| GOLD | EMBER | GOLD | COPPER | IRON |
+| SILVER | GOLD | SILVER | COAL | COPPER |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | IRON | IRON | EMBER |
+| IRON | GOLD | IRON | IRON | EMBER |
+| IRON | SILVER | COPPER | COPPER | EMBER |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | SILVER | GOLD | SILVER |
+| SILVER | COPPER | SILVER | SILVER | SILVER |
+| IRON | COAL | IRON | SILVER | IRON |
+Recalculated total win: 7.1000 (7.1000x stake)
+Recorded total/basegame/feature wins: 7.1000 / 0.0000 / 7.1000
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=8
+Replay 8 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | COPPER | EMBER | COPPER | EMBER |
+| IRON | COAL | EMBER | COAL | GOLD |
+| IRON | W   | GOLD | W   | GOLD |
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | EMBER | EMBER | GOLD | IRON |
+| IRON | EMBER | GOLD | SILVER | IRON |
+| COPPER | EMBER | GOLD | SILVER | COPPER |
+Freegame spin 3 (set 0): 0.4000 (0.4000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | W   | EMBER | GOLD |
+| IRON | IRON | EMBER | EMBER | GOLD |
+| IRON | COPPER | EMBER | EMBER | SILVER |
+Line 5: 3 oak IRON = 0.2000 (0.2000x stake)
+Line 8: 3 oak IRON = 0.2000 (0.2000x stake)
+Freegame spin 4 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | EMBER | EMBER | W   |
+| SILVER | GOLD | EMBER | EMBER | EMBER |
+| IRON | SILVER | GOLD | EMBER | EMBER |
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | EMBER | IRON | EMBER | COAL |
+| COAL | EMBER | IRON | GOLD | W   |
+| W   | GOLD | COPPER | GOLD | EMBER |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | COAL | COAL | SILVER |
+| IRON | EMBER | W   | W   | SILVER |
+| IRON | EMBER | EMBER | EMBER | IRON |
+Freegame spin 7 (set 0): 0.7000 (0.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | COAL | EMBER | EMBER |
+| GOLD | COAL | W   | EMBER | EMBER |
+| SILVER | W   | EMBER | GOLD | GOLD |
+Line 7: 3 oak SILVER = 0.7000 (0.7000x stake)
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COAL | EMBER | GOLD | COPPER |
+| COPPER | W   | EMBER | GOLD | COAL |
+| COAL | EMBER | EMBER | SILVER | W   |
+Recalculated total win: 1.1000 (1.1000x stake)
+Recorded total/basegame/feature wins: 1.1000 / 0.0000 / 1.1000
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=9
+Replay 9 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | S   |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | W   | GOLD | GOLD |
+| SILVER | EMBER | EMBER | GOLD | SILVER |
+| IRON | GOLD | EMBER | SILVER | SILVER |
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | GOLD | EMBER | GOLD | GOLD |
+| EMBER | SILVER | EMBER | GOLD | GOLD |
+| EMBER | SILVER | EMBER | SILVER | SILVER |
+Freegame spin 3 (set 0): 3.3000 (3.3000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COAL | COPPER | SILVER | EMBER |
+| W   | W   | COAL | SILVER | EMBER |
+| EMBER | EMBER | W   | IRON | GOLD |
+Line 1: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 3: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 4: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 6: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 9: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 10: 3 oak COAL = 0.1500 (0.1500x stake)
+Freegame spin 4 (set 0): 4.2000 (4.2000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | GOLD | GOLD | EMBER | EMBER |
+| GOLD | SILVER | SILVER | EMBER | EMBER |
+| SILVER | SILVER | SILVER | GOLD | EMBER |
+Line 2: 3 oak GOLD = 1.4000 (1.4000x stake)
+Line 3: 3 oak SILVER = 0.7000 (0.7000x stake)
+Line 7: 3 oak SILVER = 0.7000 (0.7000x stake)
+Line 8: 3 oak GOLD = 1.4000 (1.4000x stake)
+Freegame spin 5 (set 0): 243.0000 (243.0000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | W   | EMBER | W   | EMBER |
+| COAL | EMBER | EMBER | EMBER | EMBER |
+| W   | EMBER | EMBER | EMBER | EMBER |
+Line 3: 5 oak EMBER = 81.0000 (81.0000x stake)
+Line 5: 5 oak EMBER = 81.0000 (81.0000x stake)
+Line 7: 5 oak EMBER = 81.0000 (81.0000x stake)
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | IRON | COAL | EMBER |
+| GOLD | SILVER | COPPER | W   | EMBER |
+| GOLD | IRON | COAL | EMBER | EMBER |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | SILVER | SILVER | GOLD |
+| IRON | EMBER | SILVER | IRON | GOLD |
+| IRON | GOLD | IRON | IRON | SILVER |
+Freegame spin 8 (set 0): 48.6000 (48.6000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COPPER | COAL | GOLD | GOLD |
+| EMBER | COAL | W   | SILVER | GOLD |
+| GOLD | W   | EMBER | SILVER | SILVER |
+Line 7: 5 oak GOLD = 43.2000 (43.2000x stake)
+Line 9: 3 oak EMBER = 5.4000 (5.4000x stake)
+Recalculated total win: 299.1000 (299.1000x stake)
+Recorded total/basegame/feature wins: 299.1000 / 0.0000 / 299.1000
+Replay validation: PASSED
+runs/BB1-balance/simulation-2026-10-20_16-49-40 id=10
+Replay 10 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | S   | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | EMBER | GOLD | IRON |
+| IRON | GOLD | EMBER | SILVER | COPPER |
+| IRON | SILVER | EMBER | SILVER | COAL |
+Freegame spin 2 (set 0): 21.6000 (21.6000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COAL | EMBER | COAL | GOLD |
+| SILVER | W   | GOLD | W   | GOLD |
+| SILVER | EMBER | GOLD | EMBER | SILVER |
+Line 4: 5 oak GOLD = 10.8000 (10.8000x stake)
+Line 10: 5 oak GOLD = 10.8000 (10.8000x stake)
+Freegame spin 3 (set 0): 162.0000 (162.0000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | COPPER | EMBER | W   | W   |
+| EMBER | COAL | EMBER | EMBER | EMBER |
+| EMBER | W   | EMBER | EMBER | EMBER |
+Line 3: 5 oak EMBER = 54.0000 (54.0000x stake)
+Line 7: 5 oak EMBER = 54.0000 (54.0000x stake)
+Line 9: 5 oak EMBER = 54.0000 (54.0000x stake)
+Freegame spin 4 (set 0): 1.0500 (1.0500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | W   | COAL | EMBER | COPPER |
+| SILVER | EMBER | W   | EMBER | COAL |
+| IRON | EMBER | EMBER | EMBER | W   |
+Line 6: 3 oak SILVER = 1.0500 (1.0500x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | GOLD | EMBER | IRON |
+| IRON | IRON | SILVER | EMBER | COPPER |
+| IRON | COPPER | SILVER | GOLD | COAL |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | EMBER | W   | EMBER |
+| EMBER | GOLD | EMBER | EMBER | EMBER |
+| EMBER | SILVER | GOLD | EMBER | EMBER |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | COPPER | W   | EMBER | COPPER |
+| IRON | COAL | EMBER | EMBER | COAL |
+| IRON | W   | EMBER | EMBER | W   |
+Freegame spin 8 (set 0): 2.8000 (2.8000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | IRON | SILVER | SILVER | GOLD |
+| EMBER | IRON | SILVER | IRON | GOLD |
+| EMBER | COPPER | IRON | IRON | SILVER |
+Line 4: 4 oak IRON = 2.8000 (2.8000x stake)
+Recalculated total win: 187.4500 (187.4500x stake)
+Recorded total/basegame/feature wins: 187.4500 / 0.0000 / 187.4500
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=1
+Replay 1 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | S   | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | S   |
+Freegame spin 1 (set 0): 0.2000 (0.2000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | IRON | SILVER | IRON |
+| W   | IRON | COPPER | SILVER | IRON |
+| EMBER | COPPER | COAL | IRON | COPPER |
+Line 8: 3 oak IRON = 0.2000 (0.2000x stake)
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | W   | EMBER | IRON | W   |
+| COPPER | EMBER | GOLD | IRON | EMBER |
+| COAL | EMBER | GOLD | COPPER | EMBER |
+Freegame spin 3 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | EMBER | EMBER | GOLD |
+| SILVER | COPPER | GOLD | EMBER | GOLD |
+| IRON | COAL | GOLD | GOLD | SILVER |
+Freegame spin 4 (set 0): 3.8000 (3.8000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | SILVER | SILVER | COPPER | W   |
+| EMBER | IRON | SILVER | COAL | EMBER |
+| EMBER | IRON | IRON | W   | EMBER |
+Line 2: 3 oak SILVER = 0.7000 (0.7000x stake)
+Line 4: 3 oak IRON = 0.4000 (0.4000x stake)
+Line 6: 4 oak SILVER = 2.7000 (2.7000x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | IRON | SILVER | IRON |
+| SILVER | SILVER | IRON | SILVER | IRON |
+| IRON | SILVER | COPPER | IRON | COPPER |
+Freegame spin 6 (set 0): 0.6000 (0.6000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | SILVER | W   | COAL |
+| W   | IRON | IRON | EMBER | W   |
+| EMBER | COPPER | IRON | EMBER | EMBER |
+Line 1: 3 oak IRON = 0.6000 (0.6000x stake)
+Freegame spin 7 (set 0): 1.2000 (1.2000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | IRON | COPPER | SILVER | W   |
+| COPPER | COPPER | COAL | SILVER | EMBER |
+| COAL | COAL | W   | IRON | EMBER |
+Line 3: 3 oak COAL = 0.6000 (0.6000x stake)
+Line 7: 3 oak COAL = 0.6000 (0.6000x stake)
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | IRON | W   | SILVER |
+| SILVER | EMBER | IRON | EMBER | IRON |
+| SILVER | EMBER | COPPER | EMBER | IRON |
+Recalculated total win: 5.8000 (5.8000x stake)
+Recorded total/basegame/feature wins: 5.8000 / 0.0000 / 5.8000
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=2
+Replay 2 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | S   | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | IRON | SILVER | EMBER | GOLD |
+| COAL | IRON | SILVER | EMBER | SILVER |
+| W   | COPPER | IRON | EMBER | SILVER |
+Freegame spin 2 (set 0): 0.7000 (0.7000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | GOLD | EMBER | W   | IRON |
+| SILVER | GOLD | EMBER | EMBER | IRON |
+| SILVER | SILVER | GOLD | EMBER | COPPER |
+Line 4: 3 oak GOLD = 0.7000 (0.7000x stake)
+Freegame spin 3 (set 0): 0.7000 (0.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | SILVER | EMBER | IRON |
+| GOLD | COAL | SILVER | EMBER | COPPER |
+| SILVER | W   | IRON | GOLD | COAL |
+Line 7: 3 oak SILVER = 0.7000 (0.7000x stake)
+Freegame spin 4 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | IRON | COAL | COPPER | IRON |
+| GOLD | IRON | W   | COAL | COPPER |
+| SILVER | COPPER | EMBER | W   | COAL |
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | GOLD | SILVER | SILVER |
+| IRON | COPPER | SILVER | SILVER | IRON |
+| IRON | COAL | SILVER | IRON | IRON |
+Freegame spin 6 (set 0): 32.4000 (32.4000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | W   | COAL | EMBER | COPPER |
+| GOLD | EMBER | W   | EMBER | COAL |
+| SILVER | EMBER | EMBER | GOLD | W   |
+Line 6: 5 oak GOLD = 32.4000 (32.4000x stake)
+Freegame spin 7 (set 0): 29.8000 (29.8000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | COPPER | COAL | GOLD |
+| EMBER | EMBER | COAL | W   | SILVER |
+| GOLD | GOLD | W   | EMBER | SILVER |
+Line 3: 3 oak GOLD = 2.8000 (2.8000x stake)
+Line 4: 4 oak EMBER = 27.0000 (27.0000x stake)
+Freegame spin 8 (set 0): 6.7500 (6.7500x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | GOLD | COPPER | SILVER | COAL |
+| EMBER | SILVER | COAL | SILVER | W   |
+| EMBER | SILVER | W   | IRON | EMBER |
+Line 4: 4 oak SILVER = 6.7500 (6.7500x stake)
+Recalculated total win: 70.3500 (70.3500x stake)
+Recorded total/basegame/feature wins: 70.3500 / 0.0000 / 70.3500
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=3
+Replay 3 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | S   |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | EMBER | W   | GOLD |
+| GOLD | IRON | EMBER | EMBER | SILVER |
+| GOLD | IRON | GOLD | EMBER | SILVER |
+Freegame spin 2 (set 0): 5.4000 (5.4000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | W   | GOLD | SILVER |
+| GOLD | EMBER | EMBER | SILVER | IRON |
+| GOLD | EMBER | EMBER | SILVER | IRON |
+Line 2: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 4: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 6: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 10: 3 oak EMBER = 1.3500 (1.3500x stake)
+Freegame spin 3 (set 0): 2.7000 (2.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | W   | EMBER | SILVER | EMBER |
+| COAL | EMBER | GOLD | IRON | EMBER |
+| W   | EMBER | GOLD | IRON | GOLD |
+Line 5: 3 oak EMBER = 2.7000 (2.7000x stake)
+Freegame spin 4 (set 0): 22.3500 (22.3500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | EMBER | SILVER | COPPER |
+| EMBER | EMBER | EMBER | SILVER | COAL |
+| GOLD | GOLD | GOLD | IRON | W   |
+Line 1: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 2: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 3: 3 oak GOLD = 2.1000 (2.1000x stake)
+Line 6: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 8: 3 oak EMBER = 4.0500 (4.0500x stake)
+Line 10: 3 oak EMBER = 4.0500 (4.0500x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | IRON | EMBER | COAL |
+| SILVER | EMBER | COPPER | EMBER | W   |
+| IRON | GOLD | COAL | EMBER | EMBER |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | IRON | W   | GOLD |
+| SILVER | SILVER | IRON | EMBER | SILVER |
+| IRON | SILVER | COPPER | EMBER | SILVER |
+Freegame spin 7 (set 0): 2.8000 (2.8000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | EMBER | COAL | SILVER | EMBER |
+| COAL | GOLD | W   | IRON | GOLD |
+| W   | GOLD | EMBER | IRON | GOLD |
+Line 7: 3 oak GOLD = 2.8000 (2.8000x stake)
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | SILVER | IRON | SILVER |
+| EMBER | IRON | IRON | COPPER | SILVER |
+| EMBER | IRON | IRON | COAL | IRON |
+Recalculated total win: 33.2500 (33.2500x stake)
+Recorded total/basegame/feature wins: 33.2500 / 0.0000 / 33.2500
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=4
+Replay 4 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.7000 (0.7000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COAL | GOLD | EMBER | GOLD |
+| SILVER | W   | GOLD | EMBER | GOLD |
+| SILVER | EMBER | SILVER | GOLD | SILVER |
+Line 10: 3 oak GOLD = 0.7000 (0.7000x stake)
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | EMBER | SILVER | W   |
+| GOLD | EMBER | EMBER | IRON | EMBER |
+| SILVER | EMBER | EMBER | IRON | EMBER |
+Freegame spin 3 (set 0): 0.4000 (0.4000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | IRON | SILVER | EMBER | IRON |
+| EMBER | COPPER | IRON | EMBER | IRON |
+| EMBER | COAL | IRON | GOLD | COPPER |
+Line 6: 3 oak IRON = 0.4000 (0.4000x stake)
+Freegame spin 4 (set 0): 12.1500 (12.1500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | W   | GOLD | GOLD | IRON |
+| EMBER | EMBER | SILVER | GOLD | IRON |
+| EMBER | EMBER | SILVER | SILVER | COPPER |
+Line 2: 4 oak GOLD = 8.1000 (8.1000x stake)
+Line 6: 4 oak SILVER = 4.0500 (4.0500x stake)
+Freegame spin 5 (set 0): 59.4000 (59.4000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | EMBER | EMBER | COPPER | GOLD |
+| EMBER | EMBER | EMBER | COAL | GOLD |
+| EMBER | GOLD | EMBER | W   | SILVER |
+Line 1: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 2: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 4: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 5: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 6: 4 oak EMBER = 27.0000 (27.0000x stake)
+Line 8: 3 oak EMBER = 5.4000 (5.4000x stake)
+Line 10: 3 oak EMBER = 5.4000 (5.4000x stake)
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | IRON | EMBER | EMBER | EMBER |
+| EMBER | IRON | GOLD | GOLD | EMBER |
+| GOLD | COPPER | GOLD | GOLD | GOLD |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | IRON | IRON | W   |
+| EMBER | SILVER | COPPER | COPPER | EMBER |
+| EMBER | IRON | COAL | COAL | EMBER |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 5x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | W   | IRON | IRON | W   |
+| GOLD | EMBER | IRON | IRON | EMBER |
+| SILVER | EMBER | COPPER | COPPER | EMBER |
+Recalculated total win: 72.6500 (72.6500x stake)
+Recorded total/basegame/feature wins: 72.6500 / 0.0000 / 72.6500
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=5
+Replay 5 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | IRON | GOLD | W   |
+| SILVER | COAL | IRON | GOLD | EMBER |
+| SILVER | W   | COPPER | SILVER | EMBER |
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | EMBER | COPPER | EMBER |
+| SILVER | GOLD | EMBER | COAL | GOLD |
+| IRON | GOLD | GOLD | W   | GOLD |
+Freegame spin 3 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | EMBER | EMBER | GOLD | EMBER |
+| COPPER | EMBER | GOLD | SILVER | GOLD |
+| COAL | GOLD | GOLD | SILVER | GOLD |
+Freegame spin 4 (set 0): 4.0500 (4.0500x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | W   | COPPER | IRON | IRON |
+| EMBER | EMBER | COAL | COPPER | IRON |
+| EMBER | EMBER | W   | COAL | COPPER |
+Line 3: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 4: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 9: 3 oak EMBER = 1.3500 (1.3500x stake)
+Freegame spin 5 (set 0): 8.3000 (8.3000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | IRON | SILVER | SILVER | SILVER |
+| IRON | IRON | IRON | IRON | SILVER |
+| COPPER | COPPER | IRON | IRON | IRON |
+Line 1: 4 oak IRON = 1.4000 (1.4000x stake)
+Line 4: 4 oak IRON = 1.4000 (1.4000x stake)
+Line 6: 5 oak IRON = 4.1000 (4.1000x stake)
+Line 10: 4 oak IRON = 1.4000 (1.4000x stake)
+Freegame spin 6 (set 0): 2.1000 (2.1000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | GOLD | IRON | W   |
+| GOLD | COAL | SILVER | COPPER | EMBER |
+| SILVER | W   | SILVER | COAL | EMBER |
+Line 3: 3 oak SILVER = 1.0500 (1.0500x stake)
+Line 7: 3 oak SILVER = 1.0500 (1.0500x stake)
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | W   | IRON | SILVER | EMBER |
+| SILVER | EMBER | IRON | SILVER | GOLD |
+| IRON | EMBER | COPPER | IRON | GOLD |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | SILVER | EMBER | COAL | SILVER |
+| IRON | IRON | GOLD | W   | IRON |
+| IRON | IRON | GOLD | EMBER | IRON |
+Recalculated total win: 14.4500 (14.4500x stake)
+Recorded total/basegame/feature wins: 14.4500 / 0.0000 / 14.4500
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=6
+Replay 6 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | S   | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+Freegame spin 1 (set 0): 4.0500 (4.0500x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COPPER | W   | IRON | EMBER |
+| EMBER | COAL | EMBER | IRON | GOLD |
+| EMBER | W   | EMBER | COPPER | GOLD |
+Line 3: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 7: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 9: 3 oak EMBER = 1.3500 (1.3500x stake)
+Freegame spin 2 (set 0): 23.0000 (23.0000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | W   | W   | EMBER | COAL |
+| GOLD | EMBER | EMBER | GOLD | W   |
+| GOLD | EMBER | EMBER | GOLD | EMBER |
+Line 2: 4 oak EMBER = 13.5000 (13.5000x stake)
+Line 4: 3 oak EMBER = 2.7000 (2.7000x stake)
+Line 6: 3 oak EMBER = 2.7000 (2.7000x stake)
+Line 8: 3 oak GOLD = 1.4000 (1.4000x stake)
+Line 10: 3 oak EMBER = 2.7000 (2.7000x stake)
+Freegame spin 3 (set 0): 1.6500 (1.6500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | IRON | IRON | EMBER | EMBER |
+| EMBER | COPPER | IRON | GOLD | EMBER |
+| EMBER | COAL | COPPER | GOLD | GOLD |
+Line 2: 3 oak IRON = 0.6000 (0.6000x stake)
+Line 4: 3 oak COPPER = 0.4500 (0.4500x stake)
+Line 6: 3 oak IRON = 0.6000 (0.6000x stake)
+Freegame spin 4 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | GOLD | IRON | GOLD |
+| GOLD | EMBER | SILVER | IRON | SILVER |
+| SILVER | EMBER | SILVER | COPPER | SILVER |
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | GOLD | GOLD | GOLD | EMBER |
+| COPPER | GOLD | GOLD | SILVER | EMBER |
+| COAL | SILVER | SILVER | SILVER | GOLD |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | EMBER | SILVER | COAL | COPPER |
+| GOLD | EMBER | SILVER | W   | COAL |
+| GOLD | GOLD | IRON | EMBER | W   |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | EMBER | IRON | EMBER | COPPER |
+| COPPER | EMBER | COPPER | EMBER | COAL |
+| COAL | EMBER | COAL | GOLD | W   |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COPPER | EMBER | COPPER | SILVER |
+| COPPER | COAL | EMBER | COAL | IRON |
+| COAL | W   | GOLD | W   | IRON |
+Recalculated total win: 28.7000 (28.7000x stake)
+Recorded total/basegame/feature wins: 28.7000 / 0.0000 / 28.7000
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=7
+Replay 7 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.3500 (0.3500x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | COPPER | W   | IRON |
+| SILVER | GOLD | COAL | EMBER | COPPER |
+| IRON | SILVER | W   | EMBER | COAL |
+Line 9: 3 oak SILVER = 0.3500 (0.3500x stake)
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | EMBER | GOLD | SILVER |
+| W   | IRON | EMBER | GOLD | IRON |
+| EMBER | COPPER | GOLD | SILVER | IRON |
+Freegame spin 3 (set 0): 5.7000 (5.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | IRON | IRON | IRON | IRON |
+| W   | COPPER | COPPER | COPPER | IRON |
+| EMBER | COAL | COAL | COAL | COPPER |
+Line 1: 4 oak COPPER = 0.9000 (0.9000x stake)
+Line 8: 5 oak IRON = 4.1000 (4.1000x stake)
+Line 9: 4 oak COAL = 0.7000 (0.7000x stake)
+Freegame spin 4 (set 0): 1.0500 (1.0500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | COAL | SILVER | SILVER | W   |
+| COAL | W   | IRON | IRON | EMBER |
+| W   | EMBER | IRON | IRON | EMBER |
+Line 5: 3 oak SILVER = 1.0500 (1.0500x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | GOLD | SILVER | GOLD | EMBER |
+| EMBER | SILVER | IRON | SILVER | GOLD |
+| EMBER | SILVER | IRON | SILVER | GOLD |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | EMBER | GOLD | IRON | IRON |
+| GOLD | EMBER | GOLD | COPPER | IRON |
+| SILVER | GOLD | SILVER | COAL | COPPER |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | IRON | IRON | EMBER |
+| IRON | GOLD | IRON | IRON | EMBER |
+| IRON | SILVER | COPPER | COPPER | EMBER |
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | SILVER | GOLD | SILVER |
+| SILVER | COPPER | SILVER | SILVER | SILVER |
+| IRON | COAL | IRON | SILVER | IRON |
+Recalculated total win: 7.1000 (7.1000x stake)
+Recorded total/basegame/feature wins: 7.1000 / 0.0000 / 7.1000
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=8
+Replay 8 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| S   | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | IRON | SILVER | S   |
+| COAL | COPPER | S   | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | COPPER | EMBER | COPPER | EMBER |
+| IRON | COAL | EMBER | COAL | GOLD |
+| IRON | W   | GOLD | W   | GOLD |
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | EMBER | EMBER | GOLD | IRON |
+| IRON | EMBER | GOLD | SILVER | IRON |
+| COPPER | EMBER | GOLD | SILVER | COPPER |
+Freegame spin 3 (set 0): 0.4000 (0.4000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | W   | EMBER | GOLD |
+| IRON | IRON | EMBER | EMBER | GOLD |
+| IRON | COPPER | EMBER | EMBER | SILVER |
+Line 5: 3 oak IRON = 0.2000 (0.2000x stake)
+Line 8: 3 oak IRON = 0.2000 (0.2000x stake)
+Freegame spin 4 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | EMBER | EMBER | W   |
+| SILVER | GOLD | EMBER | EMBER | EMBER |
+| IRON | SILVER | GOLD | EMBER | EMBER |
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | EMBER | IRON | EMBER | COAL |
+| COAL | EMBER | IRON | GOLD | W   |
+| W   | GOLD | COPPER | GOLD | EMBER |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 2x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | COAL | COAL | SILVER |
+| IRON | EMBER | W   | W   | SILVER |
+| IRON | EMBER | EMBER | EMBER | IRON |
+Freegame spin 7 (set 0): 0.7000 (0.7000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | COAL | EMBER | EMBER |
+| GOLD | COAL | W   | EMBER | EMBER |
+| SILVER | W   | EMBER | GOLD | GOLD |
+Line 7: 3 oak SILVER = 0.7000 (0.7000x stake)
+Freegame spin 8 (set 0): 0.0000 (0.0000x stake)
+Heat 3x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COAL | EMBER | GOLD | COPPER |
+| COPPER | W   | EMBER | GOLD | COAL |
+| COAL | EMBER | EMBER | SILVER | W   |
+Recalculated total win: 1.1000 (1.1000x stake)
+Recorded total/basegame/feature wins: 1.1000 / 0.0000 / 1.1000
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=9
+Replay 9 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | IRON | SILVER | GOLD |
+| COAL | COPPER | S   | SILVER | S   |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | W   | GOLD | GOLD |
+| SILVER | EMBER | EMBER | GOLD | SILVER |
+| IRON | GOLD | EMBER | SILVER | SILVER |
+Freegame spin 2 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | GOLD | EMBER | GOLD | GOLD |
+| EMBER | SILVER | EMBER | GOLD | GOLD |
+| EMBER | SILVER | EMBER | SILVER | SILVER |
+Freegame spin 3 (set 0): 3.3000 (3.3000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COAL | COPPER | SILVER | EMBER |
+| W   | W   | COAL | SILVER | EMBER |
+| EMBER | EMBER | W   | IRON | GOLD |
+Line 1: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 3: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 4: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 6: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 9: 3 oak EMBER = 1.3500 (1.3500x stake)
+Line 10: 3 oak COAL = 0.1500 (0.1500x stake)
+Freegame spin 4 (set 0): 4.2000 (4.2000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | GOLD | GOLD | EMBER | EMBER |
+| GOLD | SILVER | SILVER | EMBER | EMBER |
+| SILVER | SILVER | SILVER | GOLD | EMBER |
+Line 2: 3 oak GOLD = 1.4000 (1.4000x stake)
+Line 3: 3 oak SILVER = 0.7000 (0.7000x stake)
+Line 7: 3 oak SILVER = 0.7000 (0.7000x stake)
+Line 8: 3 oak GOLD = 1.4000 (1.4000x stake)
+Freegame spin 5 (set 0): 243.0000 (243.0000x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | W   | EMBER | W   | EMBER |
+| COAL | EMBER | EMBER | EMBER | EMBER |
+| W   | EMBER | EMBER | EMBER | EMBER |
+Line 3: 5 oak EMBER = 81.0000 (81.0000x stake)
+Line 5: 5 oak EMBER = 81.0000 (81.0000x stake)
+Line 7: 5 oak EMBER = 81.0000 (81.0000x stake)
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | IRON | COAL | EMBER |
+| GOLD | SILVER | COPPER | W   | EMBER |
+| GOLD | IRON | COAL | EMBER | EMBER |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | EMBER | SILVER | SILVER | GOLD |
+| IRON | EMBER | SILVER | IRON | GOLD |
+| IRON | GOLD | IRON | IRON | SILVER |
+Freegame spin 8 (set 0): 48.6000 (48.6000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COPPER | COAL | GOLD | GOLD |
+| EMBER | COAL | W   | SILVER | GOLD |
+| GOLD | W   | EMBER | SILVER | SILVER |
+Line 7: 5 oak GOLD = 43.2000 (43.2000x stake)
+Line 9: 3 oak EMBER = 5.4000 (5.4000x stake)
+Recalculated total win: 299.1000 (299.1000x stake)
+Recorded total/basegame/feature wins: 299.1000 / 0.0000 / 299.1000
+Replay validation: PASSED
+runs/BB1-smoke/simulation-2026-10-20_16-49-26 id=10
+Replay 10 (G002-ember-forge, mode BB1)
+Basegame (set 1): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | COPPER | IRON | SILVER | GOLD |
+| S   | COPPER | S   | SILVER | S   |
+| COAL | COPPER | IRON | SILVER | GOLD |
+Freegame spin 1 (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | EMBER | GOLD | IRON |
+| IRON | GOLD | EMBER | SILVER | COPPER |
+| IRON | SILVER | EMBER | SILVER | COAL |
+Freegame spin 2 (set 0): 21.6000 (21.6000x stake)
+Heat 1x; next Heat 2x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COAL | EMBER | COAL | GOLD |
+| SILVER | W   | GOLD | W   | GOLD |
+| SILVER | EMBER | GOLD | EMBER | SILVER |
+Line 4: 5 oak GOLD = 10.8000 (10.8000x stake)
+Line 10: 5 oak GOLD = 10.8000 (10.8000x stake)
+Freegame spin 3 (set 0): 162.0000 (162.0000x stake)
+Heat 2x; next Heat 3x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | COPPER | EMBER | W   | W   |
+| EMBER | COAL | EMBER | EMBER | EMBER |
+| EMBER | W   | EMBER | EMBER | EMBER |
+Line 3: 5 oak EMBER = 54.0000 (54.0000x stake)
+Line 7: 5 oak EMBER = 54.0000 (54.0000x stake)
+Line 9: 5 oak EMBER = 54.0000 (54.0000x stake)
+Freegame spin 4 (set 0): 1.0500 (1.0500x stake)
+Heat 3x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | W   | COAL | EMBER | COPPER |
+| SILVER | EMBER | W   | EMBER | COAL |
+| IRON | EMBER | EMBER | EMBER | W   |
+Line 6: 3 oak SILVER = 1.0500 (1.0500x stake)
+Freegame spin 5 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | GOLD | EMBER | IRON |
+| IRON | IRON | SILVER | EMBER | COPPER |
+| IRON | COPPER | SILVER | GOLD | COAL |
+Freegame spin 6 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | EMBER | W   | EMBER |
+| EMBER | GOLD | EMBER | EMBER | EMBER |
+| EMBER | SILVER | GOLD | EMBER | EMBER |
+Freegame spin 7 (set 0): 0.0000 (0.0000x stake)
+Heat 4x; next Heat 4x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | COPPER | W   | EMBER | COPPER |
+| IRON | COAL | EMBER | EMBER | COAL |
+| IRON | W   | EMBER | EMBER | W   |
+Freegame spin 8 (set 0): 2.8000 (2.8000x stake)
+Heat 4x; next Heat 5x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | IRON | SILVER | SILVER | GOLD |
+| EMBER | IRON | SILVER | IRON | GOLD |
+| EMBER | COPPER | IRON | IRON | SILVER |
+Line 4: 4 oak IRON = 2.8000 (2.8000x stake)
+Recalculated total win: 187.4500 (187.4500x stake)
+Recorded total/basegame/feature wins: 187.4500 / 0.0000 / 187.4500
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=1
+Replay 1 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COPPER | SILVER | GOLD | IRON |
+| SILVER | IRON | GOLD | COAL | SILVER |
+| GOLD | SILVER | EMBER | COPPER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=2
+Replay 2 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | GOLD | W   | IRON |
+| GOLD | SILVER | COAL | COAL | SILVER |
+| EMBER | GOLD | COPPER | COPPER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=3
+Replay 3 (G002-ember-forge, mode EM1)
+Basegame (set 0): 12.1500 (12.1500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | SILVER | SILVER | SILVER |
+| W   | GOLD | GOLD | GOLD | GOLD |
+| COAL | COAL | EMBER | COAL | COAL |
+Line 1: 5 oak GOLD = 10.8000 (10.8000x stake)
+Line 8: 4 oak SILVER = 1.3500 (1.3500x stake)
+Recalculated total win: 12.1500 (12.1500x stake)
+Recorded total/basegame/feature wins: 12.1500 / 12.1500 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=4
+Replay 4 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | COPPER | GOLD | IRON |
+| GOLD | COAL | IRON | COAL | SILVER |
+| EMBER | COPPER | SILVER | COPPER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=5
+Replay 5 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | IRON | COAL | GOLD |
+| W   | COAL | SILVER | COPPER | COAL |
+| COAL | COPPER | GOLD | IRON | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=6
+Replay 6 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.4500 (0.4500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COAL | COPPER | EMBER | IRON |
+| COAL | COPPER | IRON | W   | SILVER |
+| COPPER | IRON | SILVER | COAL | GOLD |
+Line 5: 4 oak COPPER = 0.4500 (0.4500x stake)
+Recalculated total win: 0.4500 (0.4500x stake)
+Recorded total/basegame/feature wins: 0.4500 / 0.4500 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=7
+Replay 7 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COAL | SILVER | GOLD | COAL |
+| W   | COPPER | GOLD | EMBER | COPPER |
+| COAL | IRON | EMBER | W   | IRON |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=8
+Replay 8 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.1500 (0.1500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | W   | COAL | IRON | IRON |
+| IRON | COAL | COPPER | SILVER | SILVER |
+| SILVER | COPPER | IRON | GOLD | GOLD |
+Line 6: 3 oak COPPER = 0.1500 (0.1500x stake)
+Recalculated total win: 0.1500 (0.1500x stake)
+Recorded total/basegame/feature wins: 0.1500 / 0.1500 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=9
+Replay 9 (G002-ember-forge, mode EM1)
+Basegame (set 0): 4.0500 (4.0500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | COPPER | GOLD | IRON |
+| W   | EMBER | IRON | EMBER | SILVER |
+| COAL | W   | SILVER | W   | GOLD |
+Line 9: 5 oak SILVER = 4.0500 (4.0500x stake)
+Recalculated total win: 4.0500 (4.0500x stake)
+Recorded total/basegame/feature wins: 4.0500 / 4.0500 / 0.0000
+Replay validation: PASSED
+runs/EM1-balance/simulation-2026-10-20_16-49-40 id=10
+Replay 10 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.4500 (0.4500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | COAL | COPPER | COAL | COAL |
+| COAL | COPPER | IRON | COPPER | COPPER |
+| COPPER | IRON | SILVER | IRON | IRON |
+Line 5: 4 oak COPPER = 0.4500 (0.4500x stake)
+Recalculated total win: 0.4500 (0.4500x stake)
+Recorded total/basegame/feature wins: 0.4500 / 0.4500 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=1
+Replay 1 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COPPER | SILVER | GOLD | IRON |
+| SILVER | IRON | GOLD | COAL | SILVER |
+| GOLD | SILVER | EMBER | COPPER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=2
+Replay 2 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | IRON | GOLD | W   | IRON |
+| GOLD | SILVER | COAL | COAL | SILVER |
+| EMBER | GOLD | COPPER | COPPER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=3
+Replay 3 (G002-ember-forge, mode EM1)
+Basegame (set 0): 12.1500 (12.1500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | SILVER | SILVER | SILVER |
+| W   | GOLD | GOLD | GOLD | GOLD |
+| COAL | COAL | EMBER | COAL | COAL |
+Line 1: 5 oak GOLD = 10.8000 (10.8000x stake)
+Line 8: 4 oak SILVER = 1.3500 (1.3500x stake)
+Recalculated total win: 12.1500 (12.1500x stake)
+Recorded total/basegame/feature wins: 12.1500 / 12.1500 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=4
+Replay 4 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| SILVER | GOLD | COPPER | GOLD | IRON |
+| GOLD | COAL | IRON | COAL | SILVER |
+| EMBER | COPPER | SILVER | COPPER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=5
+Replay 5 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | IRON | COAL | GOLD |
+| W   | COAL | SILVER | COPPER | COAL |
+| COAL | COPPER | GOLD | IRON | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=6
+Replay 6 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.4500 (0.4500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COAL | COPPER | EMBER | IRON |
+| COAL | COPPER | IRON | W   | SILVER |
+| COPPER | IRON | SILVER | COAL | GOLD |
+Line 5: 4 oak COPPER = 0.4500 (0.4500x stake)
+Recalculated total win: 0.4500 (0.4500x stake)
+Recorded total/basegame/feature wins: 0.4500 / 0.4500 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=7
+Replay 7 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COAL | SILVER | GOLD | COAL |
+| W   | COPPER | GOLD | EMBER | COPPER |
+| COAL | IRON | EMBER | W   | IRON |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=8
+Replay 8 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.1500 (0.1500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | W   | COAL | IRON | IRON |
+| IRON | COAL | COPPER | SILVER | SILVER |
+| SILVER | COPPER | IRON | GOLD | GOLD |
+Line 6: 3 oak COPPER = 0.1500 (0.1500x stake)
+Recalculated total win: 0.1500 (0.1500x stake)
+Recorded total/basegame/feature wins: 0.1500 / 0.1500 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=9
+Replay 9 (G002-ember-forge, mode EM1)
+Basegame (set 0): 4.0500 (4.0500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | COPPER | GOLD | IRON |
+| W   | EMBER | IRON | EMBER | SILVER |
+| COAL | W   | SILVER | W   | GOLD |
+Line 9: 5 oak SILVER = 4.0500 (4.0500x stake)
+Recalculated total win: 4.0500 (4.0500x stake)
+Recorded total/basegame/feature wins: 4.0500 / 4.0500 / 0.0000
+Replay validation: PASSED
+runs/EM1-smoke/simulation-2026-10-20_16-49-26 id=10
+Replay 10 (G002-ember-forge, mode EM1)
+Basegame (set 0): 0.4500 (0.4500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | COAL | COPPER | COAL | COAL |
+| COAL | COPPER | IRON | COPPER | COPPER |
+| COPPER | IRON | SILVER | IRON | IRON |
+Line 5: 4 oak COPPER = 0.4500 (0.4500x stake)
+Recalculated total win: 0.4500 (0.4500x stake)
+Recorded total/basegame/feature wins: 0.4500 / 0.4500 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=1
+Replay 1 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.2000 (0.2000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | W   | SILVER | W   |
+| EMBER | IRON | COAL | GOLD | COAL |
+| W   | SILVER | COPPER | COAL | COPPER |
+Line 5: 3 oak IRON = 0.2000 (0.2000x stake)
+Recalculated total win: 0.2000 (0.2000x stake)
+Recorded total/basegame/feature wins: 0.2000 / 0.2000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=2
+Replay 2 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | IRON | COAL | EMBER | W   |
+| SILVER | SILVER | COPPER | W   | COAL |
+| GOLD | GOLD | IRON | COAL | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=3
+Replay 3 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.1500 (0.1500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | COPPER | COAL | IRON | COPPER |
+| IRON | IRON | COPPER | SILVER | IRON |
+| SILVER | SILVER | IRON | GOLD | SILVER |
+Line 6: 3 oak COPPER = 0.1500 (0.1500x stake)
+Recalculated total win: 0.1500 (0.1500x stake)
+Recorded total/basegame/feature wins: 0.1500 / 0.1500 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=4
+Replay 4 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | IRON | W   | W   |
+| W   | GOLD | SILVER | COAL | COAL |
+| COAL | COAL | GOLD | COPPER | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=5
+Replay 5 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.3000 (0.3000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | COAL | EMBER | COPPER | GOLD |
+| COAL | COPPER | W   | IRON | EMBER |
+| COPPER | IRON | COAL | SILVER | W   |
+Line 6: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 10: 3 oak COPPER = 0.1500 (0.1500x stake)
+Recalculated total win: 0.3000 (0.3000x stake)
+Recorded total/basegame/feature wins: 0.3000 / 0.3000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=6
+Replay 6 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | SILVER | COPPER | SILVER | IRON |
+| COPPER | GOLD | IRON | GOLD | SILVER |
+| IRON | COAL | SILVER | EMBER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=7
+Replay 7 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | SILVER | IRON | IRON |
+| W   | COAL | GOLD | SILVER | SILVER |
+| COAL | COPPER | COAL | GOLD | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=8
+Replay 8 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COPPER | GOLD | GOLD | W   |
+| SILVER | IRON | COAL | EMBER | COAL |
+| GOLD | SILVER | COPPER | W   | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=9
+Replay 9 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COAL | COPPER | GOLD | COAL |
+| W   | COPPER | IRON | EMBER | COPPER |
+| COAL | IRON | SILVER | W   | IRON |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-balance/simulation-2026-10-20_16-49-40 id=10
+Replay 10 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | W   | IRON | SILVER | IRON |
+| EMBER | COAL | SILVER | GOLD | SILVER |
+| W   | COPPER | GOLD | COAL | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=1
+Replay 1 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.2000 (0.2000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | COPPER | W   | SILVER | W   |
+| EMBER | IRON | COAL | GOLD | COAL |
+| W   | SILVER | COPPER | COAL | COPPER |
+Line 5: 3 oak IRON = 0.2000 (0.2000x stake)
+Recalculated total win: 0.2000 (0.2000x stake)
+Recorded total/basegame/feature wins: 0.2000 / 0.2000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=2
+Replay 2 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | IRON | COAL | EMBER | W   |
+| SILVER | SILVER | COPPER | W   | COAL |
+| GOLD | GOLD | IRON | COAL | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=3
+Replay 3 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.1500 (0.1500x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COPPER | COPPER | COAL | IRON | COPPER |
+| IRON | IRON | COPPER | SILVER | IRON |
+| SILVER | SILVER | IRON | GOLD | SILVER |
+Line 6: 3 oak COPPER = 0.1500 (0.1500x stake)
+Recalculated total win: 0.1500 (0.1500x stake)
+Recorded total/basegame/feature wins: 0.1500 / 0.1500 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=4
+Replay 4 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | SILVER | IRON | W   | W   |
+| W   | GOLD | SILVER | COAL | COAL |
+| COAL | COAL | GOLD | COPPER | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=5
+Replay 5 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.3000 (0.3000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| W   | COAL | EMBER | COPPER | GOLD |
+| COAL | COPPER | W   | IRON | EMBER |
+| COPPER | IRON | COAL | SILVER | W   |
+Line 6: 3 oak COAL = 0.1500 (0.1500x stake)
+Line 10: 3 oak COPPER = 0.1500 (0.1500x stake)
+Recalculated total win: 0.3000 (0.3000x stake)
+Recorded total/basegame/feature wins: 0.3000 / 0.3000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=6
+Replay 6 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| COAL | SILVER | COPPER | SILVER | IRON |
+| COPPER | GOLD | IRON | GOLD | SILVER |
+| IRON | COAL | SILVER | EMBER | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=7
+Replay 7 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | GOLD | SILVER | IRON | IRON |
+| W   | COAL | GOLD | SILVER | SILVER |
+| COAL | COPPER | COAL | GOLD | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=8
+Replay 8 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| IRON | COPPER | GOLD | GOLD | W   |
+| SILVER | IRON | COAL | EMBER | COAL |
+| GOLD | SILVER | COPPER | W   | COPPER |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=9
+Replay 9 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| EMBER | COAL | COPPER | GOLD | COAL |
+| W   | COPPER | IRON | EMBER | COPPER |
+| COAL | IRON | SILVER | W   | IRON |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED
+runs/Normal-smoke/simulation-2026-10-20_16-49-25 id=10
+Replay 10 (G002-ember-forge, mode Normal)
+Basegame (set 0): 0.0000 (0.0000x stake)
+Heat 1x; next Heat 1x
+Screen:
+| R1  | R2  | R3  | R4  | R5  |
+| GOLD | W   | IRON | SILVER | IRON |
+| EMBER | COAL | SILVER | GOLD | SILVER |
+| W   | COPPER | GOLD | COAL | GOLD |
+Recalculated total win: 0.0000 (0.0000x stake)
+Recorded total/basegame/feature wins: 0.0000 / 0.0000 / 0.0000
+Replay validation: PASSED

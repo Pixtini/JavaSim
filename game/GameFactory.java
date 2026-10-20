@@ -6,6 +6,9 @@ import game.expandingwild.ExpandingWildGame;
 import game.expandingwild.config.ExpandingWildParParser;
 import game.walkingwild.WalkingWildGame;
 import game.walkingwild.config.WalkingWildParParser;
+import game.ember_forge.EmberForgeGame;
+import game.ember_forge.config.EmberForgeConfig;
+import game.ember_forge.config.EmberForgeParParser;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -23,6 +26,7 @@ public final class GameFactory {
             case "basic-proxy" -> new BasicProxyGame(new BasicProxyConfig());
             case "expanding-wild" -> createDefaultExpandingWild();
             case "G001-walkingwild" -> createDefaultWalkingWild();
+            case "G002-ember-forge" -> createDefaultEmberForge();
             default -> throw new IllegalArgumentException("Unknown game ID: " + gameId);
         };
     }
@@ -43,6 +47,14 @@ public final class GameFactory {
                     "Normal");
         } catch (IOException exception) {
             throw new IllegalStateException("Could not load the default G001 walkingWild PAR workbook", exception);
+        }
+    }
+
+    private static Game createDefaultEmberForge() {
+        try {
+            return create(EmberForgeConfig.ID, EmberForgeConfig.DEFAULT_PAR, "Normal");
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not load the default G002 Ember Forge PAR", exception);
         }
     }
 
@@ -67,6 +79,8 @@ public final class GameFactory {
                     new ExpandingWildParParser().parse(parWorkbookPath, gameMode));
             case "G001-walkingwild" -> new WalkingWildGame(
                     new WalkingWildParParser().parse(parWorkbookPath, gameMode));
+            case "G002-ember-forge" -> new EmberForgeGame(
+                    new EmberForgeParParser().parse(parWorkbookPath, gameMode));
             default -> throw new IllegalArgumentException(
                     "No PAR workbook parser is registered for game '" + gameId + "'");
         };

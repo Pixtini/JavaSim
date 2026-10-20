@@ -1,0 +1,11 @@
+Format Version,Gameplay ID,Game ID,Game Mode,Stake,Total Win,Basegame Win,Feature Win,Event Index,Event Type,Event Win,Event Payload
+"2","1","G002-ember-forge","EM1","1.0","0.0","0.0","0.0","0","emberforge-base","0.0","v1;0;7,11,4,10,6"
+"2","2","G002-ember-forge","EM1","1.0","0.0","0.0","0.0","0","emberforge-base","0.0","v1;0;8,5,0,5,11"
+"2","3","G002-ember-forge","EM1","1.0","12.15","12.15","0.0","0","emberforge-base","12.15","v1;0;10,1,4,9,7"
+"2","4","G002-ember-forge","EM1","1.0","0.0","0.0","0.0","0","emberforge-base","0.0","v1;0;8,2,2,10,11"
+"2","5","G002-ember-forge","EM1","1.0","0.0","0.0","0.0","0","emberforge-base","0.0","v1;0;10,2,10,11,8"
+"2","6","G002-ember-forge","EM1","1.0","0.45","0.45","0.0","0","emberforge-base","0.45","v1;0;4,3,9,4,6"
+"2","7","G002-ember-forge","EM1","1.0","0.0","0.0","0.0","0","emberforge-base","0.0","v1;0;10,3,4,3,9"
+"2","8","G002-ember-forge","EM1","1.0","0.15","0.15","0.0","0","emberforge-base","0.15","v1;0;6,9,8,1,11"
+"2","9","G002-ember-forge","EM1","1.0","4.05","4.05","0.0","0","emberforge-base","4.05","v1;0;10,7,2,3,11"
+"2","10","G002-ember-forge","EM1","1.0","0.45","0.45","0.0","0","emberforge-base","0.45","v1;0;11,10,2,11,4"

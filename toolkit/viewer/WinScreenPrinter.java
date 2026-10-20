@@ -8,6 +8,7 @@ import game.model.SpinResult;
 import game.model.GameRoundResult;
 import game.walkingwild.model.WalkingWildLineWin;
 import game.walkingwild.model.WalkingWildSpin;
+import game.ember_forge.model.EmberForgeSpin;
 import simulation.replay.SavedGameplay;
 import java.io.PrintStream;
 import java.util.Locale;
@@ -30,6 +31,8 @@ public final class WinScreenPrinter {
             }
         } else if (winningSpin instanceof WalkingWildSpin walkingWildResult) {
             printWalkingWild(walkingWildResult, stake, output);
+        } else if (winningSpin instanceof EmberForgeSpin ember) {
+            printEmberForge(ember, stake, output);
         } else if (!winningSpin.getAwards().isEmpty()) {
             output.println("Awards: " + winningSpin.getAwards());
         }
@@ -67,8 +70,20 @@ public final class WinScreenPrinter {
             }
         } else if (spin instanceof WalkingWildSpin walkingWild) {
             printWalkingWild(walkingWild, stake, output);
+        } else if (spin instanceof EmberForgeSpin ember) {
+            printEmberForge(ember, stake, output);
         } else if (!spin.getAwards().isEmpty()) {
             output.println("Awards: " + spin.getAwards());
+        }
+    }
+
+    private static void printEmberForge(EmberForgeSpin spin, double stake, PrintStream output) {
+        output.printf("Heat %dx; next Heat %dx%n", spin.heat(), spin.nextHeat());
+        printGrid(spin.grid(), output);
+        for (var line : spin.lineWins()) {
+            output.printf(Locale.ROOT, "Line %d: %d oak %s = %.4f (%.4fx stake)%n",
+                    line.paylineNumber(), line.candidate().matchingReels(),
+                    line.candidate().symbol().id(), line.totalWin(), line.totalWin() / stake);
         }
     }
 

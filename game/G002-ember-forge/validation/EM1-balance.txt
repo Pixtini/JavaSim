@@ -1,0 +1,70 @@
+TotalGame
+--------
+Rounds: 2000000
+Spins: 2459328
+Total staked: £4000000.0
+Total winnings: £3913908.7
+
+Simulated RTP: 97.8477%
+Basegame RTP: 31.4279%
+Freegame RTP: 66.4198%
+
+Hit Rate (1 in): 2.16
+
+FG Triggers: 57416
+Freegame Freq (1 in): 34.83
+Freegame Avg Win: £46.27
+
+Max Win: 8100.00× round stake (£8100.0)
+Wincaps: 0
+Max Win Freq (1 in): N/A
+Standard Deviation: 17.16
+Base SD: 2.12
+Free SD: 89.88
+
+Basegame
+--------
+Rounds: 2000000
+Total winnings: £1257116.6
+Simulated RTP: 31.4279%
+Hits: 926965
+Standard Deviation: 2.12
+
+Basegame Set 0
+--------
+Rounds: 1942584
+Total winnings: £1257116.6
+Simulated RTP: 32.3568%
+Hits: 926965
+
+Basegame Set 1
+--------
+Rounds: 57416
+Total winnings: £0.0
+Simulated RTP: 0.0000%
+Hits: 0
+
+Freegame
+--------
+Rounds: 459328
+Total winnings: £2656792.1
+Simulated RTP: 66.4198%
+Hits: 176418
+Standard Deviation: 89.88
+
+Freegame Set 0
+--------
+Rounds: 459328
+Total winnings: £2656792.1
+Simulated RTP: 66.4198%
+Hits: 176418
+
+Detailed report written to: /Users/connorkelly/Documents/JavaSim/game/G002-ember-forge/validation/runs/EM1-balance/simulation-2026-10-20_16-49-40
+Game: G002-ember-forge
+Mode: EM1
+Mode cost multiplier: 2.0× base stake
+PAR workbook: /Users/connorkelly/Documents/JavaSim/game/G002-ember-forge/source/PAR.xlsx
+Logical partitions: 16
+Seed: 440056
+Time Taken: 2.040 seconds
+Report root: /Users/connorkelly/Documents/JavaSim/game/G002-ember-forge/validation/runs/EM1-balance
