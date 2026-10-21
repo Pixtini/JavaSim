@@ -38,3 +38,7 @@ No unresolved rule/config blocker or unexplained validation discrepancy remains 
 ## Implementation boundary
 
 Existing GMF reels, weighted selection, payline evaluation and highest-payout selection are reused. Heat state/round orchestration and result adaptation stay game-owned. No GMF, simulation-engine or statistics change was needed. Factory, GUI, player adapter and screen printer integration were added. [Implementation handoff](IMPLEMENTATION.md) and [validation evidence](validation/validation-report.md) record the completed checks.
+
+## 21 October 2026 — recorded-book balance layer
+
+The user supplied three `<Mode>-Books` sheets and matching `source/Books/saved_gameplays_<mode>.csv` harvests, and requested a shared opt-in simulation mechanism. [Book validation](validation/books-2026-10-21/validation-report.md) records input hashes, full active-round reconstruction, deterministic/integration tests and real Simulation-window coverage. Inputs were preserved; duplicate ID contributions are additive and zero weights disable rows. The finite books' return/trigger expectations differ from the original reel game's math, including a high Normal expectation and no fourfold Normal/EM1 trigger relation. These remain human weight-balancing decisions, not unresolved implementation rules or agent approval of the supplied balance. Source/creation records above describe the original prototype revision.

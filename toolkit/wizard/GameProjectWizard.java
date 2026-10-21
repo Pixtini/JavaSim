@@ -41,6 +41,7 @@ public final class GameProjectWizard {
         try {
             Files.createDirectory(staging);
             Path source = Files.createDirectory(staging.resolve("source"));
+            Files.createDirectory(source.resolve("books"));
             Path implementation = staging.resolve("src/main/java/game").resolve(packageName);
             Path tests = staging.resolve("src/test/java/game").resolve(packageName).resolve("tests");
             Files.createDirectories(implementation);
@@ -146,7 +147,8 @@ public final class GameProjectWizard {
                 - `source/GDD.md`: game rules and approved math.
                 - `source/edge-cases.md`: required boundary behavior.
                 - `source/flowchart.md`: round and feature flow.
-                - `source/PAR.xlsx`: Config and Reels worksheet templates.
+                - `source/PAR.xlsx`: Config, Reels and empty Normal-Books worksheet templates; add a matching Books table for each purchase mode.
+                - `source/books/`: harvested `saved_gameplays_<mode>.csv` inputs for weighted-book balancing. Implement complete replay support before harvesting; see `docs/gameplay-books.md`.
                 - `source/game-creation-form.md`: implementation intake checklist.
                 - `AGENT-REVIEW.md`: agent-authored questions, gaps, and proposals.
                 - `src/main/java/game/%s/`: this game's Java implementation and config.

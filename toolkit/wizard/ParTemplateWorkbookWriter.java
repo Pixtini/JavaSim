@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/** Writes the blank two-sheet PAR workbook used by a new-game workspace. */
+/** Writes rule sheets and an empty Normal book table for a new-game workspace. */
 final class ParTemplateWorkbookWriter {
     private ParTemplateWorkbookWriter() {}
 
@@ -34,6 +34,8 @@ final class ParTemplateWorkbookWriter {
         row(config, 23, 0, "TODO", 1, "TODO");
 
         Map<Integer, Map<Integer, String>> reels = new LinkedHashMap<>();
+        Map<Integer, Map<Integer, String>> books = new LinkedHashMap<>();
+        row(books, 1, 0, "Gameplay ID", 1, "Weight");
         row(reels, 1, 0, "BG-0", 6, "FG-0");
         for (int setColumn : new int[] {0, 6}) {
             for (int reel = 0; reel < 5; reel++) {
@@ -51,6 +53,7 @@ final class ParTemplateWorkbookWriter {
                       <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
                       <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
                       <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+                      <Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
                     </Types>
                     """);
             put(zip, "_rels/.rels", """
@@ -62,7 +65,7 @@ final class ParTemplateWorkbookWriter {
             put(zip, "xl/workbook.xml", """
                     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                     <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-                      <sheets><sheet name="Config" sheetId="1" r:id="rId1"/><sheet name="Reels" sheetId="2" r:id="rId2"/></sheets>
+                      <sheets><sheet name="Config" sheetId="1" r:id="rId1"/><sheet name="Reels" sheetId="2" r:id="rId2"/><sheet name="Normal-Books" sheetId="3" r:id="rId3"/></sheets>
                     </workbook>
                     """);
             put(zip, "xl/_rels/workbook.xml.rels", """
@@ -70,10 +73,12 @@ final class ParTemplateWorkbookWriter {
                     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
                       <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
                       <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+                      <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/>
                     </Relationships>
                     """);
             put(zip, "xl/worksheets/sheet1.xml", worksheetXml(config));
             put(zip, "xl/worksheets/sheet2.xml", worksheetXml(reels));
+            put(zip, "xl/worksheets/sheet3.xml", worksheetXml(books));
         }
     }
 

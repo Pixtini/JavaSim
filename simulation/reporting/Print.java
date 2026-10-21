@@ -153,7 +153,9 @@ public class Print {
         if (simConfig.parWorkbookPath != null) {
             output.println("PAR workbook: " + simConfig.parWorkbookPath.toAbsolutePath().normalize());
         }
-        output.println("Logical partitions: " + simConfig.partitions);
+        if (simConfig.bookMetadata != null) {
+            output.println("Book CSV: " + simConfig.bookMetadata.gameplayCsv());
+        }
         output.println("Seed: " + simConfig.seed);
         output.printf(Locale.ROOT, "Time Taken: %.3f seconds%n",
                 simulationResult.getElapsedNanos() / 1_000_000_000.0);
@@ -176,6 +178,10 @@ public class Print {
     }
 
     private Path createReportFiles(SimConfig simConfig) throws IOException {
+        if (simConfig.useBooks) {
+            if (simConfig.bookMetadata == null) throw new IOException("Missing validated book metadata");
+            simConfig.bookMetadata.verifyInputsUnchanged();
+        }
         Files.createDirectories(reportsRoot);
         String timestamp = LocalDateTime.now().format(REPORT_FOLDER_TIME);
         String folderPrefix = "simulation-" + timestamp;
@@ -195,8 +201,14 @@ public class Print {
             String workbookName = selectedWorkbook.getFileName().toString();
             Path reportWorkbook = reportFolder.resolve(workbookName);
             var modeSheets = ParWorkbookModes.select(selectedWorkbook, simConfig.gameMode);
-            ParWorkbookSheetExporter.export(selectedWorkbook, reportWorkbook,
-                    modeSheets.sheetNames());
+            var includedSheets = new java.util.LinkedHashSet<>(modeSheets.sheetNames());
+            if (simConfig.useBooks) includedSheets.add(simConfig.bookMetadata.sheetName());
+            ParWorkbookSheetExporter.export(selectedWorkbook, reportWorkbook, includedSheets);
+            if (simConfig.useBooks) {
+                Path bookFolder = Files.createDirectory(reportFolder.resolve("books"));
+                String filename = "saved_gameplays_" + simConfig.bookMetadata.mode().toLowerCase(Locale.ROOT) + ".csv";
+                Files.copy(simConfig.bookMetadata.gameplayCsv(), bookFolder.resolve(filename));
+            }
             ParWorkbookHtmlReport.write(reportWorkbook, simConfig.gameMode,
                     reportFolder.resolve("config.html"));
         }

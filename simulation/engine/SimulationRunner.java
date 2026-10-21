@@ -8,6 +8,7 @@ import simulation.config.SimConfig;
 import simulation.result.SimulationResult;
 import simulation.replay.SavedGameplay;
 import simulation.stats.StandardStats;
+import simulation.books.GameplayBook;
 import toolkit.progress.ProgressBar;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,17 @@ public final class SimulationRunner {
         long startNanos = System.nanoTime();
         simConfig.modeCostMultiplier = game.getCostMultiplier();
         validateConfig();
+        GameplayBook book = null;
+        simConfig.bookMetadata = null;
+        if (simConfig.useBooks) {
+            try {
+                book = GameplayBook.load(simConfig, game);
+                simConfig.bookMetadata = book.metadata();
+            } catch (java.io.IOException exception) {
+                throw new IllegalArgumentException("Cannot load gameplay book: " + exception.getMessage(), exception);
+            }
+        }
+        final GameplayBook selectedBook = book;
         if (!simConfig.usePreviousSeed) {
             simConfig.seed = ThreadLocalRandom.current().nextLong();
         }
@@ -53,7 +65,7 @@ public final class SimulationRunner {
         ExecutorService executor = Executors.newFixedThreadPool(workerCount);
         List<Future<PartitionStats>> partitionResults = new ArrayList<>(simConfig.partitions);
         ProgressBar progress = new ProgressBar(
-                "Monte Carlo", simConfig.rounds, System.err);
+                simConfig.useBooks ? "Gameplay books" : "Monte Carlo", simConfig.rounds, System.err);
         long baseRoundsPerPartition = simConfig.rounds / simConfig.partitions;
         long extraRounds = simConfig.rounds % simConfig.partitions;
 
@@ -66,7 +78,7 @@ public final class SimulationRunner {
                         + Math.min(partitionId, extraRounds) + 1;
                 partitionResults.add(executor.submit(
                         () -> runPartition(currentPartitionId, firstRoundId,
-                                partitionRounds, progress)));
+                                partitionRounds, progress, selectedBook)));
             }
 
             // Merge by partition ID, not by completion order, for repeatable floating-point totals.
@@ -101,9 +113,9 @@ public final class SimulationRunner {
     }
 
     private PartitionStats runPartition(int partitionId, long firstRoundId,
-            long rounds, ProgressBar progress) {
+            long rounds, ProgressBar progress, GameplayBook book) {
         Random random = new Random(seedForPartition(simConfig.seed, partitionId));
-        GameSession gameSession = game.createSession(random);
+        GameSession gameSession = book == null ? game.createSession(random) : null;
 
         int[] paytable = game.getPaytable();
         List<String> awardLabels = game.getAwardLabels();
@@ -126,8 +138,9 @@ public final class SimulationRunner {
             long gameplayId = firstRoundId + round;
             boolean captureReplay = simConfig.maxSavedGameplays > 0
                     && gameplayId <= simConfig.maxSavedGameplays;
-            GameRoundResult roundResult = gameSession.playRound(
-                    simConfig.stake, maximumRoundWin, captureReplay);
+            GameRoundResult roundResult = book == null
+                    ? gameSession.playRound(simConfig.stake, maximumRoundWin, captureReplay)
+                    : book.draw(random).round();
             if (roundResult.isWinCapReached()) {
                 totalGameStats.recordWinCap();
             }

@@ -38,15 +38,15 @@ public final class EmberForgeGameTests {
         check(normal.freeReels().equals(ante.freeReels()) && normal.freeReels().equals(buy.freeReels()),
                 "identical Freegame across modes");
         rejects(() -> PARSER.parse(EmberForgeConfig.DEFAULT_PAR, "missing"), "unknown mode");
-        malformed("xl/worksheets/sheet1.xml", x -> x.replace("<c r=\"B3\"><v>1</v>",
+        malformed("Normal-Config", x -> x.replace("<c r=\"B3\"><v>1</v>",
                 "<c r=\"B3\"><v>2</v>"), "Normal cost");
-        malformed("xl/worksheets/sheet3.xml", x -> x.replace("<c r=\"B36\"><v>4</v>",
+        malformed("EM1-Config", x -> x.replace("<c r=\"B36\"><v>4</v>",
                 "<c r=\"B36\"><v>3</v>"), "EM1 trigger weights");
-        malformed("xl/worksheets/sheet4.xml", x -> x.replace("<c r=\"M3\"><v>6</v>",
+        malformed("EM1-Reels", x -> x.replace("<c r=\"M3\"><v>6</v>",
                 "<c r=\"M3\"><v>5</v>"), "divergent feature reels");
-        malformed("xl/worksheets/sheet2.xml", x -> x.replace("<c r=\"A3\"><v>1</v>",
+        malformed("Normal-Reels", x -> x.replace("<c r=\"A3\"><v>1</v>",
                 "<c r=\"A3\"><v>8</v>"), "scatter outside entry");
-        malformed("xl/worksheets/sheet2.xml", x -> x.replace("</row>",
+        malformed("Normal-Reels", x -> x.replace("</row>",
                 "<c r=\"S1\" t=\"inlineStr\"><is><t>FG-1</t></is></c></row>"), "extra set");
         malformed("xl/workbook.xml", x -> x.replace("name=\"BB1-Reels\"", "name=\"Other-Reels\""),
                 "incomplete mode pair");
@@ -57,10 +57,11 @@ public final class EmberForgeGameTests {
         try {
             try (var zip = new ZipFile(EmberForgeConfig.DEFAULT_PAR.toFile());
                     var out = new ZipOutputStream(Files.newOutputStream(temporary))) {
+                String target = resolveSheet(zip, entry);
                 var entries = zip.entries(); boolean modified = false;
                 while (entries.hasMoreElements()) {
                     var item = entries.nextElement(); byte[] content = zip.getInputStream(item).readAllBytes();
-                    if (item.getName().equals(entry)) {
+                    if (item.getName().equals(target)) {
                         String original = new String(content, StandardCharsets.UTF_8);
                         String replacement = change.apply(original);
                         check(!replacement.equals(original), "fixture actually changes " + name);
@@ -72,6 +73,29 @@ public final class EmberForgeGameTests {
             }
             rejects(() -> PARSER.parse(temporary, "Normal"), name);
         } finally { Files.deleteIfExists(temporary); }
+    }
+    private static String resolveSheet(ZipFile zip, String name) throws Exception {
+        if (name.equals("xl/workbook.xml")) return name;
+        var factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        var builder = factory.newDocumentBuilder();
+        var workbook = builder.parse(zip.getInputStream(zip.getEntry("xl/workbook.xml")));
+        var sheets = workbook.getElementsByTagNameNS("*", "sheet");
+        String relation = null;
+        for (int i = 0; i < sheets.getLength(); i++) {
+            var sheet = (org.w3c.dom.Element) sheets.item(i);
+            if (sheet.getAttribute("name").equals(name)) relation = sheet.getAttributeNS(
+                    "http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+        }
+        var relationships = builder.parse(zip.getInputStream(zip.getEntry("xl/_rels/workbook.xml.rels")))
+                .getElementsByTagNameNS("*", "Relationship");
+        for (int i = 0; i < relationships.getLength(); i++) {
+            var item = (org.w3c.dom.Element) relationships.item(i);
+            if (item.getAttribute("Id").equals(relation))
+                return Path.of("xl").resolve(item.getAttribute("Target")).normalize().toString();
+        }
+        throw new AssertionError("Missing fixture sheet " + name);
     }
     private static void entryScreens() {
         var base = new EmberForgeBaseGame(normal);

@@ -93,3 +93,11 @@ BG-0 contains no Scatters; BG-1 always shows three Scatters and zero line pay. N
 - [ ] Human product and production math approval — outside this agent prototype run.
 
 Status: **implemented rough prototype, ready for review**, 20 October 2026.
+
+## 21 October 2026 extension — recorded books
+
+- [x] Human-supplied Normal/EM1/BB1 Books sheets and mode CSVs preserved.
+- [x] Shared Simulation toggle selects only weighted recorded complete rounds; missing or invalid inputs block execution.
+- [x] Complete statistics, cost/stake scaling, replay capture, fixed-partition repeatability and portable report bundles checked.
+- [x] New finite-book return/trigger expectations recorded separately in [book validation](../validation/books-2026-10-21/validation-report.md); original reel balance above is historical.
+- [ ] Human review/rebalance of book weights and desired Normal/EM1 relationship.

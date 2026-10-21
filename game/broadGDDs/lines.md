@@ -42,3 +42,7 @@ If present , wilds subsitute for every regular symbol. They can also create thei
 Scatters - 
 
 If present, scatters award anywhere on the screen, they may have a payout or may trigger a feature like freegames.
+
+Recorded gameplay balancing -
+
+After the game is implemented and its normal mathematical configuration is balanced, humans can harvest complete simulation replays and reweight them through `<Mode>-Books` sheets. Each selected book entry represents the whole paid round, including its feature outcomes. Book simulation samples only those recorded rounds using relative weights; it does not spin new reels or redraw feature decisions. Payouts still scale with base stake and mode cost affects exposure only. Reweighting changes the resulting trigger/win distribution, so mode relationships must be checked against the balanced book itself. Missing book inputs block book-enabled runs. See [recorded gameplay books](../../docs/gameplay-books.md).

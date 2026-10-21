@@ -30,8 +30,11 @@ public final class GameProjectWizardTests {
             require(Files.isRegularFile(first.directory().resolve("AGENT-REVIEW.md")),
                     "agent review log created");
             var par = ExcelWorkbookReader.read(source.resolve("PAR.xlsx"));
-            require(par.sheets().keySet().equals(java.util.Set.of("Config", "Reels")),
-                    "placeholder PAR has only Config and Reels sheets");
+            require(par.sheets().keySet().equals(java.util.Set.of("Config", "Reels", "Normal-Books")),
+                    "placeholder PAR includes an empty Normal book table");
+            require(par.requireSheet("Normal-Books").cell(1, 0).equals("Gameplay ID")
+                    && par.requireSheet("Normal-Books").cell(1, 1).equals("Weight"), "book headers match the shared loader");
+            require(Files.isDirectory(source.resolve("books")), "harvest destination directory created");
             require(par.requireSheet("Config").cell(1, 0).equals("Game-Wide-Config"),
                     "Config starter table is readable");
             require(par.requireSheet("Reels").cell(1, 0).equals("BG-0"),

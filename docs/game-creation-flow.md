@@ -4,7 +4,7 @@ Use this workflow when adding a game module. Keep each game's source documents, 
 
 Human-assisted specification remains the usual starting point. When that route has stalled, [javasim-draft-game-spec](../.agents/skills/javasim-draft-game-spec/SKILL.md) can propose a small game from existing market research within the available broad GDDs. It produces a documentation-only draft under `docs/game-specs/<slug>/` by default, with one Basegame, one Freegame and Normal/EM1/BB1 purchase modes. Review the rules and unresolved math before promoting the documents into the workspace below; creating a fallback draft does not allocate a game ID, populate an approved PAR or implement the game.
 
-Start with the toolkit's **New game** tab. It creates the complete `GXXX-game-name/` workspace: source intake documents and blank Config/Reels workbook under `source/`, plus package-shaped implementation and test locations under `src/`. Complete and reconcile the source materials before implementing game logic; keep all game-owned assets in this workspace.
+Start with the toolkit's **New game** tab. It creates the complete `GXXX-game-name/` workspace: source intake documents and blank Config/Reels workbook with an empty Normal-Books table under `source/`, plus package-shaped implementation and test locations under `src/`. Complete and reconcile the source materials before implementing game logic; keep all game-owned assets in this workspace.
 
 ```mermaid
 flowchart TD
@@ -27,7 +27,7 @@ flowchart TD
     PrototypeCheck[Check representative basegame wins, losses and full feature rounds]
     TestRules[Test deterministic rules with controlled random outcomes]
     TestRun[Test seeded simulation, trigger frequency, stats and thread reproducibility]
-    Replay{Will this game support saved replay?}
+    Replay[Implement required complete saved replay for book balancing]
     ReplayImpl[Define versioned ReplayEvent payload and replayRound recalculation]
     Docs[Document rules, config, assumptions and known limits]
     Integrate[Verify selection from CLI and GUI; run and inspect report]
@@ -40,8 +40,7 @@ flowchart TD
     Prototype -->|Yes| PrototypeModel --> PrototypeUI --> PrototypeCheck --> TestRules
     Prototype -->|No| TestRules
     TestRules --> TestRun --> Replay
-    Replay -->|Yes| ReplayImpl --> Docs
-    Replay -->|No| Docs
+    Replay --> ReplayImpl --> Docs
     Docs --> Integrate --> Done
 ```
 
@@ -55,7 +54,7 @@ flowchart TD
 6. **Expose metadata and register the game.** Implement `Game` metadata such as paytable buckets, award labels, basegame/freegame set counts, and max-win multiplier. Add a stable game ID and constructor branch to `GameFactory`; then confirm the existing CLI and GUI can select it. Keep shared framework changes in their existing repository-level packages rather than duplicating them inside the game workspace.
 7. **Create a playable prototype when the game needs visual inspection.** Add a game adapter that converts a normal `GameSession` round into shared display data: stopped and transformed grids, award details, winning positions, feature sequence, and metadata. Reuse the player window for stake/balance, spin, autoplay, and last-round playback; keep presentation out of game math and simulation statistics. Check basegame wins and losses plus a complete randomly triggered feature round. If the game uses a different screen or win presentation, extend the display data only as needed.
 8. **Test rules and integration.** Use controlled random streams for edge cases and trigger paths. Cover wins, losses, feature awards and counts, caps, invalid config, and any set-selection behavior. Add a seeded simulation test that checks accounting and repeatability across worker counts with a fixed partition count. Verify the prototype display matches the underlying typed result.
-9. **Add replay when the game needs it.** Store the decisions needed to recalculate each spin in versioned `ReplayEvent` payloads, implement `replayRound`, and test that replay reproduces basegame, freegame, and total wins. Ensure the prototype can display a found or replayed round where supported. Keep replay optional if the game does not need saved gameplay support.
+9. **Implement replay for book balancing.** Store the decisions needed to recalculate each spin in versioned `ReplayEvent` payloads, implement `replayRound`, and test that replay reproduces basegame, freegame, and total wins. Ensure the prototype can display a found or replayed round where supported. New games must support replay capture and RNG-free reconstruction for the standard harvest/balance workflow. Books remain an optional simulation input until humans populate them.
 10. **Document and verify.** Add a game-specific rules/config note, update `docs/architecture.md`, compile, run relevant tests, and run a small seeded simulation with and without report export. Include prototype coverage and any presentation limitations in the handoff.
 
 ## Existing reference points
@@ -66,3 +65,8 @@ flowchart TD
 - `game/proxy/` is a smaller reference for a probability-based game.
 - `game/GameFactory.java` is where a new game ID is registered.
 - `simulation/engine/SimulationRunner.java` owns generic round iteration, statistics, partitioning, and replay collection. New game-specific rules should not be added there.
+
+
+## Human balance and replay-book handoff
+
+After implementation, the normal sequence is **human balances PAR → regular simulation harvests complete replays → human balances replay weights → book-enabled simulation checks the resulting distribution**. The [gameplay-book workflow](gameplay-books.md) defines `<Mode>-Books`, mode-specific CSV naming, missing-input errors, exact finite-book expectation, preserved statistics and report provenance. New wizard workspaces include an empty Normal book table and `source/books/`; add the other modes when harvested. Replay weighting is a later balance layer and does not establish the original reel game's RTP or preserve mode trigger ratios automatically.

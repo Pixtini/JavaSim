@@ -47,53 +47,58 @@ public final class SavedGameplayCsv {
     }
 
     public static SavedGameplay readById(Path path, long requestedId) throws IOException {
-        SavedGameplayHeader summary = null;
-        List<ReplayEvent> events = new ArrayList<>();
+        return readByIds(path, java.util.Set.of(requestedId)).get(requestedId);
+    }
+
+    /** Loads requested gameplays in a single file pass; unreferenced event payloads are not retained. */
+    public static java.util.Map<Long, SavedGameplay> readByIds(Path path,
+            java.util.Set<Long> requestedIds) throws IOException {
+        java.util.Set<Long> ids = java.util.Set.copyOf(requestedIds);
+        if (ids.isEmpty() || ids.stream().anyMatch(id -> id <= 0))
+            throw new IllegalArgumentException("Requested gameplay IDs must be positive and nonempty");
+        java.util.Map<Long, SavedGameplayHeader> summaries = new java.util.LinkedHashMap<>();
+        java.util.Map<Long, List<ReplayEvent>> events = new java.util.LinkedHashMap<>();
         try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String header = reader.readLine();
             boolean versionOne = HEADER_V1.equals(header);
-            if (!versionOne && !HEADER.equals(header)) {
+            if (!versionOne && !HEADER.equals(header))
                 throw new IOException("Unrecognized saved gameplays CSV header");
-            }
             String expectedVersion = versionOne ? FORMAT_VERSION_V1 : FORMAT_VERSION;
             String line;
             while ((line = reader.readLine()) != null) {
                 List<String> fields = parseRow(line);
-                int expectedFieldCount = versionOne ? 11 : 12;
-                if (fields.size() != expectedFieldCount || !fields.get(0).equals(expectedVersion)) {
+                if (fields.size() != (versionOne ? 11 : 12) || !fields.get(0).equals(expectedVersion))
                     throw new IOException("Invalid saved gameplay CSV row");
-                }
                 long id = parseLong(fields.get(1), "gameplay ID");
-                if (id != requestedId) {
-                    continue;
-                }
+                if (!ids.contains(id)) continue;
                 int shift = versionOne ? 0 : 1;
-                SavedGameplayHeader rowSummary = new SavedGameplayHeader(
-                        fields.get(2), versionOne ? "Normal" : fields.get(3),
+                SavedGameplayHeader summary = new SavedGameplayHeader(fields.get(2),
+                        versionOne ? "Normal" : fields.get(3),
                         parseDouble(fields.get(3 + shift), "stake"),
                         parseDouble(fields.get(4 + shift), "total win"),
                         parseDouble(fields.get(5 + shift), "basegame win"),
                         parseDouble(fields.get(6 + shift), "feature win"));
-                if (summary == null) {
-                    summary = rowSummary;
-                } else if (!summary.equals(rowSummary)) {
-                    throw new IOException("Gameplay summary differs between event rows");
-                }
-                int eventIndex = (int) parseLong(fields.get(7 + shift), "event index");
-                if (eventIndex != events.size()) {
-                    throw new IOException("Saved gameplay event rows are missing or out of order");
-                }
-                events.add(new ReplayEvent(fields.get(8 + shift),
+                SavedGameplayHeader previous = summaries.putIfAbsent(id, summary);
+                if (previous != null && !previous.equals(summary))
+                    throw new IOException("Gameplay " + id + " summary differs between event rows");
+                List<ReplayEvent> sequence = events.computeIfAbsent(id, ignored -> new ArrayList<>());
+                long eventIndex = parseLong(fields.get(7 + shift), "event index");
+                if (eventIndex != sequence.size())
+                    throw new IOException("Saved gameplay " + id + " events are missing or out of order");
+                sequence.add(new ReplayEvent(fields.get(8 + shift),
                         parseDouble(fields.get(9 + shift), "event win"), fields.get(10 + shift)));
             }
+            java.util.Map<Long, SavedGameplay> result = new java.util.LinkedHashMap<>();
+            for (long id : ids) {
+                SavedGameplayHeader summary = summaries.get(id);
+                if (summary == null) throw new IOException("Saved gameplay ID not found: " + id);
+                result.put(id, new SavedGameplay(id, summary.gameId(), summary.gameMode(), summary.stake(),
+                        summary.totalWin(), summary.baseGameWin(), summary.featureGameWin(), events.get(id)));
+            }
+            return java.util.Collections.unmodifiableMap(result);
         } catch (IllegalArgumentException exception) {
-            throw new IOException("Could not parse saved gameplay " + requestedId, exception);
+            throw new IOException("Could not parse saved gameplays: " + exception.getMessage(), exception);
         }
-        if (summary == null) {
-            throw new IOException("Saved gameplay ID not found: " + requestedId);
-        }
-        return new SavedGameplay(requestedId, summary.gameId(), summary.gameMode(), summary.stake(),
-                summary.totalWin(), summary.baseGameWin(), summary.featureGameWin(), events);
     }
 
     private static void writeRow(BufferedWriter writer, List<String> fields) throws IOException {

@@ -126,11 +126,13 @@ Record test file(s): [ ]
 - [ ] Seeded simulation accounting; worker-count reproducibility with a fixed partition count where applicable.
 - [ ] Existing game/framework tests still pass after any shared-component change.
 
-## 8. Replay and optional tooling
+## 8. Replay, gameplay books and optional presentation
 
-- **Saved replay required?** [ ] Yes / [ ] No
-- **If yes, versioned payload and decisions to record:** [ ]
-- [ ] Implement replay recalculation and compare basegame, feature, and total outcomes.
+- **Saved replay/book support:** required for new games; versioned payload and decisions to record: [ ]
+- [ ] Implement RNG-free replay recalculation and compare basegame, feature, event and total outcomes.
+- [ ] Prepare `<Mode>-Books` tables and `source/books/saved_gameplays_<mode>.csv` harvest locations for human replay balancing; see [gameplay books](gameplay-books.md).
+- [ ] Verify weighted book runs use only referenced recorded rounds, preserve all statistics and fail on missing/invalid selected-mode inputs.
+- [ ] Record human book weights, finite-book expectations and matching PAR/CSV provenance separately from reel-based balance.
 - [ ] Add a viewer/player adapter only if the game needs visual inspection or play support.
 - [ ] Add exhaustive reelset support only if the game implements the required interface and its assumptions fit.
 

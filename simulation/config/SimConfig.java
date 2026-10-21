@@ -11,6 +11,10 @@ public class SimConfig {
     public double modeCostMultiplier = 1.0;
     /** Selected game PAR workbook; required by the simulation UI before starting a run. */
     public Path parWorkbookPath;
+    /** Select weighted recorded rounds from the selected mode's Books sheet instead of fresh spins. */
+    public boolean useBooks = false;
+    /** Populated by the runner after successful book preflight; used for report provenance. */
+    public simulation.books.BookRunMetadata bookMetadata;
     public long rounds = 1_000_000;
     public double stake = 1.0;
     public long seed = 5051410756155515478L;

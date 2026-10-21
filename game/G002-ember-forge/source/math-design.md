@@ -4,7 +4,7 @@
 
 ## Inputs and units
 
-[balance-input.json](balance-input.json) contains every strip, payline, payout, mode cost and trigger denominator. Run `python3 game/G002-ember-forge/source/build_par.py` from the repository root to rebuild [PAR.xlsx](PAR.xlsx), with three isolated Config/Reels mode pairs. [GDD.md](GDD.md) defines the fixed eight-spin, maximum-five Heat rule. The writer uses Python's standard library only.
+[balance-input.json](balance-input.json) contains every strip, payline, payout, mode cost and trigger denominator. The numerical baseline can be regenerated with `python3 game/G002-ember-forge/source/build_par.py --output /tmp/G002-baseline.xlsx`, with three isolated Config/Reels mode pairs. The current [PAR.xlsx](PAR.xlsx) now also includes human-balanced Books sheets and is authoritative for book runs; the helper refuses to overwrite an existing Books workbook. The JSON does not contain those human book weights. [GDD.md](GDD.md) defines the fixed eight-spin, maximum-five Heat rule. The writer uses Python's standard library only.
 
 Payouts and the 8,100× cap use base stake. Purchase costs affect the paid exposure denominator, not symbol awards or Heat. Computation retains doubles without per-line currency rounding. The prototype rounds its displayed wallet to cents after debit/settlement; simulation math uses unrounded values.
 
@@ -53,3 +53,8 @@ For a mode's entry probability p, mean round win is `(1−p) E[B] + p F`. RTP di
 These returns are close, not identical. With an unpaid entry set, selecting D near `2(F−E[B])/E[B]` equalizes Normal and EM1 RTPs; integer rounding gives D=139. An integer 47× buy price keeps BB1 close to those returns. This design favors a simple, inspectable rough balance; no prescribed production target or commercial volatility band was supplied.
 
 Machine-readable results: [exact-math.csv](../validation/exact-math.csv). Observed simulations, confidence intervals, hashes, retained reports and limitations: [validation report](../validation/validation-report.md). Changing the strips/paytable invalidates the recorded expectations and requires rebuilding PAR and repeating the audit. This audit is deliberately bounded to small reel products and this Heat law, not a general exact slot solver.
+
+
+## Recorded-book balance added 21 October 2026
+
+The expectations above describe the unrestricted reel game. Current `<Mode>-Books` sheets and `Books/saved_gameplays_<mode>.csv` define a separate finite weighted distribution. See [shared book workflow](../../../docs/gameplay-books.md) and [current book validation](../validation/books-2026-10-21/validation-report.md). Reweighting replay IDs can change RTP and trigger frequencies independently of D; do not use the original reel expectations to validate book-enabled simulations.

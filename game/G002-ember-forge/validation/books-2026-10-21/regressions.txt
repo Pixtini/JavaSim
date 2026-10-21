@@ -1,0 +1,16 @@
+java -Xmx512m -cp build/classes BookSimulationTests
+Passed 127 book simulation assertions.
+java -Xmx512m -cp build/classes SimulationTests
+Passed 88 assertions.
+java -Xmx512m -cp build/classes ReplayTests
+Passed 16 replay assertions.
+java -Xmx512m -cp build/classes toolkit.par.ExcelWorkbookReaderTests
+ExcelWorkbookReader parsed 4 sheets from game/expandingwild/expandingWildPAR.xlsx
+java -Xmx512m -cp build/classes game.ember_forge.tests.EmberForgeGameTests
+Passed 5319 Ember Forge assertions.
+java -Xmx512m -cp build/classes PlayerTests
+Passed 12 player assertions.
+java -Xmx512m -cp build/classes ViewerTests
+Passed 10 viewer assertions.
+java -cp build/classes GameProjectWizardTests
+Passed GameProjectWizard workspace checks.

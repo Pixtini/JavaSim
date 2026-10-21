@@ -46,3 +46,10 @@ flowchart TD
 - Treat sampling variation separately from rule mismatches. Increase run size when the estimate is noisy; investigate systematic differences in config, stake scaling, feature accounting, or random selection.
 
 The workflow describes a review process, not an automated certification feature. Exact full-game analysis is not currently provided for games with random feature mechanics.
+
+
+## Recorded-book balance validation
+
+Use the [book workflow](gameplay-books.md) after normal implementation/config balance and harvest. For a book-enabled run, validate the selected `<Mode>-Books` table and matching mode CSV, reconcile every active recorded round with game-owned replay, then compare sampled output with the finite weighted book expectation. Check base/free/total accounting, mode-paid exposure, set/award/cap data and fixed-partition repeatability just as for normal runs. Confirm the exported report retains its selected book table and source CSV. Missing inputs and stale/malformed replays must prevent execution, never fall back to fresh spins.
+
+Book RTP and trigger probability describe the reweighted finite harvest; they are separate from unrestricted reel-based expectations. In particular, independently reweighted Normal/EM1 books need their own fourfold-trigger check if that product constraint is retained. Document rare outcomes absent from a harvest and any human balance targets still pending.

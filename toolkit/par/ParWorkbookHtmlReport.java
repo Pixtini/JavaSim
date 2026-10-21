@@ -30,7 +30,8 @@ public final class ParWorkbookHtmlReport {
             output.write(escape(selectedSheets.mode()));
             output.write("</p></header><main>");
             for (Map.Entry<String, ExcelWorkbookReader.Sheet> sheetEntry : workbook.sheets().entrySet()) {
-                if (!selectedSheets.sheetNames().contains(sheetEntry.getKey())) {
+                if (!selectedSheets.sheetNames().contains(sheetEntry.getKey())
+                        && !sheetEntry.getKey().trim().equalsIgnoreCase(selectedSheets.mode() + "-Books")) {
                     continue;
                 }
                 ExcelWorkbookReader.Sheet sheet = sheetEntry.getValue();
@@ -41,7 +42,7 @@ public final class ParWorkbookHtmlReport {
                 else writeConfigBlocks(output, sheet);
                 output.write("</section>");
             }
-            output.write("<footer>Values are rendered from the Config and Reels sheets saved with this simulation.</footer></main></body></html>");
+            output.write("<footer>Values are rendered from the selected Config, Reels and optional Books sheets saved with this simulation.</footer></main></body></html>");
         }
     }
 

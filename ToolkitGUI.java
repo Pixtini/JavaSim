@@ -135,6 +135,8 @@ public final class ToolkitGUI extends JFrame {
         JTextField seed = new JTextField("5051410756155515478", 22);
         JCheckBox exportReport = new JCheckBox("Save report files", true);
         JCheckBox showAwards = new JCheckBox("Print award counts");
+        JCheckBox useBooks = new JCheckBox("Use weighted gameplay books");
+        useBooks.setToolTipText("Draw only recorded rounds using this mode's Books sheet and books/saved_gameplays_<mode>.csv. Missing or invalid book inputs prevent the run.");
         JSpinner threads = spinner(Runtime.getRuntime().availableProcessors(), 1,
                 Runtime.getRuntime().availableProcessors() * 4, 1);
         JSpinner partitions = spinner(256, 1, Integer.MAX_VALUE, 64);
@@ -157,6 +159,7 @@ public final class ToolkitGUI extends JFrame {
         JPanel options = new JPanel();
         options.add(exportReport);
         options.add(showAwards);
+        options.add(useBooks);
         addRow(panel, 9, "Options", options);
 
         JButton run = runButton("Run simulation", panel);
@@ -181,6 +184,7 @@ public final class ToolkitGUI extends JFrame {
                 config.maxSavedGameplays = ((Number) saved.getValue()).intValue();
                 config.exportReport = exportReport.isSelected();
                 config.showAwards = showAwards.isSelected();
+                config.useBooks = useBooks.isSelected();
                 runTask("Simulation", output -> {
                     PrintStream previousError = System.err;
                     try {

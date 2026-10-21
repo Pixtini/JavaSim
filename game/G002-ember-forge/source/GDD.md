@@ -61,3 +61,7 @@ No Basegame on the entry set can win, so BB1 cannot consume the cap before its p
 ## Package
 
 [Research rationale](research-rationale.md) · [Flow](flowchart.md) · [Edge cases](edge-cases.md) · [Math/config](math-design.md) · [Scope review](scope-review.md) · [Creation form](game-creation-form.md).
+
+## SIM-BOOKS-01 — Recorded-outcome simulation, added 21 October 2026
+
+The Simulation tool can select a separate recorded-book outcome source. It samples complete recorded rounds using `<Mode>-Books` weights and the matching mode CSV, instead of executing fresh BG/FG random selection. Recorded outcomes are reconstructed under the deterministic rules above; base stake still scales payouts and the cap, while purchase cost affects exposure. The original M-01 trigger probabilities describe fresh reel simulation. Independently reweighted books have their own return/trigger expectations and do not automatically retain the fourfold EM1 relationship. [Book workflow](../../../docs/gameplay-books.md) and [book validation](../validation/books-2026-10-21/validation-report.md) specify this simulation/config layer.

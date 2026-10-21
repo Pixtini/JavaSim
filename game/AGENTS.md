@@ -263,6 +263,14 @@ For a PAR-backed simulation, select one mode before the run starts. Every round 
 
 
 
+## Recorded gameplay books
+
+New games must support complete versioned replay capture and RNG-free `replayRound` reconstruction so humans can harvest and balance gameplay books. The shared runner owns weighted book selection; do not implement book sampling or book statistics inside a game.
+
+Use `<Mode>-Books` sheets with `Gameplay ID` and `Weight` headers in A1:B1 and `source/books/saved_gameplays_<mode>.csv` inputs. Weights are nonnegative integers, zero disables a row, and repeated IDs add their weights. Book simulation is opt-in per run and must fail before workers start if its selected mode's sheet, CSV or active referenced gameplay is missing or invalid. Regular simulations remain available without configured books. Preserve human-balanced Books sheets and harvests when updating or generating PARs. See [the shared workflow](../docs/gameplay-books.md) for scaling, validation, provenance and reporting.
+
+---
+
 ## Configuration
 
 Game mathematical values belong in the game's configuration rather than being hard-coded.

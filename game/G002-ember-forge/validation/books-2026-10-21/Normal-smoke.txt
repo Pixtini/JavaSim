@@ -1,0 +1,78 @@
+TotalGame
+--------
+Rounds: 2000
+Spins: 3104
+Total staked: £2000.0
+Total winnings: £6636.7
+
+Simulated RTP: 331.8350%
+Basegame RTP: 58.4525%
+Freegame RTP: 273.3825%
+
+Hit Rate (1 in): 2.18
+
+FG Triggers: 138
+Freegame Freq (1 in): 14.49
+Freegame Avg Win: £39.62
+
+Max Win: 8100.00× round stake (£8100.0)
+Wincaps: 0
+Max Win Freq (1 in): N/A
+Standard Deviation: 21.39
+Base SD: 1.92
+Free SD: 71.85
+
+Basegame
+--------
+Rounds: 2000
+Total winnings: £1169.1
+Simulated RTP: 58.4525%
+Hits: 917
+Standard Deviation: 1.92
+
+Basegame Set 0
+--------
+Rounds: 1862
+Total winnings: £1169.1
+Simulated RTP: 62.7846%
+Hits: 917
+
+Basegame Set 1
+--------
+Rounds: 138
+Total winnings: £0.0
+Simulated RTP: 0.0000%
+Hits: 0
+
+Freegame
+--------
+Rounds: 1104
+Total winnings: £5467.7
+Simulated RTP: 273.3825%
+Hits: 396
+Standard Deviation: 71.85
+
+Freegame Set 0
+--------
+Rounds: 1104
+Total winnings: £5467.7
+Simulated RTP: 273.3825%
+Hits: 396
+
+Detailed report written to: game/G002-ember-forge/validation/runs/Normal-book-smoke/simulation-2026-10-21_12-20-17
+Game: G002-ember-forge
+Mode: Normal
+Mode cost multiplier: 1.0× base stake
+PAR workbook: /Users/connorkelly/Documents/JavaSim/game/G002-ember-forge/source/PAR.xlsx
+Logical partitions: 16
+Use gameplay books: true
+Book sheet: Normal-Books
+Book CSV: /Users/connorkelly/Documents/JavaSim/game/G002-ember-forge/source/Books/saved_gameplays_normal.csv
+Book rows / active gameplays: 1064 / 1000
+Book total weight: 10640
+Expected book RTP: 364.219925%
+Expected book trigger probability: 0.06766917
+Source PAR SHA-256: f5b694a82bca5d41c60ba69980e61a42dd198e86bfb8dc258c1cfa41884bd2a9
+Source book CSV SHA-256: 5965570202b4b601396aa32538227fe48a5491c940da675320380a2400850f94
+Seed: 440055
+Time Taken: 0.070 seconds

@@ -43,3 +43,10 @@ java -Xmx512m -cp build/classes game.ember_forge.tests.EmberForgePrototypeCheck
 ```
 
 Source code is under `src/main/java/game/ember_forge/`, focused checks under `src/test/java/game/ember_forge/tests/`. The complete game uses the existing engine, statistics and GMF math unchanged. Prototype implementation and validation are complete; human appeal/comprehension review and production math approval remain pending.
+
+
+## Weighted recorded-gameplay balancing
+
+The Simulation window now has **Use weighted gameplay books**. For each selected mode it reads the matching `<Mode>-Books` sheet in the current PAR and `source/Books/saved_gameplays_<mode>.csv`. It samples only those recorded complete rounds, preserving normal statistics. Missing or invalid book inputs block the run. Repeated IDs add weights and zero weights disable rows.
+
+[Book workflow](../../docs/gameplay-books.md) · [Book validation](validation/books-2026-10-21/validation-report.md). The RTP figures earlier in this README describe the original reel game, not the reweighted books. Keep the human-edited PAR and harvest files intact: `build_par.py` now refuses to overwrite a workbook containing Books sheets. Use `--output /tmp/G002-baseline.xlsx` when regenerating the original numerical baseline for comparison.

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Rebuild G002's six-sheet rough-balance PAR using only Python's standard library."""
 import json
+import argparse
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from xml.sax.saxutils import escape
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -29,6 +31,14 @@ def sheet_xml(rows):
     return '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' + "".join(cells) + '</sheetData></worksheet>'
 
 def build(data, output):
+    output = Path(output)
+    if output.exists():
+        with ZipFile(output) as existing:
+            root = ET.fromstring(existing.read("xl/workbook.xml"))
+            sheets = root.findall("{*}sheets/{*}sheet")
+            if any(sheet.attrib.get("name", "").strip().lower().endswith("-books") for sheet in sheets):
+                raise ValueError("PAR contains human-balanced Books sheets; refusing to overwrite. "
+                                 "Edit the workbook directly or generate to a separate output path.")
     names = ["COAL", "COPPER", "IRON", "SILVER", "GOLD", "EMBER", "WILD", "SCATTER"]
     sheets = []
     for mode, cost in data["costs"].items():
@@ -73,5 +83,12 @@ def build(data, output):
             z.writestr(f"xl/worksheets/sheet{i}.xml", sheet_xml(rows))
 
 if __name__ == "__main__":
-    build(json.loads((ROOT / "balance-input.json").read_text()), ROOT / "PAR.xlsx")
-    print("Rebuilt G002 PAR.xlsx from balance-input.json")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=ROOT / "PAR.xlsx",
+                        help="Baseline workbook destination; existing Books workbooks are protected")
+    args = parser.parse_args()
+    try:
+        build(json.loads((ROOT / "balance-input.json").read_text()), args.output)
+    except ValueError as error:
+        parser.error(str(error))
+    print(f"Rebuilt {args.output} from balance-input.json")
